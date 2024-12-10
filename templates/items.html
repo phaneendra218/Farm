@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Items List</title>
+    <title>Items</title>
 </head>
 <body>
-    <h2>Items for Sale</h2>
+    <h1>Available Items</h1>
     <ul>
         {% for item in items %}
-        <li>{{ item.name }} - ${{ item.price }} 
-            <a href="{{ url_for('order', item_id=item.id) }}">Order</a>
-        </li>
+            <li>
+                <p>{{ item.name }} - ${{ item.price }}</p>
+                <a href="{{ url_for('order', item_id=item.id) }}">Order</a>
+            </li>
         {% endfor %}
     </ul>
-    <a href="{{ url_for('logout') }}">Logout</a>
 </body>
 </html>
