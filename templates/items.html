@@ -10,7 +10,7 @@
     <ul>
         {% for item in items %}
             <li>
-                <p>{{ item.name }} - ${{ item.price }}</p>
+                <p>{{ item.name }} - ₹{{ item.price }}</p>
                 <a href="{{ url_for('order', item_id=item.id) }}">Order</a>
             </li>
         {% endfor %}

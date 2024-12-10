@@ -1,13 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template
+from items import items  # Importing items from the items module
 
 app = Flask(__name__)
-
-# Sample items list
-items = [
-    {"id": 1, "name": "Tomato", "price": 2.5},
-    {"id": 2, "name": "Potato", "price": 1.2},
-    {"id": 3, "name": "Carrot", "price": 3.0}
-]
 
 @app.route("/")
 def home():
