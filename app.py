@@ -16,24 +16,19 @@ def get_db_connection():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        hashed_password = generate_password_hash(password)
+        # Handle signup logic here
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-        try:
-            with get_db_connection() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(
-                        "INSERT INTO users (username, password) VALUES (%s, %s)",
-                        (username, hashed_password)
-                    )
-                    conn.commit()
-            flash("Registration successful! Please login.", "success")
+        # Save the user to the database (example code here assumes SQLAlchemy)
+        if username and password:
+            hashed_password = generate_password_hash(password)
+            user = User(username=username, password=hashed_password)
+            db.session.add(user)
+            db.session.commit()
             return redirect(url_for("login"))
-        except psycopg2.IntegrityError:
-            flash("Username already exists. Try a different one.", "error")
-        except Exception as e:
-            flash(f"An error occurred: {e}", "error")
+        else:
+            return "Missing username or password", 400
 
     return render_template("signup.html")
 
