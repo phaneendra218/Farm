@@ -3,4 +3,25 @@
 {% block content %}
 <h2>Welcome to FreshlyFruited Farms</h2>
 <p>Your one-stop solution for all farming needs. Explore our platform to order fresh produce, manage your items, and much more!</p>
+
+<h3>Available Items</h3>
+<!-- Display all items with price and order now button -->
+{% if items %}
+    <ul>
+        {% for item in items %}
+        <li>
+            <strong>{{ item.name }}</strong> - ₹{{ item.price }}
+            
+            <!-- Order Now Button -->
+            <form method="POST" action="{{ url_for('order_now', item_id=item.id) }}" style="display:inline;">
+                <label>Quantity:</label>
+                <input type="number" name="quantity" min="1" required>
+                <button type="submit">Order Now</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No items available at the moment.</p>
+{% endif %}
 {% endblock %}

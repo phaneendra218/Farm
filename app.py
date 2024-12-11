@@ -32,7 +32,8 @@ class Order(db.Model):
 # Routes
 @app.route('/')
 def home():
-    return render_template('home.html')
+    items = Item.query.all()  # Fetch all items
+    return render_template('home.html', items=items)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -100,6 +101,22 @@ def add_item():
         flash('Item added successfully!', 'success')
         return redirect(url_for('items'))
     return render_template('add_item.html')
+
+@app.route('/order_now/<int:item_id>', methods=['POST'])
+def order_now(item_id):
+    if 'user_id' not in session:
+        flash('Please log in to place an order.', 'warning')
+        return redirect(url_for('login'))
+    
+    item = Item.query.get_or_404(item_id)
+    quantity = request.form['quantity']
+    
+    order = Order(user_id=session['user_id'], item_id=item.id, quantity=int(quantity))
+    db.session.add(order)
+    db.session.commit()
+    
+    flash(f'Order for {item.name} placed successfully!', 'success')
+    return redirect(url_for('home'))
 
 @app.route('/contact')
 def contact():
