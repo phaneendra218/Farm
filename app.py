@@ -1,9 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import os
-import random
-import string
-from models import db, User  # Import db and User model from models.py
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -12,32 +9,13 @@ app.secret_key = os.urandom(24)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://farmpsql_user:ilFpRrHEzsedKGwtrOtweM0ToOV6YmIW@dpg-ctc8ap5ds78s73flqmpg-a.oregon-postgres.render.com/farmpsql'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.init_app(app)
+db = SQLAlchemy(app)
 
-# Function to create a random password
-def generate_random_password():
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=12))
-
-# Create a default admin user if it doesn't exist
-def create_default_admin():
-    admin = User.query.filter_by(username='admin').first()
-    if not admin:
-        admin = User(username='admin', password=generate_random_password(), reset_required=True)
-        db.session.add(admin)
-        db.session.commit()
-
-@app.before_first_request
-def before_first_request():
-    db.create_all()  # Create database tables
-    create_default_admin()  # Ensure the default admin user is created
-
-# Models (adjusted)
+# Models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)  # Track if the user is an admin
-    reset_required = db.Column(db.Boolean, default=False)  # New field to indicate if password needs reset
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,7 +29,6 @@ class Order(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
 
 # Routes
-
 @app.route('/')
 def home():
     return render_template('base.html')
@@ -64,8 +41,7 @@ def signup():
         if User.query.filter_by(username=username).first():
             flash('Username already exists', 'danger')
         else:
-            is_admin = User.query.count() == 0  # First user will be admin
-            user = User(username=username, password=password, is_admin=is_admin)
+            user = User(username=username, password=password)
             db.session.add(user)
             db.session.commit()
             flash('Signup successful!', 'success')
@@ -80,25 +56,10 @@ def login():
         user = User.query.filter_by(username=username, password=password).first()
         if user:
             session['user_id'] = user.id
-            if user.reset_required:
-                flash('Please reset your password on first login.', 'info')
-                return redirect(url_for('reset_password', user_id=user.id))  # Redirect to reset page
             return redirect(url_for('items'))
         else:
             flash('Invalid credentials', 'danger')
     return render_template('login.html')
-
-@app.route('/reset_password/<int:user_id>', methods=['GET', 'POST'])
-def reset_password(user_id):
-    user = User.query.get_or_404(user_id)
-    if request.method == 'POST':
-        new_password = request.form['new_password']
-        user.password = new_password
-        user.reset_required = False  # Set reset_required to False after password reset
-        db.session.commit()
-        flash('Password has been reset successfully.', 'success')
-        return redirect(url_for('login'))  # Redirect to login page after password reset
-    return render_template('reset_password.html', user=user)
 
 @app.route('/items', methods=['GET', 'POST'])
 def items():
@@ -116,15 +77,6 @@ def items():
 
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-
-    # Check if the user is an admin
-    user = User.query.get(session['user_id'])
-    if not user.is_admin:
-        flash('You are not authorized to access this page.', 'danger')
-        return redirect(url_for('items'))  # Redirect to items page if not admin
-
     if request.method == 'POST':
         name = request.form['name']
         price = request.form['price']
