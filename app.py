@@ -57,6 +57,7 @@ def login():
         user = User.query.filter_by(username=username, password=password).first()
         if user:
             session['user_id'] = user.id
+            session['username'] = user.username  # Store username in session
             session['is_admin'] = user.is_admin  # Store admin status in session
             return redirect(url_for('items'))
         else:

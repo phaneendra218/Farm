@@ -63,6 +63,16 @@
             background-color: #fff3cd;
             color: #856404;
         }
+        /* New CSS for the welcome message and logout button */
+        .user-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            text-align: right;
+        }
+        .user-info button {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -80,6 +90,13 @@
             {% endif %}
         </nav>
     </header>
+
+    {% if 'user_id' in session %}
+    <div class="user-info">
+        <p>Welcome to {{ session['username'] }}</p>
+        <a href="/logout"><button>Logout</button></a>
+    </div>
+    {% endif %}
 
     <div class="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
