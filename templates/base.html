@@ -16,6 +16,7 @@
             padding: 10px 0;
             color: white;
             text-align: center;
+            position: relative;
         }
         nav a {
             margin: 0 15px;
@@ -72,10 +73,21 @@
         .user-info button {
             margin-top: 10px;
         }
+        /* Logo styling */
+        .logo {
+            position: absolute;
+            left: 20px;
+            top: 10px;
+            height: 50px;
+        }
     </style>
 </head>
 <body>
     <header>
+        <!-- Logo added here -->
+        <a href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Farming Logo" class="logo">
+        </a>
         <h1>Farming Web Application</h1>
         <nav>
             <a href="/">Home</a>
