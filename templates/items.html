@@ -1,16 +1,25 @@
 {% extends "base.html" %}
+
 {% block content %}
 <h2>Items</h2>
-<ul>
-    {% for item in items %}
-    <li>{{ item.name }} - ${{ item.price }}
-        <form method="POST">
-            <input type="hidden" name="item_id" value="{{ item.id }}">
-            <label>Quantity:</label>
-            <input type="number" name="quantity" min="1" required>
-            <button type="submit">Order</button>
-        </form>
-    </li>
-    {% endfor %}
-</ul>
+
+<!-- Check if there are any items to display -->
+{% if items %}
+    <ul>
+        {% for item in items %}
+        <li>
+            <strong>{{ item.name }}</strong> - ${{ item.price }}
+            <form method="POST">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <label>Quantity:</label>
+                <input type="number" name="quantity" min="1" required>
+                <button type="submit">Order</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No items available at the moment.</p>
+{% endif %}
+
 {% endblock %}
