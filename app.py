@@ -69,20 +69,13 @@ def items():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     items = Item.query.all()
-    if request.method == 'POST':
-        item_id = request.form['item_id']
-        quantity = int(request.form['quantity'])
-        order = Order(user_id=session['user_id'], item_id=item_id, quantity=quantity)
-        db.session.add(order)
-        db.session.commit()
-        flash('Order placed successfully!', 'success')
     return render_template('items.html', items=items, is_admin=session.get('is_admin', False))
 
 @app.route('/delete_item/<int:item_id>', methods=['POST'])
 def delete_item(item_id):
     if 'user_id' not in session or not session.get('is_admin'):
         flash('Unauthorized access', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('items'))  # Redirect to items page instead of login
     item = Item.query.get_or_404(item_id)
     try:
         db.session.delete(item)
@@ -97,7 +90,7 @@ def delete_item(item_id):
 def add_item():
     if 'user_id' not in session or not session.get('is_admin'):
         flash('Unauthorized access', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('items'))  # Redirect to items page instead of login
     if request.method == 'POST':
         name = request.form['name']
         price = request.form['price']

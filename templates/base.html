@@ -82,8 +82,10 @@
             <a href="/">Home</a>
             {% if 'user_id' in session %}
                 <a href="/items">Items</a>
-                <a href="/add_item">Add Item</a>
-                <!-- Removed Logout from the top navigation -->
+                {% if session['role'] == 'admin' %}
+                    <a href="/add_item">Add Item</a>
+                    <a href="/delete_item">Delete Item</a>
+                {% endif %}
             {% else %}
                 <a href="/signup">Signup</a>
                 <a href="/login">Login</a>
@@ -93,7 +95,7 @@
 
     {% if 'user_id' in session %}
     <div class="user-info">
-        <p>Welcome to {{ session['username'] }}</p>
+        <p>Welcome, {{ session['username'] }}</p>
         <a href="/logout"><button>Logout</button></a>
     </div>
     {% endif %}
