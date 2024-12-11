@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-# import os
+import os
 
 app = Flask(__name__)
-# app.secret_key = os.urandom(24)
+app.secret_key = os.urandom(24)
 
 # Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://farmpsql_user:ilFpRrHEzsedKGwtrOtweM0ToOV6YmIW@dpg-ctc8ap5ds78s73flqmpg-a.oregon-postgres.render.com/farmpsql'

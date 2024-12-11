@@ -4,18 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farming Web Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #4CAF50;
+            padding: 10px 0;
+            color: white;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            padding: 20px;
+        }
+        footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .flash-messages {
+            margin: 10px 0;
+        }
+        .flash-messages ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .flash-messages li {
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            margin-bottom: 10px;
+        }
+        .flash-messages li.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-messages li.info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .flash-messages li.warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
 </head>
 <body>
     <header>
+        <h1>Farming Web Application</h1>
         <nav>
             <a href="/">Home</a>
             <a href="/signup">Signup</a>
             <a href="/login">Login</a>
+            {% if 'user_id' in session %}
+                <a href="/logout">Logout</a>
+            {% endif %}
         </nav>
     </header>
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <main>
         {% block content %}
         {% endblock %}
     </main>
+
+    <footer>
+        <p>&copy; 2024 Farming Web Application</p>
+    </footer>
 </body>
 </html>
