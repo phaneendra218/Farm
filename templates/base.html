@@ -4,121 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farming Web Application</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        header {
-            background-color: #4CAF50;
-            padding: 10px 0;
-            color: white;
-            text-align: center;
-        }
-        nav a {
-            margin: 0 15px;
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        main {
-            padding: 20px;
-        }
-        footer {
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
-        .flash-messages {
-            margin: 10px 0;
-        }
-        .flash-messages ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .flash-messages li {
-            padding: 10px;
-            background-color: #f8d7da;
-            color: #721c24;
-            margin-bottom: 10px;
-        }
-        .flash-messages li.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .flash-messages li.info {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-        .flash-messages li.warning {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        /* New CSS for the welcome message and logout button */
-        .user-info {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            text-align: right;
-        }
-        .user-info button {
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <h1>Farming Web Application</h1>
-        <nav>
-            <a href="/">Home</a>
-            {% if 'user_id' in session %}
-                <a href="/items">Items</a>
-                {% if session['role'] == 'admin' %}
-                    <a href="/add_item">Add Item</a>
-                    <a href="/delete_item">Delete Item</a>
-                {% endif %}
-            {% else %}
-                <a href="/signup">Signup</a>
-                <a href="/login">Login</a>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('items') }}">Items</a></li>
+            {% if session.get('is_admin') %}
+                <li><a href="{{ url_for('add_item') }}">Add Item</a></li>
             {% endif %}
-        </nav>
-    </header>
+            <li><a href="{{ url_for('contact') }}">Contact</a></li>
+            {% if session.get('user_id') %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 
-    {% if 'user_id' in session %}
-    <div class="user-info">
-        <p>Welcome, {{ session['username'] }}</p>
-        <a href="/logout"><button>Logout</button></a>
-    </div>
-    {% endif %}
-
-    <div class="flash-messages">
+    <div class="content">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <ul>
+                <ul class="flashes">
                     {% for category, message in messages %}
-                        <li class="{{ category }}">{{ message }}</li>
+                        <li class="flash {{ category }}">{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
         {% endwith %}
-    </div>
 
-    <main>
         {% block content %}
         {% endblock %}
-    </main>
-
-    <footer>
-        <p>&copy; 2024 Farming Web Application</p>
-    </footer>
+    </div>
 </body>
 </html>
