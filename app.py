@@ -32,7 +32,8 @@ class Order(db.Model):
 # Routes
 @app.route('/')
 def home():
-    return render_template('home.html')
+    items = Item.query.all()
+    return render_template('home.html', items=items)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -59,7 +60,8 @@ def login():
             session['user_id'] = user.id
             session['username'] = user.username  # Store username in session
             session['is_admin'] = user.is_admin  # Store admin status in session
-            return redirect(url_for('items'))
+            next_page = session.pop('next', url_for('items'))
+            return redirect(next_page)
         else:
             flash('Invalid credentials', 'danger')
     return render_template('login.html')
@@ -71,35 +73,14 @@ def items():
     items = Item.query.all()
     return render_template('items.html', items=items, is_admin=session.get('is_admin', False))
 
-@app.route('/delete_item/<int:item_id>', methods=['POST'])
-def delete_item(item_id):
-    if 'user_id' not in session or not session.get('is_admin'):
-        flash('Unauthorized access', 'danger')
-        return redirect(url_for('items'))  # Redirect to items page instead of login
-    item = Item.query.get_or_404(item_id)
-    try:
-        db.session.delete(item)
-        db.session.commit()
-        flash('Item deleted successfully!', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error deleting item: {str(e)}', 'danger')
+@app.route('/order_now/<int:item_id>', methods=['POST'])
+def order_now(item_id):
+    if 'user_id' not in session:
+        session['next'] = url_for('items')
+        flash('Please log in to place an order.', 'info')
+        return redirect(url_for('login'))
+    # Add logic for placing an order after login (if required)
     return redirect(url_for('items'))
-
-@app.route('/add_item', methods=['GET', 'POST'])
-def add_item():
-    if 'user_id' not in session or not session.get('is_admin'):
-        flash('Unauthorized access', 'danger')
-        return redirect(url_for('items'))  # Redirect to items page instead of login
-    if request.method == 'POST':
-        name = request.form['name']
-        price = request.form['price']
-        new_item = Item(name=name, price=float(price))
-        db.session.add(new_item)
-        db.session.commit()
-        flash('Item added successfully!', 'success')
-        return redirect(url_for('items'))
-    return render_template('add_item.html')
 
 @app.route('/contact')
 def contact():
