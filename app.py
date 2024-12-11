@@ -32,8 +32,7 @@ class Order(db.Model):
 # Routes
 @app.route('/')
 def home():
-    items = Item.query.all()  # Fetch all items
-    return render_template('home.html', items=items)
+    return render_template('home.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -101,36 +100,6 @@ def add_item():
         flash('Item added successfully!', 'success')
         return redirect(url_for('items'))
     return render_template('add_item.html')
-
-@app.route('/order_now/<int:item_id>', methods=['POST'])
-def order_now(item_id):
-    if 'user_id' not in session:
-        flash('Please log in to place an order.', 'warning')
-        return redirect(url_for('login'))
-
-    # Retrieve the item being ordered
-    item = Item.query.get_or_404(item_id)
-    
-    # Get the quantity from the form
-    quantity = request.form.get('quantity')
-    
-    # Validate that the quantity is provided and is a positive integer
-    try:
-        quantity = int(quantity)
-        if quantity < 1:
-            raise ValueError("Quantity must be greater than 0.")
-    except (ValueError, TypeError):
-        flash("Invalid quantity. Please enter a valid number greater than 0.", 'danger')
-        return redirect(url_for('items'))  # Redirect back to items page in case of invalid input
-
-    # Create a new order entry in the database
-    order = Order(user_id=session['user_id'], item_id=item.id, quantity=quantity)
-    db.session.add(order)
-    db.session.commit()
-
-    # Notify the user of successful order placement
-    flash(f'Order for {item.name} (Quantity: {quantity}) placed successfully!', 'success')
-    return redirect(url_for('home'))
 
 @app.route('/contact')
 def contact():
