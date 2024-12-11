@@ -11,8 +11,12 @@
     <h3>Available Items:</h3>
     <ul>
         {% for item in items %}
-            <li>{{ item.name }} - ${{ item.price }}
+            <li>{{ item.name }} - ₹{{ item.price }}
                 <form action="{{ url_for('order_now', item_id=item.id) }}" method="POST">
+                    {% if 'user_id' in session %}
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity" min="1" required>
+                    {% endif %}
                     <button type="submit">Order Now</button>
                 </form>
             </li>

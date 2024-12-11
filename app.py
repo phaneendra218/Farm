@@ -69,7 +69,6 @@ def login():
 def items():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
     items = Item.query.all()
     return render_template('items.html', items=items, is_admin=session.get('is_admin', False))
 
@@ -108,15 +107,29 @@ def order_now(item_id):
     if 'user_id' not in session:
         flash('Please log in to place an order.', 'warning')
         return redirect(url_for('login'))
-    
+
+    # Retrieve the item being ordered
     item = Item.query.get_or_404(item_id)
-    quantity = request.form['quantity']
     
-    order = Order(user_id=session['user_id'], item_id=item.id, quantity=int(quantity))
+    # Get the quantity from the form
+    quantity = request.form.get('quantity')
+    
+    # Validate that the quantity is provided and is a positive integer
+    try:
+        quantity = int(quantity)
+        if quantity < 1:
+            raise ValueError("Quantity must be greater than 0.")
+    except (ValueError, TypeError):
+        flash("Invalid quantity. Please enter a valid number greater than 0.", 'danger')
+        return redirect(url_for('items'))  # Redirect back to items page in case of invalid input
+
+    # Create a new order entry in the database
+    order = Order(user_id=session['user_id'], item_id=item.id, quantity=quantity)
     db.session.add(order)
     db.session.commit()
-    
-    flash(f'Order for {item.name} placed successfully!', 'success')
+
+    # Notify the user of successful order placement
+    flash(f'Order for {item.name} (Quantity: {quantity}) placed successfully!', 'success')
     return redirect(url_for('home'))
 
 @app.route('/contact')
