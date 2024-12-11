@@ -8,13 +8,18 @@
 </head>
 <body>
     <nav>
-        <ul>
+        <ul class="nav-list">
             <li><a href="{{ url_for('home') }}">Home</a></li>
             <li><a href="{{ url_for('items') }}">Items</a></li>
+            
+            <!-- Add Item link only visible to admin users -->
             {% if session.get('is_admin') %}
                 <li><a href="{{ url_for('add_item') }}">Add Item</a></li>
             {% endif %}
+            
             <li><a href="{{ url_for('contact') }}">Contact</a></li>
+            
+            <!-- Show Logout if user is logged in, else show Login -->
             {% if session.get('user_id') %}
                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
             {% else %}
