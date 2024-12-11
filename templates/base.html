@@ -70,12 +70,13 @@
         <h1>Farming Web Application</h1>
         <nav>
             <a href="/">Home</a>
-            <a href="/signup">Signup</a>
-            <a href="/login">Login</a>
-            <a href="/items">Items</a>
-            <a href="/add_item">Add Item</a> <!-- New link to Add Item page -->
             {% if 'user_id' in session %}
+                <a href="/items">Items</a>
+                <a href="/add_item">Add Item</a>
                 <a href="/logout">Logout</a>
+            {% else %}
+                <a href="/signup">Signup</a>
+                <a href="/login">Login</a>
             {% endif %}
         </nav>
     </header>
