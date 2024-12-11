@@ -1,72 +1,89 @@
+from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "2f61d8dd0a2c18bd0ccec4f4727e6012")  # Replace with a strong secret key
+app.secret_key = os.urandom(24)
 
-# Database connection settings from Render environment variables
-DB_URL = os.environ.get("DATABASE_URL")  # This should be set in Render
+# Database Configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://farmpsql_user:ilFpRrHEzsedKGwtrOtweM0ToOV6YmIW@dpg-ctc8ap5ds78s73flqmpg-a.oregon-postgres.render.com/farmpsql'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-def get_db_connection():
-    return psycopg2.connect(DB_URL, sslmode='require', cursor_factory=RealDictCursor)
+db = SQLAlchemy(app)
 
-@app.route("/signup", methods=["GET", "POST"])
+# Models
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(80), nullable=False)
+
+class Item(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+
+# Routes
+@app.route('/')
+def home():
+    return render_template('base.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if request.method == "POST":
-        # Handle signup logic here
-        username = request.form.get("username")
-        password = request.form.get("password")
-
-        # Save the user to the database (example code here assumes SQLAlchemy)
-        if username and password:
-            hashed_password = generate_password_hash(password)
-            user = User(username=username, password=hashed_password)
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists', 'danger')
+        else:
+            user = User(username=username, password=password)
             db.session.add(user)
             db.session.commit()
-            return redirect(url_for("login"))
-        else:
-            return "Missing username or password", 400
+            flash('Signup successful!', 'success')
+            return redirect(url_for('login'))
+    return render_template('signup.html')
 
-    return render_template("signup.html")
-
-@app.route("/login", methods=["GET", "POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username, password=password).first()
+        if user:
+            session['user_id'] = user.id
+            return redirect(url_for('items'))
+        else:
+            flash('Invalid credentials', 'danger')
+    return render_template('login.html')
 
-        try:
-            with get_db_connection() as conn:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT * FROM users WHERE username = %s", (username,))
-                    user = cur.fetchone()
-                    
-                    if user and check_password_hash(user["password"], password):
-                        session["user_id"] = user["id"]
-                        session["username"] = user["username"]
-                        flash("Login successful!", "success")
-                        return redirect(url_for("home"))
-                    else:
-                        flash("Invalid username or password.", "error")
-        except Exception as e:
-            flash(f"An error occurred: {e}", "error")
+@app.route('/items', methods=['GET', 'POST'])
+def items():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    items = Item.query.all()
+    if request.method == 'POST':
+        item_id = request.form['item_id']
+        quantity = int(request.form['quantity'])
+        order = Order(user_id=session['user_id'], item_id=item_id, quantity=quantity)
+        db.session.add(order)
+        db.session.commit()
+        flash('Order placed successfully!', 'success')
+    return render_template('items.html', items=items)
 
-    return render_template("login.html")
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
 
-@app.route("/logout")
+@app.route('/logout')
 def logout():
     session.clear()
-    flash("You have been logged out.", "info")
-    return redirect(url_for("login"))
+    return redirect(url_for('login'))
 
-@app.route("/")
-def home():
-    if "user_id" not in session:
-        return redirect(url_for("login"))
-    return render_template("items.html", items=[])
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+if __name__ == '__main__':
+    db.create_all()
+    app.run(debug=True)

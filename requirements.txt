@@ -1,4 +1,3 @@
-Flask==2.3.2
-gunicorn==20.1.0
-psycopg2-binary
-werkzeug
+Flask
+Flask-SQLAlchemy
+psycopg2
