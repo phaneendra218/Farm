@@ -16,6 +16,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)  # New field to track admin users
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,7 +42,9 @@ def signup():
         if User.query.filter_by(username=username).first():
             flash('Username already exists', 'danger')
         else:
-            user = User(username=username, password=password)
+            # If it's the first user, make them an admin
+            is_admin = User.query.count() == 0  # First user will be admin
+            user = User(username=username, password=password, is_admin=is_admin)
             db.session.add(user)
             db.session.commit()
             flash('Signup successful!', 'success')
@@ -77,6 +80,15 @@ def items():
 
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    # Check if the user is an admin
+    user = User.query.get(session['user_id'])
+    if not user.is_admin:
+        flash('You are not authorized to access this page.', 'danger')
+        return redirect(url_for('items'))  # Redirect to items page if not admin
+
     if request.method == 'POST':
         name = request.form['name']
         price = request.form['price']
