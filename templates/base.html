@@ -63,7 +63,6 @@
             background-color: #fff3cd;
             color: #856404;
         }
-        /* New CSS for the welcome message and logout button */
         .user-info {
             position: absolute;
             top: 10px;
@@ -82,16 +81,14 @@
             <a href="/">Home</a>
             {% if 'user_id' in session %}
                 <a href="/items">Items</a>
-                
-                <!-- Add Item link only visible to admin users -->
                 {% if session.get('is_admin') %}
                     <a href="/add_item">Add Item</a>
                 {% endif %}
-                
-                <!-- Removed Logout from the top navigation -->
+                <a href="/contact">Contact Us</a>
             {% else %}
                 <a href="/signup">Signup</a>
                 <a href="/login">Login</a>
+                <a href="/contact">Contact Us</a>
             {% endif %}
         </nav>
     </header>
