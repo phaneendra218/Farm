@@ -75,6 +75,24 @@ def items():
         flash('Order placed successfully!', 'success')
     return render_template('items.html', items=items)
 
+@app.route('/add_item', methods=['GET', 'POST'])
+def add_item():
+    if request.method == 'POST':
+        name = request.form['name']
+        price = request.form['price']
+        
+        # Create a new Item object
+        new_item = Item(name=name, price=float(price))
+        
+        # Add the new item to the session and commit to the database
+        db.session.add(new_item)
+        db.session.commit()
+        
+        flash('Item added successfully!', 'success')
+        return redirect(url_for('items'))  # Redirect to the items page after adding
+
+    return render_template('add_item.html')  # Display the form when GET request
+
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
