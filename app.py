@@ -75,6 +75,20 @@ def items():
         flash('Order placed successfully!', 'success')
     return render_template('items.html', items=items)
 
+@app.route('/delete_item/<int:item_id>', methods=['POST'])
+def delete_item(item_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    item = Item.query.get_or_404(item_id)
+    try:
+        db.session.delete(item)
+        db.session.commit()
+        flash('Item deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting item: {str(e)}', 'danger')
+    return redirect(url_for('items'))
+
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
     if request.method == 'POST':
