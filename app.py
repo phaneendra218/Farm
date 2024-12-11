@@ -16,6 +16,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)  # Admin flag
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -56,6 +57,7 @@ def login():
         user = User.query.filter_by(username=username, password=password).first()
         if user:
             session['user_id'] = user.id
+            session['is_admin'] = user.is_admin  # Store admin status in session
             return redirect(url_for('items'))
         else:
             flash('Invalid credentials', 'danger')
@@ -73,11 +75,12 @@ def items():
         db.session.add(order)
         db.session.commit()
         flash('Order placed successfully!', 'success')
-    return render_template('items.html', items=items)
+    return render_template('items.html', items=items, is_admin=session.get('is_admin', False))
 
 @app.route('/delete_item/<int:item_id>', methods=['POST'])
 def delete_item(item_id):
-    if 'user_id' not in session:
+    if 'user_id' not in session or not session.get('is_admin'):
+        flash('Unauthorized access', 'danger')
         return redirect(url_for('login'))
     item = Item.query.get_or_404(item_id)
     try:
@@ -91,21 +94,18 @@ def delete_item(item_id):
 
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
+    if 'user_id' not in session or not session.get('is_admin'):
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('login'))
     if request.method == 'POST':
         name = request.form['name']
         price = request.form['price']
-        
-        # Create a new Item object
         new_item = Item(name=name, price=float(price))
-        
-        # Add the new item to the session and commit to the database
         db.session.add(new_item)
         db.session.commit()
-        
         flash('Item added successfully!', 'success')
-        return redirect(url_for('items'))  # Redirect to the items page after adding
-
-    return render_template('add_item.html')  # Display the form when GET request
+        return redirect(url_for('items'))
+    return render_template('add_item.html')
 
 @app.route('/contact')
 def contact():
@@ -119,4 +119,11 @@ def logout():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Ensures tables are created before starting the app
+
+        # Ensure an admin user exists (for simplicity, hardcoding admin credentials here)
+        if not User.query.filter_by(username='admin').first():
+            admin_user = User(username='admin', password='admin', is_admin=True)
+            db.session.add(admin_user)
+            db.session.commit()
+
     app.run(host='0.0.0.0', port=5000)
