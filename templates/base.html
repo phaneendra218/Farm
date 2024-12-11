@@ -70,6 +70,10 @@
         .user-info {
             text-align: right;
         }
+        .user-info p {
+            display: inline-block;
+            margin-right: 15px;
+        }
         .user-info button {
             margin-top: 10px;
         }
@@ -101,14 +105,15 @@
                 <a href="/contact">Contact Us</a>
             {% endif %}
         </nav>
-    </header>
 
-    {% if 'user_id' in session %}
-    <div class="user-info">
-        <p>Welcome, {{ session['username'] }}</p>
-        <a href="/logout"><button>Logout</button></a>
-    </div>
-    {% endif %}
+        {% if 'user_id' in session %}
+        <!-- User info section positioned on the right side -->
+        <div class="user-info">
+            <p>Welcome, {{ session['username'] }}</p>
+            <a href="/logout"><button>Logout</button></a>
+        </div>
+        {% endif %}
+    </header>
 
     <div class="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
