@@ -1,27 +1,26 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h2>Welcome to FreshlyFruited Farms</h2>
-<p>Your one-stop solution for all farming needs. Explore our platform to order fresh produce, manage your items, and much more!</p>
-
-<h3>Available Items</h3>
-<!-- Display all items with price and order now button -->
-{% if items %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome to the Farming Shop</h1>
+    
+    <h3>Available Items:</h3>
     <ul>
         {% for item in items %}
-        <li>
-            <strong>{{ item.name }}</strong> - ₹{{ item.price }}
-            
-            <!-- Order Now Button -->
-            <form method="POST" action="{{ url_for('order_now', item_id=item.id) }}" style="display:inline;">
-                <label>Quantity:</label>
-                <input type="number" name="quantity" min="1" required>
-                <button type="submit">Order Now</button>
-            </form>
-        </li>
+            <li>{{ item.name }} - ${{ item.price }}
+                <form action="{{ url_for('order_now', item_id=item.id) }}" method="POST">
+                    <button type="submit">Order Now</button>
+                </form>
+            </li>
         {% endfor %}
     </ul>
-{% else %}
-    <p>No items available at the moment.</p>
-{% endif %}
-{% endblock %}
+
+    {% if 'user_id' not in session %}
+        <p><a href="{{ url_for('login') }}">Login to place an order</a></p>
+    {% endif %}
+</body>
+</html>

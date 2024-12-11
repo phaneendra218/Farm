@@ -69,6 +69,7 @@ def login():
 def items():
     if 'user_id' not in session:
         return redirect(url_for('login'))
+    
     items = Item.query.all()
     return render_template('items.html', items=items, is_admin=session.get('is_admin', False))
 

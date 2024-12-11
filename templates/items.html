@@ -1,32 +1,40 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h2>Items</h2>
-
-<!-- Check if there are any items to display -->
-{% if items %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Items</title>
+</head>
+<body>
+    <h1>Available Items</h1>
+    
+    <h3>Items List:</h3>
     <ul>
         {% for item in items %}
-        <li>
-            <strong>{{ item.name }}</strong> - ₹{{ item.price }}
-            
-            {% if session.get('is_admin') %}  <!-- Show delete button only for admin -->
-                <form method="POST" action="{{ url_for('delete_item', item_id=item.id) }}" style="display:inline;">
-                    <button type="submit" onclick="return confirm('Are you sure you want to delete this item?');">Delete</button>
-                </form>
-            {% endif %}
-            
-            <form method="POST" style="display:inline;">
-                <input type="hidden" name="item_id" value="{{ item.id }}">
-                <label>Quantity:</label>
-                <input type="number" name="quantity" min="1" required>
-                <button type="submit">Order</button>
-            </form>
-        </li>
+            <li>
+                <strong>{{ item.name }}</strong> - ${{ item.price }}
+                
+                {% if 'user_id' in session %}
+                    <!-- Show quantity input only if logged in -->
+                    <form action="{{ url_for('order_now', item_id=item.id) }}" method="POST">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity" min="1" required>
+                        <button type="submit">Order Now</button>
+                    </form>
+                {% else %}
+                    <!-- If not logged in, just a button to log in -->
+                    <form action="{{ url_for('login') }}">
+                        <button type="submit">Login to Order</button>
+                    </form>
+                {% endif %}
+            </li>
         {% endfor %}
     </ul>
-{% else %}
-    <p>No items available at the moment.</p>
-{% endif %}
-
-{% endblock %}
+    
+    {% if 'user_id' in session %}
+        <p><a href="{{ url_for('logout') }}">Logout</a></p>
+    {% else %}
+        <p><a href="{{ url_for('login') }}">Login</a></p>
+    {% endif %}
+</body>
+</html>
