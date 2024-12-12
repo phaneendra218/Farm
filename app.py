@@ -150,6 +150,11 @@ def add_to_basket(item_id):
         db.session.add(basket_item)
 
     db.session.commit()
+
+    # Update the basket count in session
+    basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
+    session['basket_count'] = basket_count
+
     flash('Item added to basket successfully!', 'success')
     return redirect(url_for('items'))
 
@@ -163,6 +168,27 @@ def basket():
     basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.user_id == user_id).all()
 
     return render_template('basket.html', basket_items=basket_items)
+
+@app.route('/remove_from_basket/<int:item_id>', methods=['POST'])
+def remove_from_basket(item_id):
+    if 'user_id' not in session:
+        flash('Please login to remove items from your basket', 'danger')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
+
+    if basket_item:
+        db.session.delete(basket_item)
+        db.session.commit()
+
+        # Update the basket count
+        basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
+        session['basket_count'] = basket_count
+
+        flash('Item removed from basket', 'info')
+
+    return redirect(url_for('basket'))
 
 if __name__ == '__main__':
     with app.app_context():

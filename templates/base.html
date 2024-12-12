@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshlyFruited Farms</title>
     <style>
+        /* Existing styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -77,10 +78,24 @@
         .user-info button {
             margin-top: 10px;
         }
-        /* Updated logo size */
         .logo {
             height: 80px;  /* Doubled logo height */
             margin-right: 20px; /* Adds gap between logo and nav */
+        }
+
+        /* Basket Icon Style */
+        #basket-icon {
+            position: relative;
+        }
+        #basket-count {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background-color: red;
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 50%;
         }
     </style>
 </head>
@@ -113,6 +128,12 @@
             <a href="/logout"><button>Logout</button></a>
         </div>
         {% endif %}
+
+        <!-- Basket icon with count -->
+        <a href="/basket" id="basket-icon">
+            <img src="{{ url_for('static', filename='basket.png') }}" alt="Basket" style="width:24px; height:24px;">
+            <span id="basket-count">{{ session.get('basket_count', 0) }}</span>
+        </a>
     </header>
 
     <div class="flash-messages">

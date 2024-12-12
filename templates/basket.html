@@ -3,19 +3,20 @@
 {% block content %}
 <h2>Your Basket</h2>
 
-<!-- Check if there are any items in the basket -->
 {% if basket_items %}
     <ul>
         {% for basket_item, item in basket_items %}
         <li>
-            <strong>{{ item.name }}</strong> - ₹{{ item.price }} x {{ basket_item.quantity }} = ₹{{ item.price * basket_item.quantity }}
+            <strong>{{ item.name }}</strong> - ₹{{ item.price }} x {{ basket_item.quantity }}
+            <form method="POST" action="{{ url_for('remove_from_basket', item_id=basket_item.item_id) }}" style="display:inline;">
+                <button type="submit">Remove</button>
+            </form>
         </li>
         {% endfor %}
     </ul>
-    <a href="{{ url_for('items') }}">Continue Shopping</a>
+    <p><strong>Total Price:</strong> ₹{{ basket_items|sum(attribute='item.price * basket_item.quantity') }}</p>
 {% else %}
     <p>Your basket is empty.</p>
-    <a href="{{ url_for('items') }}">Start Shopping</a>
 {% endif %}
 
 {% endblock %}
