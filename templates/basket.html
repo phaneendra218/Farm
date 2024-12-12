@@ -5,16 +5,22 @@
 
 {% if basket_items %}
     <ul>
-        {% for basket_item, item in basket_items %}
+    {% for basket_item, item in basket_items %}
         <li>
-            <strong>{{ item.name }}</strong> - ₹{{ item.price }} x {{ basket_item.quantity }}
-            <form method="POST" action="{{ url_for('remove_from_basket', item_id=basket_item.item_id) }}" style="display:inline;">
+            {{ item.name }} - ₹{{ item.price }} x {{ basket_item.quantity }}
+            <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}">
                 <button type="submit">Remove</button>
             </form>
         </li>
-        {% endfor %}
+    {% endfor %}
     </ul>
-    <p><strong>Total Price:</strong> ₹{{ basket_items|sum(attribute='item.price * basket_item.quantity') }}</p>
+
+    <p><strong>Total Price:</strong> ₹{{ total_price }}</p>
+
+    <form method="POST" action="{{ url_for('checkout') }}">
+        <button type="submit">Checkout</button>
+    </form>
+
 {% else %}
     <p>Your basket is empty.</p>
 {% endif %}
