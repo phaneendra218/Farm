@@ -16,11 +16,18 @@
                 </form>
             {% endif %}
             
-            <form method="POST" style="display:inline;">
+            <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="display:inline;">
                 <input type="hidden" name="item_id" value="{{ item.id }}">
                 <label>Quantity:</label>
                 <input type="number" name="quantity" min="1" required>
                 <button type="submit">Order</button>
+            </form>
+
+            <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="display:inline;">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <label>Quantity:</label>
+                <input type="number" name="quantity" min="1" required>
+                <button type="submit">Add to Basket</button>
             </form>
         </li>
         {% endfor %}

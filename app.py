@@ -29,6 +29,12 @@ class Order(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
 
+class Basket(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+
 # Routes
 @app.route('/')
 def home():
@@ -125,6 +131,38 @@ def order_item(item_id):
     
     flash('Item ordered successfully!', 'success')
     return redirect(url_for('items'))  # Redirect to the items page
+
+@app.route('/add_to_basket/<int:item_id>', methods=['POST'])
+def add_to_basket(item_id):
+    if 'user_id' not in session:
+        flash('Please login to add items to your basket', 'danger')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    quantity = int(request.form.get('quantity', 1))
+
+    # Check if the item already exists in the basket
+    basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
+    if basket_item:
+        basket_item.quantity += quantity  # Update quantity if item already exists
+    else:
+        basket_item = Basket(user_id=user_id, item_id=item_id, quantity=quantity)
+        db.session.add(basket_item)
+
+    db.session.commit()
+    flash('Item added to basket successfully!', 'success')
+    return redirect(url_for('items'))
+
+@app.route('/basket')
+def basket():
+    if 'user_id' not in session:
+        flash('Please login to view your basket', 'danger')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.user_id == user_id).all()
+
+    return render_template('basket.html', basket_items=basket_items)
 
 if __name__ == '__main__':
     with app.app_context():
