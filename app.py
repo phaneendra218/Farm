@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -22,7 +23,10 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
+    description = db.Column(db.String(500), nullable=True)  # Added description field
     hidden = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp for creation
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)  # Timestamp for updates
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,7 +46,7 @@ class Basket(db.Model):
 # Routes
 @app.route('/')
 def home():
-    items = Item.query.all()  # Fetch all items from the database
+    items = Item.query.filter_by(hidden=False).all()  # Fetch all visible items from the database
     if 'user_id' in session:
         user_id = session['user_id']
         basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
@@ -87,7 +91,7 @@ def login():
 def items():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    items = Item.query.all()
+    items = Item.query.filter_by(hidden=False).all()  # Only show visible items
     user_id = session['user_id']
     basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
     session['basket_count'] = basket_count
@@ -116,7 +120,8 @@ def add_item():
     if request.method == 'POST':
         name = request.form['name']
         price = request.form['price']
-        new_item = Item(name=name, price=float(price))
+        description = request.form.get('description')  # Get description from the form
+        new_item = Item(name=name, price=float(price), description=description)
         db.session.add(new_item)
         db.session.commit()
         flash('Item added successfully!', 'success')
