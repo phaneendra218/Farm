@@ -22,6 +22,7 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
+    hidden = db.Column(db.Boolean, default=False)
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -215,6 +216,31 @@ def remove_from_basket(item_id):
 def checkout():
     # Handle checkout logic here
     return render_template('checkout.html')
+
+@app.route('/hide_item/<int:item_id>', methods=['POST'])
+def hide_item(item_id):
+    if 'is_admin' not in session or not session['is_admin']:
+        return redirect(url_for('index'))  # Redirect if not admin
+    
+    item = Item.query.get(item_id)
+    if item:
+        item.hidden = True
+        db.session.commit()
+        flash('Item has been hidden', 'success')
+    return redirect(url_for('items'))  # Redirect back to the items page
+
+# Route to unhide an item
+@app.route('/unhide_item/<int:item_id>', methods=['POST'])
+def unhide_item(item_id):
+    if 'is_admin' not in session or not session['is_admin']:
+        return redirect(url_for('index'))  # Redirect if not admin
+    
+    item = Item.query.get(item_id)
+    if item:
+        item.hidden = False
+        db.session.commit()
+        flash('Item has been unhidden', 'success')
+    return redirect(url_for('items'))  # Redirect back to the items page
 
 if __name__ == '__main__':
     with app.app_context():
