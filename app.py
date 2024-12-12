@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import os
-from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -23,10 +22,6 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
-    description = db.Column(db.String(500), nullable=True)  # Added description field
-    hidden = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp for creation
-    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)  # Timestamp for updates
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +41,7 @@ class Basket(db.Model):
 # Routes
 @app.route('/')
 def home():
-    items = Item.query.filter_by(hidden=False).all()  # Fetch all visible items from the database
+    items = Item.query.all()  # Fetch all items from the database
     if 'user_id' in session:
         user_id = session['user_id']
         basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
@@ -91,7 +86,7 @@ def login():
 def items():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    items = Item.query.filter_by(hidden=False).all()  # Only show visible items
+    items = Item.query.all()
     user_id = session['user_id']
     basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
     session['basket_count'] = basket_count
@@ -120,8 +115,7 @@ def add_item():
     if request.method == 'POST':
         name = request.form['name']
         price = request.form['price']
-        description = request.form.get('description')  # Get description from the form
-        new_item = Item(name=name, price=float(price), description=description)
+        new_item = Item(name=name, price=float(price))
         db.session.add(new_item)
         db.session.commit()
         flash('Item added successfully!', 'success')
@@ -221,31 +215,6 @@ def remove_from_basket(item_id):
 def checkout():
     # Handle checkout logic here
     return render_template('checkout.html')
-
-@app.route('/hide_item/<int:item_id>', methods=['POST'])
-def hide_item(item_id):
-    if 'is_admin' not in session or not session['is_admin']:
-        return redirect(url_for('index'))  # Redirect if not admin
-    
-    item = Item.query.get(item_id)
-    if item:
-        item.hidden = True
-        db.session.commit()
-        flash('Item has been hidden', 'success')
-    return redirect(url_for('items'))  # Redirect back to the items page
-
-# Route to unhide an item
-@app.route('/unhide_item/<int:item_id>', methods=['POST'])
-def unhide_item(item_id):
-    if 'is_admin' not in session or not session['is_admin']:
-        return redirect(url_for('index'))  # Redirect if not admin
-    
-    item = Item.query.get(item_id)
-    if item:
-        item.hidden = False
-        db.session.commit()
-        flash('Item has been unhidden', 'success')
-    return redirect(url_for('items'))  # Redirect back to the items page
 
 if __name__ == '__main__':
     with app.app_context():

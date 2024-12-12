@@ -8,11 +8,7 @@
     <ul>
         {% for item in items %}
         <li>
-            {% if item.hidden %}
-                <strong>{{ item.name }}</strong> - ₹{{ item.price }} - <em>Sold Out</em>
-            {% else %}
-                <strong>{{ item.name }}</strong> - ₹{{ item.price }}
-            {% endif %}
+            <strong>{{ item.name }}</strong> - ₹{{ item.price }}
 
             <!-- Quantity input for adding to basket -->
             <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="display:inline;">
@@ -26,17 +22,6 @@
                 <form method="POST" action="{{ url_for('delete_item', item_id=item.id) }}" style="display:inline;">
                     <button type="submit" onclick="return confirm('Are you sure you want to delete this item?');">Delete</button>
                 </form>
-
-                <!-- Admin hide/unhide button -->
-                {% if item.hidden %}
-                    <form method="POST" action="{{ url_for('unhide_item', item_id=item.id) }}" style="display:inline;">
-                        <button type="submit" onclick="return confirm('Are you sure you want to unhide this item?');">Unhide</button>
-                    </form>
-                {% else %}
-                    <form method="POST" action="{{ url_for('hide_item', item_id=item.id) }}" style="display:inline;">
-                        <button type="submit" onclick="return confirm('Are you sure you want to hide this item?');">Hide</button>
-                    </form>
-                {% endif %}
             {% endif %}
 
             <!-- Order item button -->
