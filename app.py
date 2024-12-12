@@ -35,6 +35,9 @@ class Basket(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
 
+    user = db.relationship('User', backref='baskets')
+    item = db.relationship('Item', backref='baskets')
+
 # Routes
 @app.route('/')
 def home():
