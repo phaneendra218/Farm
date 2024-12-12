@@ -42,6 +42,10 @@ class Basket(db.Model):
 @app.route('/')
 def home():
     items = Item.query.all()  # Fetch all items from the database
+    if 'user_id' in session:
+        user_id = session['user_id']
+        basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
+        session['basket_count'] = basket_count
     return render_template('home.html', items=items)
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -69,6 +73,10 @@ def login():
             session['user_id'] = user.id
             session['username'] = user.username  # Store username in session
             session['is_admin'] = user.is_admin  # Store admin status in session
+
+            # Update the basket count in the session
+            basket_count = db.session.query(Basket).filter_by(user_id=user.id).count()
+            session['basket_count'] = basket_count
             return redirect(url_for('items'))
         else:
             flash('Invalid credentials', 'danger')
@@ -79,6 +87,9 @@ def items():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     items = Item.query.all()
+    user_id = session['user_id']
+    basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
+    session['basket_count'] = basket_count
     return render_template('items.html', items=items, is_admin=session.get('is_admin', False))
 
 @app.route('/delete_item/<int:item_id>', methods=['POST'])
