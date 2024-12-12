@@ -17,8 +17,9 @@
 
     <p><strong>Total Price:</strong> ₹{{ total_price }}</p>
 
+    <!-- Proceed to checkout button -->
     <form method="POST" action="{{ url_for('checkout') }}">
-        <button type="submit">Checkout</button>
+        <button type="submit">Proceed to Checkout</button>
     </form>
 
 {% else %}

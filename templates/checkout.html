@@ -1,0 +1,10 @@
+<!-- templates/checkout.html -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Checkout</h1>
+  <form method="POST" action="{{ url_for('process_checkout') }}">
+    <!-- Add form fields for checkout, like shipping information, payment details, etc. -->
+    <button type="submit">Submit Order</button>
+  </form>
+{% endblock %}
