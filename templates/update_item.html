@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Update Item</h2>
+  <form method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="name">Item Name</label>
+      <input type="text" class="form-control" id="name" name="name" value="{{ item.name }}" required>
+    </div>
+    <div class="form-group">
+      <label for="price">Price</label>
+      <input type="number" class="form-control" id="price" name="price" value="{{ item.price }}" step="0.01" required>
+    </div>
+    <div class="form-group">
+      <label for="image">Item Image (optional)</label>
+      <input type="file" class="form-control-file" id="image" name="image">
+      {% if item.image_path %}
+        <p>Current Image:</p>
+        <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="Item Image" width="100">
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Update Item</button>
+  </form>
+  <a href="{{ url_for('items') }}" class="btn btn-secondary mt-3">Back to Items</a>
+{% endblock %}

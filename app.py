@@ -287,6 +287,48 @@ def unhide_item(item_id):
     flash('Item unhidden successfully!', 'success')
     return redirect(url_for('items'))
 
+@app.route('/update_item/<int:item_id>', methods=['GET', 'POST'])
+def update_item(item_id):
+    if 'user_id' not in session or not session.get('is_admin'):
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('items'))  # Redirect to items page instead of login
+
+    item = Item.query.get_or_404(item_id)
+
+    if request.method == 'POST':
+        # Get the updated details from the form
+        name = request.form['name']
+        price = request.form['price']
+        
+        # Handle the image file
+        image = request.files.get('image')
+
+        if image and allowed_file(image.filename):
+            # Check the file size first
+            image.seek(0, os.SEEK_END)
+            file_size = image.tell()
+
+            if file_size > 100 * 1024:  # 100 KB limit
+                flash('File is too large. The image must be less than 100 KB.', 'danger')
+                return redirect(request.url)
+
+            # Save the image
+            filename = secure_filename(image.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image.seek(0)  # Reset the file pointer to save the file
+            image.save(image_path)
+            item.image_path = image_path  # Update the image path in the item
+
+        # Update the item details
+        item.name = name
+        item.price = float(price)
+        
+        db.session.commit()
+        flash(f'Item "{name}" updated successfully!', 'success')
+        return redirect(url_for('items'))  # Redirect to the list of items page
+
+    return render_template('update_item.html', item=item)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Ensures tables are created before starting the app

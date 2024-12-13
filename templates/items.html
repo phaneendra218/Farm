@@ -27,6 +27,10 @@
 
                 <!-- Admin actions -->
                 {% if session.get('is_admin') %}
+                    <!-- Update button -->
+                    <a href="{{ url_for('update_item_form', item_id=item.id) }}" class="update-button" style="display:block; margin-top:10px;">Update</a>
+                    
+                    <!-- Delete button -->
                     <form method="POST" action="{{ url_for('delete_item', item_id=item.id) }}" style="margin-top:10px;">
                         <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this item?');">Delete</button>
                     </form>
