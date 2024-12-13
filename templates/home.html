@@ -6,16 +6,22 @@
 
 <h3>Available Items</h3>
 {% if items %}
-    <ul>
+    <div class="item-container">
         {% for item in items %}
-        <li>
-            <strong>{{ item.name }}</strong> - ₹{{ item.price }}
-            <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="display:inline;">
-                <button type="submit">Order Now</button>
-            </form>
-        </li>
+            <div class="item-card">
+                <h4>{{ item.name }}</h4>
+                <p>Price: ₹{{ item.price }}</p>
+                {% if item.image_path %}
+                    <img src="{{ url_for('static', filename=item.image_path) }}" alt="{{ item.name }}" style="width:150px; height:auto;">
+                {% else %}
+                    <p>No image available</p>
+                {% endif %}
+                <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
+                    <button type="submit">Order Now</button>
+                </form>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 {% else %}
     <p>No items available at the moment.</p>
 {% endif %}

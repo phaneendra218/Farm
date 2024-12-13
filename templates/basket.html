@@ -4,16 +4,22 @@
 <h2>Your Basket</h2>
 
 {% if basket_items %}
-    <ul>
-    {% for basket_item, item in basket_items %}
-        <li>
-            {{ item.name }} - ₹{{ item.price }} x {{ basket_item.quantity }}
-            <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}">
-                <button type="submit">Remove</button>
-            </form>
-        </li>
-    {% endfor %}
-    </ul>
+    <div class="basket-container">
+        {% for basket_item, item in basket_items %}
+            <div class="basket-item-card">
+                <h4>{{ item.name }}</h4>
+                <p>Price: ₹{{ item.price }} x {{ basket_item.quantity }}</p>
+                {% if item.image_path %}
+                    <img src="{{ url_for('static', filename=item.image_path) }}" alt="{{ item.name }}" style="width:100px; height:auto;">
+                {% else %}
+                    <p>No image available</p>
+                {% endif %}
+                <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}" style="margin-top:10px;">
+                    <button type="submit">Remove</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
 
     <p><strong>Total Price:</strong> ₹{{ total_price }}</p>
 
@@ -21,9 +27,7 @@
     <form method="POST" action="{{ url_for('checkout') }}">
         <button type="submit">Proceed to Checkout</button>
     </form>
-
 {% else %}
     <p>Your basket is empty.</p>
 {% endif %}
-
 {% endblock %}

@@ -53,7 +53,7 @@ class Basket(db.Model):
 # Routes
 @app.route('/')
 def home():
-    items = Item.query.all()  # Fetch all items from the database
+    items = Item.query.all()  # Fetch all items from the database, including image_path for each item
     if 'user_id' in session:
         user_id = session['user_id']
         basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
