@@ -14,7 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024  # 50 KB
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024  # 100 KB
 # Ensure the upload folder exists
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -148,8 +148,8 @@ def add_item():
             image.seek(0, os.SEEK_END)
             file_size = image.tell()
 
-            if file_size > 50 * 1024:  # 50 KB limit
-                flash('File is too large. The image must be less than 50 KB.', 'danger')
+            if file_size > 100 * 1024:  # 100 KB limit
+                flash('File is too large. The image must be less than 100 KB.', 'danger')
                 return redirect(request.url)
 
             # Save the image
