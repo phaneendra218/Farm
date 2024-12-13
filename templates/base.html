@@ -56,6 +56,32 @@
             padding: 20px;
             flex-grow: 1; /* Ensures main content pushes the footer down */
         }
+
+        .flash-messages {
+            margin: 20px 0;
+        }
+        .flash-messages ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .flash-messages li {
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            margin-bottom: 10px;
+        }
+        .flash-messages li.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-messages li.info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .flash-messages li.warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
     
         .user-info {
             text-align: right;
@@ -118,37 +144,7 @@
         .item-card:hover, .basket-item-card:hover {
             background-color: #f0f0f0;  /* Light background color on hover */
             transition: background-color 0.3s ease;  /* Smooth transition effect */
-        }
-        .flash-messages ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 10px 0; /* Add some spacing around flash messages */
-        }
-        
-        .flash-message {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        
-        .flash-message.success {
-            background-color: #d4edda; /* Light green background for success */
-            color: #155724; /* Dark green text */
-            border: 1px solid #c3e6cb; /* Green border */
-        }
-        
-        .flash-message.error {
-            background-color: #f8d7da; /* Light red background for error */
-            color: #721c24; /* Dark red text */
-            border: 1px solid #f5c6cb; /* Red border */
-        }
-        
-        .flash-message.info {
-            background-color: #d1ecf1; /* Light blue background for info */
-            color: #0c5460; /* Dark blue text */
-            border: 1px solid #bee5eb; /* Blue border */
-        }        
+        }  
     
         button {
             background-color: #4CAF50;
