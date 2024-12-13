@@ -10,6 +10,13 @@
         <li>
             <strong>{{ item.name }}</strong> - ₹{{ item.price }}
 
+            <!-- Display image if it exists -->
+            {% if item.image_path %}
+                <div>
+                    <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" width="100">
+                </div>
+            {% endif %}
+
             <!-- Quantity input for adding to basket -->
             <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="display:inline;">
                 <label for="quantity_{{ item.id }}">Quantity:</label>

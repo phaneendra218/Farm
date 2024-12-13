@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -8,6 +9,14 @@ app.secret_key = os.urandom(24)
 # Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://farmpsql_user:ilFpRrHEzsedKGwtrOtweM0ToOV6YmIW@dpg-ctc8ap5ds78s73flqmpg-a.oregon-postgres.render.com/farmpsql'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Set the upload folder and allowed file extensions
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# Ensure the upload folder exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 db = SQLAlchemy(app)
 
@@ -22,6 +31,7 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
+    image_path = db.Column(db.String(255), nullable=True)
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
 
 class Order(db.Model):
@@ -112,19 +122,39 @@ def delete_item(item_id):
         flash(f'Error deleting item: {str(e)}', 'danger')
     return redirect(url_for('items'))
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
     if 'user_id' not in session or not session.get('is_admin'):
         flash('Unauthorized access', 'danger')
         return redirect(url_for('items'))  # Redirect to items page instead of login
+    
     if request.method == 'POST':
+        # Get item details from the form
         name = request.form['name']
         price = request.form['price']
-        new_item = Item(name=name, price=float(price))
-        db.session.add(new_item)
-        db.session.commit()
-        flash('Item added successfully!', 'success')
-        return redirect(url_for('items'))
+        
+        # Handle the image file
+        if 'image' not in request.files:
+            flash('No image file selected', 'warning')
+            return redirect(request.url)
+
+        image = request.files['image']
+        if image and allowed_file(image.filename):
+            filename = secure_filename(image.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image.save(image_path)
+
+            # Save item to database with image path
+            new_item = Item(name=name, price=float(price), image_path=image_path)
+            db.session.add(new_item)
+            db.session.commit()
+
+            flash(f'Item "{name}" added successfully!', 'success')
+            return redirect(url_for('items'))  # Redirect to the list of items page
+
     return render_template('add_item.html')
 
 @app.route('/contact')
