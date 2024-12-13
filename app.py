@@ -22,6 +22,7 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
+    is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -86,7 +87,11 @@ def login():
 def items():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    items = Item.query.all()
+        # Check if the user is an admin
+    if session.get('is_admin'):
+        items = Item.query.all()  # Admin sees all items (visible or hidden)
+    else:
+        items = Item.query.filter_by(is_hidden=False).all()
     user_id = session['user_id']
     basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
     session['basket_count'] = basket_count
@@ -215,6 +220,31 @@ def remove_from_basket(item_id):
 def checkout():
     # Handle checkout logic here
     return render_template('checkout.html')
+
+@app.route('/hide_item/<int:item_id>', methods=['POST'])
+def hide_item(item_id):
+    if 'user_id' not in session or not session.get('is_admin'):
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('items'))
+
+    item = Item.query.get_or_404(item_id)
+    item.is_hidden = True
+    db.session.commit()
+    flash('Item hidden successfully!', 'success')
+    return redirect(url_for('items'))
+
+
+@app.route('/unhide_item/<int:item_id>', methods=['POST'])
+def unhide_item(item_id):
+    if 'user_id' not in session or not session.get('is_admin'):
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('items'))
+
+    item = Item.query.get_or_404(item_id)
+    item.is_hidden = False
+    db.session.commit()
+    flash('Item unhidden successfully!', 'success')
+    return redirect(url_for('items'))
 
 if __name__ == '__main__':
     with app.app_context():
