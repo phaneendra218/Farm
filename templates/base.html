@@ -15,6 +15,7 @@
             flex-direction: column; /* Makes footer stick to the bottom */
             min-height: 100vh;
         }
+    
         header {
             background-color: #4CAF50;
             padding: 20px 30px;
@@ -24,67 +25,54 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 60%; /* Reduced width of the header */
+            margin: 0 auto; /* Center the header */
         }
+    
+        footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            width: 50%; /* Reduced width of the footer */
+            margin: 0 auto; /* Center the footer */
+        }
+    
+        .logo {
+            height: 90px;  /* Reduced logo height to match header */
+            width: auto;
+            margin-right: 20px; /* Adds gap between logo and nav */
+        }
+    
         nav a {
             margin: 0 15px;
             color: white;
             text-decoration: none;
             font-weight: bold;
         }
+    
         nav a:hover {
             text-decoration: underline;
         }
+    
         main {
             padding: 20px;
             flex-grow: 1; /* Ensures main content pushes the footer down */
         }
-        footer {
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            padding: 10px;
-        }
-        .flash-messages {
-            margin: 20px 0;
-        }
-        .flash-messages ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .flash-messages li {
-            padding: 10px;
-            background-color: #f8d7da;
-            color: #721c24;
-            margin-bottom: 10px;
-        }
-        .flash-messages li.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .flash-messages li.info {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-        .flash-messages li.warning {
-            background-color: #fff3cd;
-            color: #856404;
-        }
+    
         .user-info {
             text-align: right;
         }
+    
         .user-info p {
             display: inline-block;
             margin-right: 15px;
         }
+    
         .user-info button {
             margin-top: 10px;
         }
-        .logo {
-            height: 150px;  /* Doubled logo height */
-            width: auto;
-            margin-right: 20px; /* Adds gap between logo and nav */
-        }
-
+    
         /* Basket Icon Style */
         #basket-icon {
             position: relative;
@@ -99,14 +87,14 @@
             padding: 2px 6px;
             border-radius: 50%;
         }
-
+    
         /* New styles for item and basket images */
         .item-container, .basket-container {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
         }
-
+    
         .item-card, .basket-item-card {
             border: 1px solid #ddd;
             padding: 10px;
@@ -114,14 +102,14 @@
             text-align: center;
             width: 200px;
         }
-
+    
         .item-card img, .basket-item-card img {
             max-width: 100%;
             max-height: 150px;
             border-radius: 5px;
             margin-top: 10px;
         }
-
+    
         button {
             background-color: #4CAF50;
             color: white;
@@ -130,11 +118,12 @@
             border-radius: 5px;
             cursor: pointer;
         }
-
+    
         button:hover {
             background-color: #45a049;
         }
     </style>
+    
 </head>
 <body>
     <header>
