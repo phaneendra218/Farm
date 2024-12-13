@@ -22,6 +22,7 @@
     </div>
     <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to update this item?');">Update Item</button>
   </form>
-  <a href="{{ url_for('items') }}" class="btn btn-secondary mt-3">Back to Items</a>
-  <button>Back to Items</button>
+  <form action="{{ url_for('items') }}" method="get" style="display:inline;">
+    <button type="submit" class="btn btn-secondary mt-3">Back to Items</button>
+  </form>
 {% endblock %}
