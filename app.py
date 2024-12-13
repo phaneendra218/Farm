@@ -289,10 +289,12 @@ def unhide_item(item_id):
 
 @app.route('/update_item/<int:item_id>', methods=['GET', 'POST'])
 def update_item(item_id):
+    # Check if the user is logged in and is an admin
     if 'user_id' not in session or not session.get('is_admin'):
         flash('Unauthorized access', 'danger')
-        return redirect(url_for('items'))  # Redirect to items page instead of login
+        return redirect(url_for('items'))  # Redirect to items page if not authorized
 
+    # Get the item from the database
     item = Item.query.get_or_404(item_id)
 
     if request.method == 'POST':
@@ -327,6 +329,7 @@ def update_item(item_id):
         flash(f'Item "{name}" updated successfully!', 'success')
         return redirect(url_for('items'))  # Redirect to the list of items page
 
+    # If GET request, render the update form with item details
     return render_template('update_item.html', item=item)
 
 if __name__ == '__main__':
