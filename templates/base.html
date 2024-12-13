@@ -84,24 +84,6 @@
             width: auto;
             margin-right: 20px; /* Adds gap between logo and nav */
         }
-        .item-container, .basket-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .item-card, .basket-item-card {
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            width: 200px;
-        }
-
-        img {
-            border-radius: 5px;
-            margin-top: 10px;
-        }
 
         /* Basket Icon Style */
         #basket-icon {
@@ -117,6 +99,29 @@
             padding: 2px 6px;
             border-radius: 50%;
         }
+
+        /* New styles for item and basket images */
+        .item-container, .basket-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .item-card, .basket-item-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            width: 200px;
+        }
+
+        .item-card img, .basket-item-card img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
