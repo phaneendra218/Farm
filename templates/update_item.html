@@ -16,7 +16,7 @@
       <input type="file" class="form-control-file" id="image" name="image">
       {% if item.image_path %}
         <p>Current Image:</p>
-        <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="Item Image" width="100">
+        <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width:150px; height:100px;">
       {% endif %}
     </div>
     <button type="submit" class="btn btn-primary">Update Item</button>
