@@ -5,16 +5,16 @@
   <form method="POST" enctype="multipart/form-data">
     <input type="hidden" name="item_id" value="{{ item.id }}"> <!-- Hidden item ID -->
     <div class="form-group">
-      <label for="name">Item Name</label>
-      <input type="text" class="form-control" id="name" name="name" value="{{ item.name }}" required>
+      <label for="name">Item Name</label><br>
+      <input type="text" class="form-control" id="name" name="name" value="{{ item.name }}" required><br>
     </div>
     <div class="form-group">
-      <label for="price">Price</label>
-      <input type="number" class="form-control" id="price" name="price" value="{{ item.price }}" step="0.01" required>
+      <label for="price">Price</label><br>
+      <input type="number" class="form-control" id="price" name="price" value="{{ item.price }}" step="0.01" required><br>
     </div>
     <div class="form-group">
-      <label for="image">Item Image (optional)</label>
-      <input type="file" class="form-control-file" id="image" name="image">
+      <label for="image">Item Image (optional)</label><br>
+      <input type="file" class="form-control-file" id="image" name="image"><br>
       {% if item.image_path %}
         <p>Current Image:</p>
         <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width:150px; height:100px;">
