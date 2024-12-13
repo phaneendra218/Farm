@@ -3,6 +3,7 @@
 {% block content %}
   <h2>Update Item</h2>
   <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="item_id" value="{{ item.id }}"> <!-- Hidden item ID -->
     <div class="form-group">
       <label for="name">Item Name</label>
       <input type="text" class="form-control" id="name" name="name" value="{{ item.name }}" required>
@@ -19,7 +20,7 @@
         <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width:150px; height:100px;">
       {% endif %}
     </div>
-    <button type="submit" class="btn btn-primary">Update Item</button>
+    <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to update this item?');">Update Item</button>
   </form>
   <a href="{{ url_for('items') }}" class="btn btn-secondary mt-3">Back to Items</a>
 {% endblock %}
