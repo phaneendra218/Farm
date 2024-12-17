@@ -68,22 +68,14 @@ def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        phone_number = request.form.get('phone_number')  # Optional
-        address = request.form.get('address')  # Optional
-
-        # Hash the password before saving (using werkzeug.security or your preferred method)
-        hashed_password = generate_password_hash(password)
-
-        # Create a new user
-        new_user = User(username=username, password=hashed_password, phone_number=phone_number, address=address)
-
-        # Add user to the database
-        db.session.add(new_user)
-        db.session.commit()
-
-        flash('Signup successful! Please log in.', 'success')
-        return redirect(url_for('login'))
-    
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists', 'danger')
+        else:
+            user = User(username=username, password=password)
+            db.session.add(user)
+            db.session.commit()
+            flash('Signup successful!', 'success')
+            return redirect(url_for('login'))
     return render_template('signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
