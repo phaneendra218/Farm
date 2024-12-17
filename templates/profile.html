@@ -65,7 +65,7 @@
 
 <div class="profile-container">
     <h2>My Profile</h2>
-    <form method="POST">
+    <form method="POST" onsubmit="return confirmUpdate()">
         <label>Username</label>
         <input type="text" name="username" value="{{ user.username }}" readonly>
 
@@ -73,10 +73,10 @@
         <input type="text" name="phone_number" value="{{ user.phone_number }}">
 
         <label>Primary Address</label>
-        <textarea name="address" rows="4">{{ user.address }}</textarea>
+        <textarea name="address" rows="3">{{ user.address }}</textarea>
 
-        <label>Address 2</label>
-        <textarea name="alternate_address" rows="4">{{ user.alternate_address }}</textarea>
+        <label>Alternate Address</label>
+        <textarea name="alternate_address" rows="3">{{ user.alternate_address }}</textarea>
 
         <label>Password</label>
         <input type="password" name="password" placeholder="New password">
@@ -84,4 +84,10 @@
         <button type="submit">Update Profile</button>
     </form>
 </div>
+
+<script>
+    function confirmUpdate() {
+        return confirm("Are you sure you want to update your profile?");
+    }
+</script>
 {% endblock %}
