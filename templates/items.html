@@ -7,7 +7,7 @@
 {% if items %}
     <div class="item-container">
         {% for item in items %}
-            <div class="item-card">
+            <div class="item-card sold-out-container" style="position:relative;">
                 <h4>{{ item.name }}</h4>
                 <p>Price: ₹{{ item.price }}</p>
                 
@@ -18,9 +18,12 @@
                     <p>No image available</p>
                 {% endif %}
 
-                <!-- Check if item is hidden -->
+                <!-- Check if item is hidden (Sold Out) -->
                 {% if item.is_hidden %}
+                    <!-- Sold Out Message -->
                     <p class="text-danger" style="font-weight: bold;">Sold Out</p>
+                    <!-- Coming Soon Stamp -->
+                    <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" style="width:100px; height:100px; position:absolute; top:10px; right:10px;">
                 {% else %}
                     <!-- Quantity input for adding to basket -->
                     <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="margin-top:10px;">
