@@ -213,7 +213,7 @@
                 <p>Primary Address: {{ session['user_address'] }}</p>
             {% endif %}
             {% if session['user_alternate_address'] %}
-                <p>Alternate Address: {{ session['user_alternate_address'] }}</p>
+                <p>Address 2: {{ session['user_alternate_address'] }}</p>
             {% endif %}
             
             <a href="{{ url_for('profile') }}"><button>View Profile</button></a>
