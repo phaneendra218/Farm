@@ -78,19 +78,22 @@
 <div class="profile-container">
     <h2>My Profile</h2>
     <form method="POST" id="profileForm" onsubmit="return validateForm()">
+        <!-- View Mode Fields -->
         <label>Username</label>
         <input type="text" name="username" id="username" value="{{ user.username }}" readonly>
 
         <label>Phone Number</label>
         <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number }}" maxlength="10"
                pattern="\d{10}" title="Phone number must be exactly 10 digits." required readonly>
-        <div id="phone_error" class="error-message"></div>
 
         <label>Primary Address</label>
         <textarea name="address" id="address" rows="3" readonly>{{ user.address }}</textarea>
 
+        {% if user.alternate_address %}
+        <!-- Display Alternate Address only if it has a value -->
         <label>Alternate Address</label>
         <textarea name="alternate_address" id="alternate_address" rows="3" readonly>{{ user.alternate_address }}</textarea>
+        {% endif %}
 
         <label>Password</label>
         <input type="password" name="password" id="password" placeholder="New password" readonly>
@@ -108,12 +111,30 @@
     // Function to enable editing fields
     function enableEdit() {
         const fields = ['phone_number', 'address', 'alternate_address', 'password'];
-        fields.forEach(id => document.getElementById(id).removeAttribute('readonly'));
+        fields.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) field.removeAttribute('readonly');
+        });
 
         // Show Update/Cancel buttons and hide Edit button
         document.getElementById('edit-btn').style.display = 'none';
         document.getElementById('update-btn').style.display = 'inline-block';
         document.getElementById('cancel-btn').style.display = 'inline-block';
+
+        // If the alternate_address field doesn't exist in View Mode, insert it dynamically
+        if (!document.getElementById('alternate_address')) {
+            const alternateAddressLabel = document.createElement('label');
+            alternateAddressLabel.textContent = 'Alternate Address';
+
+            const alternateAddressInput = document.createElement('textarea');
+            alternateAddressInput.name = 'alternate_address';
+            alternateAddressInput.id = 'alternate_address';
+            alternateAddressInput.rows = '3';
+
+            const form = document.getElementById('profileForm');
+            form.insertBefore(alternateAddressLabel, document.getElementById('password').parentNode);
+            form.insertBefore(alternateAddressInput, document.getElementById('password').parentNode);
+        }
     }
 
     // Function to cancel editing and reset fields
@@ -121,9 +142,19 @@
         // Re-add readonly to fields
         const fields = ['phone_number', 'address', 'alternate_address', 'password'];
         fields.forEach(id => {
-            document.getElementById(id).setAttribute('readonly', true);
-            document.getElementById(id).value = document.getElementById(id).defaultValue; // Reset value
+            const field = document.getElementById(id);
+            if (field) {
+                field.setAttribute('readonly', true);
+                field.value = field.defaultValue; // Reset value
+            }
         });
+
+        // Remove dynamically added Alternate Address field if empty
+        const alternateAddress = document.getElementById('alternate_address');
+        if (alternateAddress && !alternateAddress.value.trim()) {
+            alternateAddress.previousElementSibling.remove(); // Remove label
+            alternateAddress.remove(); // Remove field
+        }
 
         // Hide Update/Cancel buttons and show Edit button
         document.getElementById('edit-btn').style.display = 'inline-block';
