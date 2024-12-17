@@ -213,7 +213,9 @@
                 <p>Address: {{ session['user_address'] }}</p>
             {% endif %}
             
-            <a href="{{ url_for('profile') }}"><button>View Profile</button></a>
+            <a href="{{ url_for('profile') }}">
+                <img src="{{ url_for('static', filename='Consumer.png') }}" alt="Profile Icon" style="width: 40px; height: 40px;">
+            </a>
             <a href="/logout"><button>Logout</button></a>
         </div>
         {% endif %}
