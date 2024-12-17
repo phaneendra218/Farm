@@ -29,7 +29,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)  # Admin flag
     phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
     address = db.Column(db.String(255), nullable=True)  # New field for address
-    alternate_address = db.Column(db.String(255))
+    alternate_address = db.Column(db.String(255), nullable=True)
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,14 +68,22 @@ def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists', 'danger')
-        else:
-            user = User(username=username, password=password)
-            db.session.add(user)
-            db.session.commit()
-            flash('Signup successful!', 'success')
-            return redirect(url_for('login'))
+        phone_number = request.form.get('phone_number')  # Optional
+        address = request.form.get('address')  # Optional
+
+        # Hash the password before saving (using werkzeug.security or your preferred method)
+        hashed_password = generate_password_hash(password)
+
+        # Create a new user
+        new_user = User(username=username, password=hashed_password, phone_number=phone_number, address=address)
+
+        # Add user to the database
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Signup successful! Please log in.', 'success')
+        return redirect(url_for('login'))
+    
     return render_template('signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
