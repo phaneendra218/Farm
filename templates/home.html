@@ -16,9 +16,15 @@
                 {% else %}
                     <p>No image available</p>
                 {% endif %}
-                <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
-                    <button type="submit">Order Now</button>
-                </form>
+                
+                <!-- Check if item is hidden -->
+                {% if item.is_hidden %}
+                    <p class="text-danger" style="font-weight: bold;">Sold Out</p>
+                {% else %}
+                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
+                        <button type="submit">Order Now</button>
+                    </form>
+                {% endif %}
             </div>
         {% endfor %}
     </div>

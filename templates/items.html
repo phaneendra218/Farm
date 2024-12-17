@@ -17,46 +17,47 @@
                 {% else %}
                     <p>No image available</p>
                 {% endif %}
-                
-                <!-- Quantity input for adding to basket -->
-                <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="margin-top:10px;">
-                    <label for="quantity_{{ item.id }}">Quantity:</label>
-                    <input type="number" name="quantity" id="quantity_{{ item.id }}" min="1" value="1" required>
-                    <button type="submit">Add to Basket</button>
-                </form>
 
+                <!-- Check if item is hidden -->
+                {% if item.is_hidden %}
+                    <p class="text-danger" style="font-weight: bold;">Sold Out</p>
+                {% else %}
+                    <!-- Quantity input for adding to basket -->
+                    <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="margin-top:10px;">
+                        <label for="quantity_{{ item.id }}">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity_{{ item.id }}" min="1" value="1" required>
+                        <button type="submit">Add to Basket</button>
+                    </form>
+                    
+                    <!-- Order item button -->
+                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <button type="submit">Order</button>
+                    </form>
+                {% endif %}
+                
                 <!-- Admin actions -->
                 {% if session.get('is_admin') %}
-                    <!-- Update button -->
                     <form action="{{ url_for('update_item', item_id=item.id) }}" method="get" style="display:inline;">
                         <button type="submit" class="btn btn-primary" style="margin-top:10px;">Update</button>
                     </form>                    
-                    <!-- Delete button -->
                     <form method="POST" action="{{ url_for('delete_item', item_id=item.id) }}" style="margin-top:10px;">
                         <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this item?');">Delete</button>
                     </form>
-                    <!-- Hide or unhide the item -->
                     {% if item.is_hidden %}
                         <form method="POST" action="{{ url_for('unhide_item', item_id=item.id) }}" style="margin-top:10px;">
-                            <button type="submit">Unhide</button>
+                            <button type="submit" class="btn btn-warning">Unhide</button>
                         </form>
                     {% else %}
                         <form method="POST" action="{{ url_for('hide_item', item_id=item.id) }}" style="margin-top:10px;">
-                            <button type="submit">Hide</button>
+                            <button type="submit" class="btn btn-danger">Hide</button>
                         </form>
                     {% endif %}
                 {% endif %}
-
-                <!-- Order item button -->
-                <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                    <button type="submit">Order</button>
-                </form>
             </div>
         {% endfor %}
     </div>
 {% else %}
     <p>No items available at the moment.</p>
 {% endif %}
-
 {% endblock %}
