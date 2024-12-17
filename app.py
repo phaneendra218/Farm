@@ -27,7 +27,7 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)  # Admin flag
-    phone_number = db.Column(db.String(20), nullable=True)  # New field for phone number
+    phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
     address = db.Column(db.String(255), nullable=True)  # New field for address
 
 class Item(db.Model):
