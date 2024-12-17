@@ -78,6 +78,7 @@
 <div class="profile-container">
     <h2>My Profile</h2>
     <form method="POST" id="profileForm" onsubmit="return validateForm()">
+        {{ csrf_token() }}
         <!-- View Mode Fields -->
         <label>Username</label>
         <input type="text" name="username" id="username" value="{{ user.username }}" readonly>
