@@ -340,13 +340,12 @@ def profile():
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
-    
+
     if request.method == 'POST':
         # Update profile information
-        user.username = request.form['username']
         user.phone_number = request.form['phone_number']
         user.address = request.form['address']
-        user.alternate_address = request.form['alternate_address']
+        user.alternate_address = request.form['alternate_address'] if request.form.get('alternate_address') else None
         # Update password if provided
         if request.form['password']:
             user.password = request.form['password']

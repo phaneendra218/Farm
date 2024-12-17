@@ -78,7 +78,6 @@
 <div class="profile-container">
     <h2>My Profile</h2>
     <form method="POST" id="profileForm" onsubmit="return validateForm()">
-        {{ csrf_token() }}
         <!-- View Mode Fields -->
         <label>Username</label>
         <input type="text" name="username" id="username" value="{{ user.username }}" readonly>
@@ -123,7 +122,7 @@
         document.getElementById('cancel-btn').style.display = 'inline-block';
 
         // If the alternate_address field doesn't exist in View Mode, insert it dynamically
-        if (!document.getElementById('alternate_address')) {
+        if (!document.getElementById('alternate_address') && '{{ user.alternate_address }}') {
             const alternateAddressLabel = document.createElement('label');
             alternateAddressLabel.textContent = 'Alternate Address';
 
@@ -178,4 +177,5 @@
         }
     }
 </script>
+
 {% endblock %}
