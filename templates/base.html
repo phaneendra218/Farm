@@ -202,7 +202,7 @@
         <div class="user-info">
             <p>Welcome, {{ session['username'] }}</p>
             
-            <!-- Display user's name, phone number, and address if available -->
+            <!-- Display user's name, phone number, and address if available
             {% if session['user_name'] %}
                 <p>Name: {{ session['user_name'] }}</p>
             {% endif %}
@@ -214,7 +214,7 @@
             {% endif %}
             {% if session['user_alternate_address'] %}
                 <p>Address 2: {{ session['user_alternate_address'] }}</p>
-            {% endif %}
+            {% endif %} -->
             
             <a href="{{ url_for('profile') }}"><button>View Profile</button></a>
             <a href="/logout"><button>Logout</button></a>
