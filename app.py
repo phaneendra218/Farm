@@ -29,6 +29,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)  # Admin flag
     phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
     address = db.Column(db.String(255), nullable=True)  # New field for address
+    alternate_address = db.Column(db.String(255))
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -345,7 +346,7 @@ def profile():
         user.username = request.form['username']
         user.phone_number = request.form['phone_number']
         user.address = request.form['address']
-        
+        user.alternate_address = request.form['alternate_address']
         # Update password if provided
         if request.form['password']:
             user.password = request.form['password']
