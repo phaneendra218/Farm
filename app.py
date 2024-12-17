@@ -98,15 +98,17 @@ def login():
 def items():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-        # Check if the user is an admin
-    if session.get('is_admin'):
-        items = Item.query.all()  # Admin sees all items (visible or hidden)
-    else:
-        items = Item.query.filter_by(is_hidden=False).all()
+    
+    # Fetch all items for both admin and normal users
+    items = Item.query.all()  # Do not filter hidden items
+    
     user_id = session['user_id']
     basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
     session['basket_count'] = basket_count
-    return render_template('items.html', items=items, is_admin=session.get('is_admin', False))
+
+    return render_template('items.html', 
+                           items=items, 
+                           is_admin=session.get('is_admin', False))
 
 @app.route('/delete_item/<int:item_id>', methods=['POST'])
 def delete_item(item_id):
