@@ -15,11 +15,11 @@
                     <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width:150px; height:100px;">
                 {% else %}
                     <p>No image available</p>
-                {% endif %}
-                
+                {% endif %}                
                 <!-- Check if item is hidden -->
                 {% if item.is_hidden %}
                     <p class="text-danger" style="font-weight: bold;">Sold Out</p>
+                    <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" style="width:100px; height:100px; position:absolute; top:40%; right:10px; transform:translateY(-50%);">
                 {% else %}
                     <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
                         <button type="submit">Order Now</button>
