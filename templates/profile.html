@@ -1,0 +1,23 @@
+<!-- templates/profile.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Profile</h2>
+
+<form method="POST">
+    <label>Username</label><br>
+    <input type="text" name="username" value="{{ user.username }}" required><br>
+
+    <label>Phone Number</label><br>
+    <input type="text" name="phone_number" value="{{ user.phone_number }}"><br>
+
+    <label>Address</label><br>
+    <textarea name="address">{{ user.address }}</textarea><br>
+
+    <label>Password</label><br>
+    <input type="password" name="password" placeholder="New password"><br>
+
+    <button type="submit">Update Profile</button>
+</form>
+
+{% endblock %}

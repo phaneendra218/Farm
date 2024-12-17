@@ -27,6 +27,8 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)  # Admin flag
+    phone_number = db.Column(db.String(20), nullable=True)  # New field for phone number
+    address = db.Column(db.String(255), nullable=True)  # New field for address
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -322,17 +324,37 @@ def update_item(item_id):
             image.seek(0)  # Reset the file pointer to save the file
             image.save(image_path)
             item.image_path = image_path  # Update the image path in the item
-
         # Update the item details
         item.name = name
-        item.price = float(price)
-        
+        item.price = float(price)        
         db.session.commit()
         flash(f'Item "{name}" updated successfully!', 'success')
         return redirect(url_for('items'))  # Redirect to the list of items page
-
     # If GET request, render the update form with item details
     return render_template('update_item.html', item=item)
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'user_id' not in session:
+        flash('Please login to view your profile', 'danger')
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    
+    if request.method == 'POST':
+        # Update profile information
+        user.username = request.form['username']
+        user.phone_number = request.form['phone_number']
+        user.address = request.form['address']
+        
+        # Update password if provided
+        if request.form['password']:
+            user.password = request.form['password']
+        
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
+    
+    return render_template('profile.html', user=user)
 
 if __name__ == '__main__':
     with app.app_context():
