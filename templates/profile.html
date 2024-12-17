@@ -14,22 +14,33 @@
 
     .profile-container h2 {
         text-align: center;
-        color: #333;
         margin-bottom: 20px;
+        color: #333;
     }
 
     .profile-container label {
         font-weight: bold;
         color: #555;
-        display: block;
         margin-bottom: 5px;
+        display: block;
     }
 
-    .profile-container .info {
-        background-color: #e9ecef;
+    .profile-container input,
+    .profile-container textarea {
+        width: 100%;
         padding: 10px;
-        border-radius: 5px;
         margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .profile-container input[readonly],
+    .profile-container textarea[readonly] {
+        background-color: #e9ecef;
+        color: #555;
+        cursor: not-allowed;
     }
 
     .profile-container button {
@@ -39,6 +50,7 @@
         padding: 10px 20px;
         border-radius: 5px;
         cursor: pointer;
+        font-size: 16px;
         transition: background-color 0.3s ease;
     }
 
@@ -46,52 +58,92 @@
         background-color: #45a049;
     }
 
-    form input, form textarea {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+    .profile-container .cancel-btn {
+        background-color: #ccc;
+        color: black;
+    }
+
+    .profile-container .cancel-btn:hover {
+        background-color: #b3b3b3;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: -10px;
+        margin-bottom: 10px;
     }
 </style>
 
 <div class="profile-container">
     <h2>My Profile</h2>
+    <form method="POST" id="profileForm" onsubmit="return validateForm()">
+        <label>Username</label>
+        <input type="text" name="username" id="username" value="{{ user.username }}" readonly>
 
-    {% if not edit_mode %}
-        <!-- View Profile Mode -->
-        <p><strong>Username:</strong> <span class="info">{{ user.username }}</span></p>
-        <p><strong>Phone Number:</strong> <span class="info">{{ user.phone_number }}</span></p>
-        <p><strong>Primary Address:</strong> <span class="info">{{ user.address }}</span></p>
-        <p><strong>Alternate Address:</strong> <span class="info">{{ user.alternate_address }}</span></p>
+        <label>Phone Number</label>
+        <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number }}" maxlength="10"
+               pattern="\d{10}" title="Phone number must be exactly 10 digits." required readonly>
+        <div id="phone_error" class="error-message"></div>
 
-        <!-- Edit Button -->
-        <a href="{{ url_for('profile', edit='true') }}">
-            <button>Edit Profile</button>
-        </a>
-    {% else %}
-        <!-- Edit Profile Mode -->
-        <form method="POST">
-            <label>Username</label>
-            <input type="text" value="{{ user.username }}" readonly>
+        <label>Primary Address</label>
+        <textarea name="address" id="address" rows="3" readonly>{{ user.address }}</textarea>
 
-            <label>Phone Number</label>
-            <input type="text" name="phone_number" value="{{ user.phone_number }}" maxlength="10" required>
+        <label>Alternate Address</label>
+        <textarea name="alternate_address" id="alternate_address" rows="3" readonly>{{ user.alternate_address }}</textarea>
 
-            <label>Primary Address</label>
-            <textarea name="address" rows="3">{{ user.address }}</textarea>
+        <label>Password</label>
+        <input type="password" name="password" id="password" placeholder="New password" readonly>
 
-            <label>Alternate Address</label>
-            <textarea name="alternate_address" rows="3">{{ user.alternate_address }}</textarea>
-
-            <label>Password</label>
-            <input type="password" name="password" placeholder="Enter new password (optional)">
-
-            <button type="submit">Update Profile</button>
-            <a href="{{ url_for('profile') }}">
-                <button type="button" style="background-color: #ccc; color: black;">Cancel</button>
-            </a>
-        </form>
-    {% endif %}
+        <!-- Buttons -->
+        <div id="button-group">
+            <button type="button" id="edit-btn" onclick="enableEdit()">Edit Profile</button>
+            <button type="submit" id="update-btn" style="display:none;">Update Profile</button>
+            <button type="button" id="cancel-btn" class="cancel-btn" style="display:none;" onclick="cancelEdit()">Cancel</button>
+        </div>
+    </form>
 </div>
+
+<script>
+    // Function to enable editing fields
+    function enableEdit() {
+        const fields = ['phone_number', 'address', 'alternate_address', 'password'];
+        fields.forEach(id => document.getElementById(id).removeAttribute('readonly'));
+
+        // Show Update/Cancel buttons and hide Edit button
+        document.getElementById('edit-btn').style.display = 'none';
+        document.getElementById('update-btn').style.display = 'inline-block';
+        document.getElementById('cancel-btn').style.display = 'inline-block';
+    }
+
+    // Function to cancel editing and reset fields
+    function cancelEdit() {
+        // Re-add readonly to fields
+        const fields = ['phone_number', 'address', 'alternate_address', 'password'];
+        fields.forEach(id => {
+            document.getElementById(id).setAttribute('readonly', true);
+            document.getElementById(id).value = document.getElementById(id).defaultValue; // Reset value
+        });
+
+        // Hide Update/Cancel buttons and show Edit button
+        document.getElementById('edit-btn').style.display = 'inline-block';
+        document.getElementById('update-btn').style.display = 'none';
+        document.getElementById('cancel-btn').style.display = 'none';
+    }
+
+    // Existing validation logic
+    function validateForm() {
+        const phoneInput = document.getElementById('phone_number');
+        const phoneError = document.getElementById('phone_error');
+        const phoneRegex = /^\d{10}$/;
+
+        if (!phoneRegex.test(phoneInput.value)) {
+            phoneError.textContent = "Phone number must be exactly 10 digits.";
+            return false; // Prevent form submission
+        } else {
+            phoneError.textContent = ""; // Clear error message
+            return confirm("Are you sure you want to update your profile?");
+        }
+    }
+</script>
 {% endblock %}

@@ -356,7 +356,7 @@ def profile():
         return redirect(url_for('profile'))
     
     edit_mode = request.args.get('edit', 'false') == 'true'
-    return render_template('profile.html', user=user, edit_mode=edit_mode)
+    return render_template('profile.html', user=user)
 
 if __name__ == '__main__':
     with app.app_context():
