@@ -190,23 +190,19 @@
                     <a href="/add_item">Add Item</a>
                 {% endif %}
                 <a href="/contact">Contact Us</a>
-    
-                <!-- Profile Icon placed here -->
-                <a href="{{ url_for('profile') }}" style="margin-left: 10px;">
-                    <img src="{{ url_for('static', filename='Consumer.png') }}" alt="Profile Icon" style="width: 36px; height: 36px;">
-                </a>
             {% else %}
                 <a href="/signup">Signup</a>
                 <a href="/login">Login</a>
                 <a href="/contact">Contact Us</a>
             {% endif %}
         </nav>
-    
+
         {% if 'user_id' in session %}
-        <!-- User info section -->
+        <!-- User info section positioned on the right side -->
         <div class="user-info">
             <p>Welcome, {{ session['username'] }}</p>
-    
+            
+            <!-- Display user's name, phone number, and address if available -->
             {% if session['user_name'] %}
                 <p>Name: {{ session['user_name'] }}</p>
             {% endif %}
@@ -217,10 +213,11 @@
                 <p>Address: {{ session['user_address'] }}</p>
             {% endif %}
             
+            <a href="{{ url_for('profile') }}"><button>View Profile</button></a>
             <a href="/logout"><button>Logout</button></a>
         </div>
         {% endif %}
-    
+
         <!-- Basket icon with count -->
         <a href="/basket" id="basket-icon">
             <img src="{{ url_for('static', filename='basket.png') }}" alt="Basket" style="width:36px; height:36px;">
