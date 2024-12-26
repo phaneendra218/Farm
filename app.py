@@ -375,7 +375,7 @@ def profile():
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
     
-    return render_template('profile.html', user=user, edit_mode=edit_mode)
+    return render_template('profile.html', user=user)
 
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
