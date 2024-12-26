@@ -377,6 +377,24 @@ def profile():
     
     return render_template('profile.html', user=user)
 
+@app.route('/save_addresses', methods=['POST'])
+def save_addresses():
+    user_id = request.form.get("user_id")  # Replace with session or form data
+    addresses = []
+    
+    for i in range(5):
+        address_name = request.form.get(f'address_name_{i}')
+        address = request.form.get(f'address_{i}')
+        
+        if address_name and address:
+            addresses.append(Address(user_id=user_id, street=address_name, city=address, state="State", zip_code="12345"))
+    
+    if addresses:
+        db.session.add_all(addresses)
+        db.session.commit()
+    
+    return redirect('/profile')  # Redirect to the user profile or another page
+
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
     # Retrieve static fields
