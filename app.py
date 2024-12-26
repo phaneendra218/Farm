@@ -29,7 +29,15 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)  # Admin flag
     phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
     address = db.Column(db.String(255), nullable=True)  # Primary address
-    addresses = db.relationship('User', backref='addresses', lazy=True)  # Relationship to Address table
+    addresses = db.relationship('Address', backref='user', lazy=True)  # Relationship to Address table
+
+class Address(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to User table
+    street = db.Column(db.String(255), nullable=False)
+    city = db.Column(db.String(100), nullable=False)
+    state = db.Column(db.String(100), nullable=False)
+    zip_code = db.Column(db.String(20), nullable=False)
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
