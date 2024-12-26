@@ -377,6 +377,32 @@ def profile():
     
     return render_template('profile.html', user=user, edit_mode=edit_mode)
 
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    # Retrieve static fields
+    phone_number = request.form.get('phone_number')
+    address = request.form.get('address')
+    password = request.form.get('password')
+
+    # Process dynamically added addresses
+    custom_addresses = []
+    for i in range(1, 6):  # Max 5 addresses
+        address_name = request.form.get(f'address_name_{i}')
+        address_value = request.form.get(f'address_{i}')
+        if address_name and address_value:
+            custom_addresses.append({'name': address_name, 'address': address_value})
+
+    # Update the database (assume `user` is the current user object)
+    user.phone_number = phone_number
+    user.address = address
+    user.password = password  # Ensure password is hashed
+
+    # Update custom addresses in the database
+    user.custom_addresses = custom_addresses  # Update logic depends on your database schema
+    db.session.commit()
+
+    return redirect('/profile')
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Ensures tables are created before starting the app
