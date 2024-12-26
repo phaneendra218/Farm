@@ -358,9 +358,8 @@ def profile():
         db.session.commit()
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
-    
-    edit_mode = request.args.get('edit', 'false') == 'true'
-    return render_template('profile.html', user=user, edit_mode=edit_mode)
+
+    return render_template('profile.html', user=user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():
