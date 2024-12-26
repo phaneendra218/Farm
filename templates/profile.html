@@ -122,43 +122,12 @@
         <div id="button-group">
             <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
                 <button type="button">Edit Profile</button>
+            </a>
         </div>
     </form>
 </div>
 
-<script>
-    // Function to enable editing fields
-    function enableEdit() {
-        const fields = ['phone_number', 'address', 'alternate_address', 'password'];
-        fields.forEach(id => {
-            const field = document.getElementById(id);
-            if (field) field.removeAttribute('readonly');
-        });
-
-        // Show Update/Cancel buttons and hide Edit button
-        document.getElementById('edit-btn').style.display = 'none';
-        document.getElementById('update-btn').style.display = 'inline-block';
-        document.getElementById('cancel-btn').style.display = 'inline-block';
-    }
-
-    // Function to cancel editing and reset fields
-    function cancelEdit() {
-        // Re-add readonly to fields
-        const fields = ['phone_number', 'address', 'alternate_address', 'password'];
-        fields.forEach(id => {
-            const field = document.getElementById(id);
-            if (field) {
-                field.setAttribute('readonly', true);
-                field.value = field.defaultValue; // Reset value
-            }
-        });
-
-        // Hide Update/Cancel buttons and show Edit button
-        document.getElementById('edit-btn').style.display = 'inline-block';
-        document.getElementById('update-btn').style.display = 'none';
-        document.getElementById('cancel-btn').style.display = 'none';
-    }
-
+<!-- <script>
     // Existing validation logic
     function validateForm() {
         const phoneInput = document.getElementById('phone_number');
@@ -173,6 +142,6 @@
             return confirm("Are you sure you want to update your profile?");
         }
     }
-</script>
+</script> -->
 
 {% endblock %}
