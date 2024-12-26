@@ -375,7 +375,7 @@ def profile():
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
     
-    return render_template('profile.html', user=user)
+    return render_template('profile.html', user=user, edit_mode=edit_mode)
 
 if __name__ == '__main__':
     with app.app_context():
