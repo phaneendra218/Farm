@@ -36,6 +36,7 @@ class Item(db.Model):
     name = db.Column(db.String(120), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_path = db.Column(db.String(255), nullable=True)
+    unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
 
 class Order(db.Model):
@@ -141,6 +142,7 @@ def add_item():
         # Get item details from the form
         name = request.form['name']
         price = request.form['price']
+        unit = request.form['unit']
         
         # Handle the image file
         if 'image' not in request.files:

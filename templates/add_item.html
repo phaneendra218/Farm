@@ -6,10 +6,18 @@
     <label>Item Name</label><br>
     <input type="text" name="name" required><br>
     
-    <label>Item Price</label><br>
+    <label>Item Price (₹)</label><br>
     <input type="number" name="price" step="0.01" required><br>
+    
+    <!-- Add unit selection -->
+    <label>Unit</label><br>
+    <select name="unit" required>
+        <option value="kg">kg</option>
+        <option value="piece">piece</option>
+        <option value="litre">litre</option>
+        <option value="dozen">dozen</option>
+    </select><br>
 
-    <!-- Add image upload field -->
     <label>Item Image</label><br>
     <input type="file" name="image" accept="image/*" required><br>
     

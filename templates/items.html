@@ -9,7 +9,7 @@
         {% for item in items %}
             <div class="item-card" style="position:relative;">
                 <h4>{{ item.name }}</h4>
-                <p>Price: ₹{{ item.price }}</p>
+                <p>Price: ₹{{ item.price }} /{{ item.unit }}</p>
                 
                 <!-- Display image if it exists -->
                 {% if item.image_path %}
