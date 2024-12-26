@@ -120,9 +120,7 @@
 
         <!-- Buttons -->
         <div id="button-group">
-            <button type="button" id="edit-btn" onclick="enableEdit()">Edit Profile</button>
-            <button type="submit" id="update-btn" style="display:none;">Update Profile</button>
-            <button type="button" id="cancel-btn" class="cancel-btn" style="display:none;" onclick="cancelEdit()">Cancel</button>
+            <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">Edit Profile</a>
         </div>
     </form>
 </div>

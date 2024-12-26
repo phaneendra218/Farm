@@ -337,6 +337,7 @@ def update_item(item_id):
         return redirect(url_for('items'))  # Redirect to the list of items page
     # If GET request, render the update form with item details
     return render_template('update_item.html', item=item)
+
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'user_id' not in session:
@@ -360,6 +361,28 @@ def profile():
     
     edit_mode = request.args.get('edit', 'false') == 'true'
     return render_template('profile.html', user=user, edit_mode=edit_mode)
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+def edit_profile():
+    if 'user_id' not in session:
+        flash('Please login to edit your profile', 'danger')
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+
+    if request.method == 'POST':
+        # Update profile information
+        user.phone_number = request.form['phone_number']
+        user.address = request.form['address']
+        user.alternate_address = request.form['alternate_address'] if request.form.get('alternate_address') else None
+        if request.form['password']:
+            user.password = request.form['password']
+        
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
+    
+    return render_template('edit_profile.html', user=user)
 
 if __name__ == '__main__':
     with app.app_context():
