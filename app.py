@@ -166,7 +166,7 @@ def add_item():
             image.save(image_path)
 
             # Save item to database with image path
-            new_item = Item(name=name, price=float(price), image_path=image_path)
+            new_item = Item(name=name, price=float(price), unit=unit, image_path=image_path)
             db.session.add(new_item)
             db.session.commit()
 
@@ -330,7 +330,8 @@ def update_item(item_id):
             item.image_path = image_path  # Update the image path in the item
         # Update the item details
         item.name = name
-        item.price = float(price)        
+        item.price = float(price)
+        item.unit = unit    
         db.session.commit()
         flash(f'Item "{name}" updated successfully!', 'success')
         return redirect(url_for('items'))  # Redirect to the list of items page
