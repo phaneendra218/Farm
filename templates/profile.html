@@ -156,7 +156,6 @@
 
     // Function to cancel editing and reset fields
     function cancelEdit() {
-        // Re-add readonly to fields
         const fields = ['phone_number', 'address', 'password'];
         fields.forEach(id => {
             const field = document.getElementById(id);
@@ -165,11 +164,20 @@
                 field.value = field.defaultValue; // Reset value
             }
         });
-
-        // Disable custom address fields
+    
+        // Disable existing custom address fields
         const addressFields = document.querySelectorAll("#custom-addresses input, #custom-addresses textarea");
-        addressFields.forEach(field => field.setAttribute('readonly', true));
-
+        addressFields.forEach(field => {
+            field.setAttribute('readonly', true);
+            field.value = field.defaultValue; // Reset value
+        });
+    
+        // Remove dynamically added address fields
+        const dynamicFields = document.querySelectorAll("#custom-addresses .dynamic-address");
+        dynamicFields.forEach(field => field.remove());
+    
+        addressCount = {{ user.custom_addresses|length }}; // Reset count
+    
         // Hide Update/Cancel buttons and show Edit button
         document.getElementById('edit-btn').style.display = 'inline-block';
         document.getElementById('update-btn').style.display = 'none';
