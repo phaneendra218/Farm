@@ -308,6 +308,7 @@ def update_item(item_id):
         # Get the updated details from the form
         name = request.form['name']
         price = request.form['price']
+        unit = request.form['unit']
         
         # Handle the image file
         image = request.files.get('image')
