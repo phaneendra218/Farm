@@ -388,10 +388,10 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Ensures tables are created before starting the app
 
-        # Ensure an admin user exists (for simplicity, hardcoding admin credentials here)
-        if not User.query.filter_by(username='admin').first():
-            admin_user = User(username='admin', password='admin', is_admin=True)
-            db.session.add(admin_user)
-            db.session.commit()
+        # # Ensure an admin user exists (for simplicity, hardcoding admin credentials here)
+        # if not User.query.filter_by(username='admin').first():
+        #     admin_user = User(username='admin', password='admin', is_admin=True)
+        #     db.session.add(admin_user)
+        #     db.session.commit()
 
     app.run(host='0.0.0.0', port=5000)
