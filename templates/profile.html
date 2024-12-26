@@ -2,7 +2,6 @@
 
 {% block content %}
 <style>
-    /* Existing Styles */
     .profile-container {
         max-width: 500px;
         margin: 0 auto;
@@ -74,20 +73,6 @@
         margin-top: -10px;
         margin-bottom: 10px;
     }
-
-    .address-container {
-        margin-bottom: 15px;
-    }
-
-    .address-container input,
-    .address-container textarea {
-        margin-bottom: 5px;
-    }
-
-    .address-label {
-        font-size: 14px;
-    }
-
 </style>
 
 <div class="profile-container">
@@ -104,25 +89,9 @@
         <label>Primary Address</label>
         <textarea name="address" id="address" rows="3" readonly>{{ user.address }}</textarea>
 
-        <!-- Custom Addresses Section -->
-        <label>Custom Addresses (Max 5)</label>
-        <div id="custom-addresses">
-            {% for address in user.custom_addresses %}
-            <div class="address-container">
-                <label class="address-label">Address Name</label>
-                <input type="text" name="address_name_{{ loop.index }}" value="{{ address.name }}" readonly>
-                <label class="address-label">Address</label>
-                <textarea name="address_{{ loop.index }}" rows="3" readonly>{{ address.address }}</textarea>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div id="address-container"></div>
-        <div id="error-message" style="color: red; display: none;">You can add up to 5 custom addresses only.</div>
-
-        <div id="add-address-container">
-            <button type="button" id="add-address-btn" onclick="addNewAddress()">Add New Address</button>
-        </div>
+        <!-- Alternate Address Field (always visible in both modes) -->
+        <label id="alternate_address_label">Alternate Address</label>
+        <textarea name="alternate_address" id="alternate_address" rows="3" readonly>{{ user.alternate_address }}</textarea>
 
         <label>Password</label>
         <input type="password" name="password" id="password" placeholder="New password" readonly>
@@ -137,31 +106,36 @@
 </div>
 
 <script>
-    let addressCount = {{ user.custom_addresses|length }}; // Initial address count based on existing addresses
-    const maxAddresses = 5;
+    // Function to enable editing fields
+    function enableEdit() {
+        const fields = ['phone_number', 'address', 'alternate_address', 'password'];
+        fields.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) field.removeAttribute('readonly');
+        });
 
-    function addNewAddress() {
-        const addressContainer = document.getElementById("address-container");
-        const errorMessage = document.getElementById("error-message");
+        // Show Update/Cancel buttons and hide Edit button
+        document.getElementById('edit-btn').style.display = 'none';
+        document.getElementById('update-btn').style.display = 'inline-block';
+        document.getElementById('cancel-btn').style.display = 'inline-block';
+    }
 
-        if (addressCount >= maxAddresses) {
-            errorMessage.style.display = "block";
-            return;
-        }
+    // Function to cancel editing and reset fields
+    function cancelEdit() {
+        // Re-add readonly to fields
+        const fields = ['phone_number', 'address', 'alternate_address', 'password'];
+        fields.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) {
+                field.setAttribute('readonly', true);
+                field.value = field.defaultValue; // Reset value
+            }
+        });
 
-        errorMessage.style.display = "none";
-
-        const newAddress = document.createElement("div");
-        newAddress.className = "address-container dynamic-address";
-        newAddress.innerHTML = `
-            <label class="address-label">Address Name</label>
-            <input type="text" name="address_name_${addressCount + 1}" placeholder="Work" required>
-            <label class="address-label">Address</label>
-            <textarea name="address_${addressCount + 1}" rows="3" placeholder="456 Elm St" required></textarea>
-        `;
-
-        addressContainer.appendChild(newAddress);
-        addressCount++;
+        // Hide Update/Cancel buttons and show Edit button
+        document.getElementById('edit-btn').style.display = 'inline-block';
+        document.getElementById('update-btn').style.display = 'none';
+        document.getElementById('cancel-btn').style.display = 'none';
     }
 
     // Existing validation logic
