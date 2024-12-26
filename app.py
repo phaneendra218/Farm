@@ -28,8 +28,8 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)  # Admin flag
     phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
-    address = db.Column(db.String(255), nullable=True)  # New field for address
-    alternate_address = db.Column(db.String(255), nullable=True)
+    address = db.Column(db.String(255), nullable=True)  # Primary address
+    addresses = db.relationship('Address', backref='user', lazy=True)  # Relationship to Address table
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -337,6 +337,7 @@ def update_item(item_id):
         return redirect(url_for('items'))  # Redirect to the list of items page
     # If GET request, render the update form with item details
     return render_template('update_item.html', item=item)
+
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'user_id' not in session:
@@ -349,17 +350,24 @@ def profile():
         # Update profile information
         user.phone_number = request.form['phone_number']
         user.address = request.form['address']
-        user.alternate_address = request.form['alternate_address'] if request.form.get('alternate_address') else None
-        # Update password if provided
-        if request.form['password']:
-            user.password = request.form['password']
+        
+        # Add new address if provided
+        if request.form.get('new_address') and request.form.get('new_address_name'):
+            if len(user.addresses) >= 5:
+                flash('You can only add up to 5 addresses.', 'danger')
+            else:
+                new_address = Address(
+                    user_id=user.id,
+                    name=request.form['new_address_name'],
+                    address=request.form['new_address']
+                )
+                db.session.add(new_address)
         
         db.session.commit()
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
     
-    edit_mode = request.args.get('edit', 'false') == 'true'
-    return render_template('profile.html', user=user, edit_mode=edit_mode)
+    return render_template('profile.html', user=user)
 
 if __name__ == '__main__':
     with app.app_context():

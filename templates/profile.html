@@ -73,6 +73,20 @@
         margin-top: -10px;
         margin-bottom: 10px;
     }
+
+    .address-container {
+        margin-bottom: 15px;
+    }
+
+    .address-container input,
+    .address-container textarea {
+        margin-bottom: 5px;
+    }
+
+    .address-label {
+        font-size: 14px;
+    }
+
 </style>
 
 <div class="profile-container">
@@ -89,9 +103,22 @@
         <label>Primary Address</label>
         <textarea name="address" id="address" rows="3" readonly>{{ user.address }}</textarea>
 
-        <!-- Alternate Address Field (always visible in both modes) -->
-        <label id="alternate_address_label">Alternate Address</label>
-        <textarea name="alternate_address" id="alternate_address" rows="3" readonly>{{ user.alternate_address }}</textarea>
+        <!-- Custom Addresses Section -->
+        <label>Custom Addresses (Max 5)</label>
+        <div id="custom-addresses">
+            {% for address in user.custom_addresses %}
+            <div class="address-container">
+                <label class="address-label">Address Name</label>
+                <input type="text" name="address_name_{{ loop.index }}" value="{{ address.name }}" readonly>
+                <label class="address-label">Address</label>
+                <textarea name="address_{{ loop.index }}" rows="3" readonly>{{ address.address }}</textarea>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="add-address-container">
+            <button type="button" id="add-address-btn" onclick="addAddressField()">Add New Address</button>
+        </div>
 
         <label>Password</label>
         <input type="password" name="password" id="password" placeholder="New password" readonly>
@@ -106,13 +133,20 @@
 </div>
 
 <script>
+    let addressCount = {{ user.custom_addresses|length }};
+    const maxAddresses = 5;
+
     // Function to enable editing fields
     function enableEdit() {
-        const fields = ['phone_number', 'address', 'alternate_address', 'password'];
+        const fields = ['phone_number', 'address', 'password'];
         fields.forEach(id => {
             const field = document.getElementById(id);
             if (field) field.removeAttribute('readonly');
         });
+
+        // Enable custom address fields
+        const addressFields = document.querySelectorAll("#custom-addresses input, #custom-addresses textarea");
+        addressFields.forEach(field => field.removeAttribute('readonly'));
 
         // Show Update/Cancel buttons and hide Edit button
         document.getElementById('edit-btn').style.display = 'none';
@@ -123,7 +157,7 @@
     // Function to cancel editing and reset fields
     function cancelEdit() {
         // Re-add readonly to fields
-        const fields = ['phone_number', 'address', 'alternate_address', 'password'];
+        const fields = ['phone_number', 'address', 'password'];
         fields.forEach(id => {
             const field = document.getElementById(id);
             if (field) {
@@ -132,10 +166,32 @@
             }
         });
 
+        // Disable custom address fields
+        const addressFields = document.querySelectorAll("#custom-addresses input, #custom-addresses textarea");
+        addressFields.forEach(field => field.setAttribute('readonly', true));
+
         // Hide Update/Cancel buttons and show Edit button
         document.getElementById('edit-btn').style.display = 'inline-block';
         document.getElementById('update-btn').style.display = 'none';
         document.getElementById('cancel-btn').style.display = 'none';
+    }
+
+    // Function to add a new address field
+    function addAddressField() {
+        if (addressCount < maxAddresses) {
+            addressCount++;
+            const newAddressField = `
+                <div class="address-container" id="address_${addressCount}">
+                    <label class="address-label">Address Name</label>
+                    <input type="text" name="address_name_${addressCount}" required>
+                    <label class="address-label">Address</label>
+                    <textarea name="address_${addressCount}" rows="3" required></textarea>
+                </div>
+            `;
+            document.getElementById('custom-addresses').insertAdjacentHTML('beforeend', newAddressField);
+        } else {
+            alert('You can add up to 5 custom addresses only.');
+        }
     }
 
     // Existing validation logic
