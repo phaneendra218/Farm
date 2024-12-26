@@ -351,6 +351,7 @@ def profile():
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
+    addresses = Address.query.filter_by(user_id=user.id).all()
 
     if request.method == 'POST':
         # Update profile information
@@ -376,7 +377,7 @@ def profile():
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
     
-    return render_template('profile.html', user=user)
+    return render_template('profile.html', user=user, addresses=addresses)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():

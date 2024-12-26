@@ -111,7 +111,7 @@
         <!-- Address Section -->
         <div class="profile-section">
             <h3>Addresses</h3>
-            {% for address in user.addresses %}
+            {% for address in addresses %}
             <label>{{ address.address_type.capitalize() }} Address</label>
             <textarea name="addresses" id="address" rows="3" readonly>{{ address.address }}</textarea>
             {% if address.is_default %}
