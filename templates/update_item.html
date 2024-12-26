@@ -15,10 +15,11 @@
     <div class="form-group">
       <label for="unit">Unit</label><br>
       <select class="form-control" id="unit" name="unit" required>
-        <option value="kg" {% if item.unit == "kg" %}selected{% endif %}>kg</option>
-        <option value="piece" {% if item.unit == "piece" %}selected{% endif %}>piece</option>
-        <option value="litre" {% if item.unit == "litre" %}selected{% endif %}>litre</option>
-        <option value="dozen" {% if item.unit == "dozen" %}selected{% endif %}>dozen</option>
+        <option value="kg" {% if item.unit == "kg" %}selected{% endif %}>Kg</option>
+        <option value="piece" {% if item.unit == "piece" %}selected{% endif %}>Piece</option>
+        <option value="litre" {% if item.unit == "litre" %}selected{% endif %}>Litre</option>
+        <option value="dozen" {% if item.unit == "dozen" %}selected{% endif %}>Dozen</option>
+        <option value="bag" {% if item.unit == "bag" %}selected{% endif %}>Bag</option>
       </select><br>
     </div>
     <div class="form-group">
