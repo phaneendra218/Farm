@@ -8,7 +8,7 @@
         {% for basket_item, item in basket_items %}
             <div class="basket-item-card">
                 <h4>{{ item.name }}</h4>
-                <p>Price: ₹{{ item.price }} x {{ basket_item.quantity }}</p>
+                <p>Price: ₹{{ item.price }} /{{ item.unit }} x {{ basket_item.quantity }}</p>
                 {% if item.image_path %}
                     <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width:150px; height:100px;">
                 {% else %}
