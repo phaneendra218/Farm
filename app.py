@@ -22,14 +22,20 @@ if not os.path.exists(UPLOAD_FOLDER):
 db = SQLAlchemy(app)
 
 # Models
+class Address(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    address_type = db.Column(db.String(50), nullable=False)  # e.g., home, office, etc.
+    is_default = db.Column(db.Boolean, default=False)
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)  # Admin flag
     phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
-    address = db.Column(db.String(255), nullable=True)  # Primary address
-    alternate_address = db.Column(db.String(255), nullable=True)
+    addresses = db.relationship('Address', backref='user', lazy=True)
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -349,8 +355,19 @@ def profile():
     if request.method == 'POST':
         # Update profile information
         user.phone_number = request.form['phone_number']
-        user.address = request.form['address']
-        user.alternate_address = request.form['alternate_address'] if request.form.get('alternate_address') else None
+        addresses = request.form.getlist('addresses')
+        address_types = request.form.getlist('address_types')
+        default_address = request.form['default_address']
+
+        # Clear existing addresses
+        Address.query.filter_by(user_id=user.id).delete()
+
+        # Add new addresses
+        for i in range(len(addresses)):
+            is_default = (default_address == address_types[i])
+            new_address = Address(user_id=user.id, address=addresses[i], address_type=address_types[i], is_default=is_default)
+            db.session.add(new_address)
+
         # Update password if provided
         if request.form['password']:
             user.password = request.form['password']
@@ -358,7 +375,7 @@ def profile():
         db.session.commit()
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
-
+    
     return render_template('profile.html', user=user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -372,8 +389,20 @@ def edit_profile():
     if request.method == 'POST':
         # Update profile information
         user.phone_number = request.form['phone_number']
-        user.address = request.form['address']
-        user.alternate_address = request.form['alternate_address'] if request.form.get('alternate_address') else None
+        addresses = request.form.getlist('addresses')
+        address_types = request.form.getlist('address_types')
+        default_address = request.form['default_address']
+
+        # Clear existing addresses
+        Address.query.filter_by(user_id=user.id).delete()
+
+        # Add new addresses
+        for i in range(len(addresses)):
+            is_default = (default_address == address_types[i])
+            new_address = Address(user_id=user.id, address=addresses[i], address_type=address_types[i], is_default=is_default)
+            db.session.add(new_address)
+
+        # Update password if provided
         if request.form['password']:
             user.password = request.form['password']
         

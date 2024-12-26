@@ -58,11 +58,14 @@
         <label>Phone Number</label>
         <input type="text" name="phone_number" value="{{ user.phone_number }}" maxlength="10" pattern="\d{10}" title="Phone number must be exactly 10 digits." required>
 
-        <label>Primary Address</label>
-        <textarea name="address" rows="3" required>{{ user.address }}</textarea>
-
-        <label>Alternate Address</label>
-        <textarea name="alternate_address" rows="3">{{ user.alternate_address }}</textarea>
+        {% for address in user.addresses %}
+        <label>{{ address.address_type.capitalize() }} Address</label>
+        <textarea name="addresses" rows="3" required>{{ address.address }}</textarea>
+        <input type="hidden" name="address_types" value="{{ address.address_type }}">
+        <label>
+            <input type="radio" name="default_address" value="{{ address.address_type }}" {% if address.is_default %}checked{% endif %}> Make this address default
+        </label>
+        {% endfor %}
 
         <label>New Password</label>
         <input type="password" name="password" placeholder="New password">

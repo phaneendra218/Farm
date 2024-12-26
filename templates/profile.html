@@ -110,12 +110,14 @@
 
         <!-- Address Section -->
         <div class="profile-section">
-            <h3>Address</h3>
-            <label>Primary Address</label>
-            <textarea name="address" id="address" rows="3" readonly>{{ user.address }}</textarea>
-
-            <label>Alternate Address</label>
-            <textarea name="alternate_address" id="alternate_address" rows="3" readonly>{{ user.alternate_address }}</textarea>
+            <h3>Addresses</h3>
+            {% for address in user.addresses %}
+            <label>{{ address.address_type.capitalize() }} Address</label>
+            <textarea name="addresses" id="address" rows="3" readonly>{{ address.address }}</textarea>
+            {% if address.is_default %}
+            <p><strong>Default Address</strong></p>
+            {% endif %}
+            {% endfor %}
         </div>
 
         <!-- Buttons -->
