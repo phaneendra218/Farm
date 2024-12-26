@@ -22,13 +22,6 @@ if not os.path.exists(UPLOAD_FOLDER):
 db = SQLAlchemy(app)
 
 # Models
-class Address(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    address = db.Column(db.String(255), nullable=False)
-    address_type = db.Column(db.String(50), nullable=False)  # e.g., home, office, etc.
-    is_default = db.Column(db.Boolean, default=False)
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -36,6 +29,13 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)  # Admin flag
     phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
     addresses = db.relationship('Address', backref='user', lazy=True)
+
+class Address(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    address_type = db.Column(db.String(50), nullable=False)  # e.g., home, office, etc.
+    is_default = db.Column(db.Boolean, default=False)
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
