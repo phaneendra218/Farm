@@ -185,6 +185,22 @@
                 <p>No addresses available.</p>
             {% endif %}
         </div>
+
+        <!-- Add New Address Section -->
+        <div class="profile-section">
+            <h3>Add New Address</h3>
+            <form id="add-address-form">
+                <input type="text" name="address_type" placeholder="Address Type (e.g., Home, Office)" required style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;">
+                <textarea name="address" placeholder="Enter Address" required style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;"></textarea>
+                <div style="margin-bottom: 10px;">
+                    <label>
+                        <input type="checkbox" name="is_default" style="margin-right: 5px;">
+                        Set as Default Address
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Address</button>
+            </form>
+        </div>
     </div>
 
     <!-- Edit Profile Button -->
