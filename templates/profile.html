@@ -28,103 +28,46 @@
         background-color: #fff;
     }
 
-    .profile-section h3 {
-        margin-bottom: 15px;
-        color: #555;
-        font-size: 20px;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 10px;
-    }
-
-    .address-section {
-        margin-bottom: 15px;
-    }
-
-    .address-section p {
-        margin: 5px 0;
-        line-height: 1.6;
-    }
-
-    .address-section strong {
-        color: #4CAF50;
-        font-size: 16px;
-    }
-
-    .default-address {
-        background-color: #e8f5e9;
-        border-left: 4px solid #4CAF50;
-        padding: 15px;
-        margin-bottom: 15px;
+    .btn {
+        padding: 8px 12px;
         border-radius: 5px;
-        position: relative;
+        cursor: pointer;
+        font-size: 14px;
+        margin: 0 5px;
     }
 
-    .default-address .badge {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background-color: #4CAF50;
-        color: #fff;
-        font-size: 12px;
-        font-weight: bold;
-        padding: 5px 10px;
-        border-radius: 20px;
-        text-transform: uppercase;
-    }
-
-    .non-default-address {
-        background-color: #f9f9f9;
-        border-left: 4px solid #ccc;
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    .profile-container button {
+    .btn-primary {
         background-color: #4CAF50;
         color: white;
         border: none;
-        padding: 12px 25px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease;
     }
 
-    .profile-container button:hover {
+    .btn-primary:hover {
         background-color: #45a049;
-    }
-
-    .profile-container .btn-primary {
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
     }
 
     .btn-secondary {
         background-color: #6c757d;
         color: white;
         border: none;
-        padding: 5px 10px;
-        margin-right: 5px;
-        border-radius: 5px;
-        cursor: pointer;
     }
 
-    .btn-secondary:disabled {
-        background-color: #ccc;
+    .btn-secondary:hover {
+        background-color: #5a6268;
     }
 
     .btn-danger {
         background-color: #dc3545;
         color: white;
         border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
     }
 
     .btn-danger:hover {
         background-color: #c82333;
+    }
+
+    .hidden {
+        display: none;
     }
 
     @media (max-width: 768px) {
@@ -132,13 +75,9 @@
             padding: 20px;
         }
 
-        .profile-section h3 {
-            font-size: 18px;
-        }
-
-        .profile-container button {
+        .btn {
             width: 100%;
-            padding: 10px;
+            margin-top: 10px;
         }
     }
 </style>
@@ -149,9 +88,14 @@
         <!-- Phone Number Section -->
         <div class="profile-section">
             <label><strong>Phone Number:</strong></label>
-            <div>
-                <input type="text" id="phone-number" value="{{ user.phone_number }}" placeholder="Enter your phone number" style="padding: 8px; width: 80%; border: 1px solid #ccc; border-radius: 5px;">
-                <button id="update-phone-number" class="btn btn-primary" style="margin-left: 10px;">Update</button>
+            <div id="phone-display">
+                <span id="phone-number">{{ user.phone_number }}</span>
+                <button id="edit-phone" class="btn btn-secondary">Edit</button>
+            </div>
+            <div id="phone-edit" class="hidden">
+                <input type="text" id="phone-input" value="{{ user.phone_number }}" placeholder="Enter your phone number" style="padding: 8px; width: 60%; border: 1px solid #ccc; border-radius: 5px;">
+                <button id="update-phone" class="btn btn-primary">Update</button>
+                <button id="cancel-edit" class="btn btn-danger">Cancel</button>
             </div>
         </div>
 
@@ -195,13 +139,31 @@
 </div>
 
 <script>
-    // Update phone number
-    document.getElementById('update-phone-number').addEventListener('click', function () {
-        const phoneNumber = document.getElementById('phone-number').value.trim();
+    const editButton = document.getElementById('edit-phone');
+    const updateButton = document.getElementById('update-phone');
+    const cancelButton = document.getElementById('cancel-edit');
+    const phoneDisplay = document.getElementById('phone-display');
+    const phoneEdit = document.getElementById('phone-edit');
+    const phoneNumber = document.getElementById('phone-number');
+    const phoneInput = document.getElementById('phone-input');
+
+    editButton.addEventListener('click', () => {
+        phoneDisplay.classList.add('hidden');
+        phoneEdit.classList.remove('hidden');
+    });
+
+    cancelButton.addEventListener('click', () => {
+        phoneEdit.classList.add('hidden');
+        phoneDisplay.classList.remove('hidden');
+        phoneInput.value = phoneNumber.textContent.trim();
+    });
+
+    updateButton.addEventListener('click', () => {
+        const newPhoneNumber = phoneInput.value.trim();
 
         // Validate phone number format
         const phoneRegex = /^[0-9]{10}$/;
-        if (!phoneRegex.test(phoneNumber)) {
+        if (!phoneRegex.test(newPhoneNumber)) {
             alert('Please enter a valid 10-digit phone number.');
             return;
         }
@@ -214,7 +176,7 @@
             },
             body: new URLSearchParams({
                 action: 'update_phone_number',
-                phone_number: phoneNumber,
+                phone_number: newPhoneNumber,
             }),
         })
         .then(response => response.json())
@@ -222,37 +184,13 @@
             if (data.message) {
                 alert(data.message);
                 if (data.success) {
-                    window.location.reload();
+                    phoneNumber.textContent = newPhoneNumber;
+                    phoneEdit.classList.add('hidden');
+                    phoneDisplay.classList.remove('hidden');
                 }
             }
         })
         .catch(error => console.error('Error:', error));
-    });
-
-    // Delete address functionality (existing)
-    document.querySelectorAll('.delete-address').forEach(button => {
-        button.addEventListener('click', function () {
-            const addressId = this.getAttribute('data-id');
-            if (confirm('Are you sure you want to delete this address?')) {
-                fetch('{{ url_for("delete_address_by_id") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        address_id: addressId,
-                    }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message);
-                        window.location.reload();
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        });
     });
 </script>
 {% endblock %}
