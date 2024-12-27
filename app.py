@@ -394,7 +394,7 @@ def edit_profile():
 
         # Ensure only one default address
         default_addresses = [a for a in user.addresses if a.is_default]
-        if len(default_addresses > 1):
+        if len(default_addresses) > 1:
             for address in default_addresses[1:]:
                 address.is_default = False
 
@@ -404,6 +404,17 @@ def edit_profile():
 
     # Pass 'enumerate' explicitly to the template context
     return render_template('edit_profile.html', user=user, enumerate=enumerate)
+
+@app.route('/delete_address/<int:address_id>', methods=['POST'])
+def delete_address(address_id):
+    address = Address.query.get(address_id)
+    if address and address.user_id == session['user_id']:
+        db.session.delete(address)
+        db.session.commit()
+        flash('Address deleted successfully!', 'success')
+    else:
+        flash('Address not found or unauthorized.', 'danger')
+    return redirect(url_for('edit_profile'))
 
 if __name__ == '__main__':
     with app.app_context():
