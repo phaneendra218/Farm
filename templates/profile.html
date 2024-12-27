@@ -161,38 +161,39 @@
     updateButton.addEventListener('click', () => {
         const newPhoneNumber = phoneInput.value.trim();
 
-        // Validate phone number format
         const phoneRegex = /^[0-9]{10}$/;
         if (!phoneRegex.test(newPhoneNumber)) {
             alert('Please enter a valid 10-digit phone number.');
             return;
         }
-
-        // Send updated phone number to the server
         fetch('{{ url_for("profile") }}', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
+           },
             body: new URLSearchParams({
                 action: 'update_phone_number',
                 phone_number: newPhoneNumber,
             }),
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                phoneNumber.textContent = newPhoneNumber;
-                alert('Phone number updated successfully!');
-                phoneEdit.classList.add('hidden');
-                phoneDisplay.classList.remove('hidden');
-            } else {
-                alert(data.message || 'Failed to update the phone number. Please try again.');
-            }
-        })     
-        .catch(error => {
+        .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.message || 'An error occurred');
+            });
+        }
+        return response.json();
+       })
+       .then(data => {
+        phoneNumber.textContent = newPhoneNumber;
+        alert(data.message || 'Phone number updated successfully!');
+        phoneEdit.classList.add('hidden');
+        phoneDisplay.classList.remove('hidden');
+    })    
+    .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while updating the phone number. Please try again.');
+        alert(error.message || 'An error occurred while updating the phone number. Please try again.');
     });
     });
 </script>

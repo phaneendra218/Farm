@@ -372,10 +372,10 @@ def profile():
         elif action == 'update_phone_number':
             phone_number = request.form.get('phone_number')
             if not phone_number or not phone_number.isdigit() or len(phone_number) != 10:
-                return jsonify({'message': 'Invalid phone number. Please enter a valid 10-digit number.', 'success': False})
+                return jsonify({'message': 'Invalid phone number. Please enter a valid 10-digit number.', 'success': False}), 400
             user.phone_number = phone_number
             db.session.commit()
-            return jsonify({'message': 'Phone number updated successfully!', 'success': True})
+            return jsonify({'message': 'Phone number updated successfully!', 'success': True}), 200
 
     return render_template('profile.html', user=user)
 
