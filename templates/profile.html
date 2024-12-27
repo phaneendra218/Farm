@@ -181,16 +181,19 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.message) {
-                alert(data.message);
-                if (data.success) {
-                    phoneNumber.textContent = newPhoneNumber;
-                    phoneEdit.classList.add('hidden');
-                    phoneDisplay.classList.remove('hidden');
-                }
+            if (data.success) {
+                phoneNumber.textContent = newPhoneNumber;
+                alert('Phone number updated successfully!');
+                phoneEdit.classList.add('hidden');
+                phoneDisplay.classList.remove('hidden');
+            } else {
+                alert(data.message || 'Failed to update the phone number. Please try again.');
             }
-        })
-        .catch(error => console.error('Error:', error));
+        })     
+        .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the phone number. Please try again.');
+    });
     });
 </script>
 {% endblock %}
