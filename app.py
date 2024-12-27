@@ -372,7 +372,7 @@ def edit_profile():
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
-    addresses = list(user.addresses)  # Convert query object to a list
+    addresses = list(user.addresses)
 
     if request.method == 'POST':
         # Update phone number
