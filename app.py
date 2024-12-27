@@ -416,6 +416,18 @@ def profile():
             else:
                 return jsonify({'success': False, 'message': 'Please provide valid address details.'}), 400
 
+        # Handle deleting an address
+        elif action == 'delete_address':
+            address_id = request.form.get('address_id')
+            address = Address.query.get(address_id)
+
+            if address and address.user_id == user.id:
+                db.session.delete(address)
+                db.session.commit()
+                return jsonify({'success': True, 'message': 'Address deleted successfully!'}), 200
+
+            return jsonify({'success': False, 'message': 'Failed to delete the address.'}), 400
+
     return render_template('profile.html', user=user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
