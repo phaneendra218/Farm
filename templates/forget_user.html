@@ -2,8 +2,7 @@
 
 {% block content %}
 <style>
-    /* Add similar styling as login for consistency */
-    .forget-password-container {
+    .forget-user-container {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -11,7 +10,7 @@
         background-color: #f4f7fc;
     }
 
-    .forget-password-box {
+    .forget-user-box {
         background-color: #fff;
         padding: 20px;
         border-radius: 8px;
@@ -29,16 +28,14 @@
     }
 </style>
 
-<div class="forget-password-container">
-    <div class="forget-password-box">
-        <h2>Forget Password</h2>
+<div class="forget-user-container">
+    <div class="forget-user-box">
+        <h2>Forgot Username</h2>
         <form method="POST">
-            <label for="username">Username<span class="mandatory">*</span></label>
-            <input type="text" id="username" name="username" required>        
             <label for="phone_number">Phone Number<span class="mandatory">*</span></label>
-            <input type="text" id="phone_number" name="phone_number" required>        
+            <input type="text" id="phone_number" name="phone_number" required>
             <button type="submit">Submit</button>
-        </form>       
+        </form>
     </div>
 </div>
 {% endblock %}

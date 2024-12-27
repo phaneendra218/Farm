@@ -112,14 +112,17 @@ def login():
 @app.route('/forget_password', methods=['GET', 'POST'])
 def forget_password():
     if request.method == 'POST':
+        username = request.form['username']
         phone_number = request.form['phone_number']
-        user = User.query.filter_by(phone_number=phone_number).first()
+        user = User.query.filter_by(username=username, phone_number=phone_number).first()
+
         if user:
-            session['reset_user_id'] = user.id  # Temporarily store user ID in session
-            flash('Phone number validated. Please update your password.', 'success')
+            session['reset_user_id'] = user.id
+            flash('Validation successful. Please update your password.', 'success')
             return redirect(url_for('update_password'))
         else:
-            flash('Phone number not matched. Please try again.', 'danger')
+            flash('Username and phone number do not match. Please try again.', 'danger')
+
     return render_template('forget_password.html')
 
 @app.route('/update_password', methods=['GET', 'POST'])
@@ -144,6 +147,20 @@ def update_password():
             return redirect(url_for('login'))
 
     return render_template('update_password.html')
+
+@app.route('/forget_user', methods=['GET', 'POST'])
+def forget_user():
+    if request.method == 'POST':
+        phone_number = request.form['phone_number']
+        user = User.query.filter_by(phone_number=phone_number).first()
+
+        if user:
+            flash(f'Your username is: {user.username}', 'success')
+            return redirect(url_for('login')) 
+        else:
+            flash('Phone number not found. Please try again.', 'danger')
+
+    return render_template('forget_user.html')
 
 @app.route('/items', methods=['GET', 'POST'])
 def items():
