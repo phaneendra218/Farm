@@ -87,6 +87,24 @@
         margin-bottom: 5px;
     }
 
+    .default-address {
+        border: 3px solid #2ecc71;
+        background-color: #f6fff5;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    .non-default-address {
+        border: 1px solid #e0e0e0;
+        background-color: #fff;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
     .toast {
         position: fixed;
         bottom: 20px;
@@ -131,7 +149,7 @@
             <h3>Addresses</h3>
             {% if user.addresses %}
                 {% for address in user.addresses %}
-                <div class="address-section">
+                <div class="address-section {% if address.is_default %}default-address{% else %}non-default-address{% endif %}">
                     {% if address.is_default %}
                         <span class="badge">Default</span>
                     {% endif %}
