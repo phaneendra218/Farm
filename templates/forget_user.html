@@ -54,11 +54,16 @@
         border-radius: 5px;
         cursor: pointer;
         font-size: 16px;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
     button:hover {
         background-color: #45a049;
+        transform: translateY(-2px);
+    }
+
+    button:active {
+        transform: translateY(1px);
     }
 
     /* Modal styles */
@@ -77,7 +82,7 @@
     .modal-content {
         background-color: #fff;
         margin: 15% auto;
-        padding: 20px;
+        padding: 20px 30px;
         border: 1px solid #888;
         border-radius: 8px;
         width: 80%;
@@ -97,6 +102,29 @@
     .close:focus {
         color: black;
         text-decoration: none;
+    }
+
+    /* Adjusting OK button size */
+    #okButton {
+        padding: 8px 20px;
+        font-size: 14px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        display: inline-block;
+        margin-top: 15px;
+    }
+
+    #okButton:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+    }
+
+    #okButton:active {
+        transform: translateY(1px);
     }
 </style>
 
