@@ -184,23 +184,26 @@
             {% else %}
                 <p>No addresses available.</p>
             {% endif %}
-        </div>
 
-        <!-- Add New Address Section -->
-        <div class="profile-section">
-            <h3>Add New Address</h3>
-            <form id="add-address-form">
-                <input type="hidden" name="action" value="add_new_address">
-                <input type="text" name="address_type" placeholder="Address Type (e.g., Home, Office)" required style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;">
-                <textarea name="address" placeholder="Enter Address" required style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;"></textarea>
-                <div style="margin-bottom: 10px;">
-                    <label>
-                        <input type="checkbox" name="is_default" style="margin-right: 5px;">
-                        Set as Default Address
-                    </label>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Address</button>
-            </form>
+            <!-- Add New Address Button -->
+            <button id="add-new-address-button" class="btn btn-success" style="margin-top: 20px;">+ Add A New Address</button>
+
+            <!-- Add New Address Form -->
+            <div id="add-address-form-container" class="hidden" style="margin-top: 20px;">
+                <form id="add-address-form">
+                    <input type="hidden" name="action" value="add_new_address">
+                    <input type="text" name="address_type" placeholder="Address Type (e.g., Home, Office)" required style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;">
+                    <textarea name="address" placeholder="Enter Address" required style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;"></textarea>
+                    <div style="margin-bottom: 10px;">
+                        <label>
+                            <input type="checkbox" name="is_default" style="margin-right: 5px;">
+                            Set as Default Address
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Address</button>
+                    <button type="button" id="cancel-add-address" class="btn btn-danger">Cancel</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -219,6 +222,20 @@
         toast.classList.add('active');
         setTimeout(() => toast.classList.remove('active'), 3000);
     };
+    const addAddressButton = document.getElementById('add-new-address-button');
+    const addAddressFormContainer = document.getElementById('add-address-form-container');
+    const cancelAddAddressButton = document.getElementById('cancel-add-address');
+
+    addAddressButton.addEventListener('click', () => {
+        addAddressButton.classList.add('hidden');
+        addAddressFormContainer.classList.remove('hidden');
+    });
+
+    cancelAddAddressButton.addEventListener('click', () => {
+        addAddressFormContainer.classList.add('hidden');
+        addAddressButton.classList.remove('hidden');
+        document.getElementById('add-address-form').reset();
+    });
     const editPhoneButton = document.getElementById('edit-phone');
     const updatePhoneButton = document.getElementById('update-phone');
     const cancelPhoneButton = document.getElementById('cancel-edit');
@@ -319,7 +336,7 @@
                 });
         });
     });
-    
+
     document.getElementById('add-address-form').addEventListener('submit', (event) => {
     event.preventDefault();
 
