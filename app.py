@@ -368,12 +368,18 @@ def edit_profile():
         if request.form['password']:
             user.password = request.form['password']
 
-        # Update addresses
+        # Handle deleted addresses
+        delete_address_ids = request.form.getlist('delete_address_ids[]')
+        for address_id in delete_address_ids:
+            address = Address.query.get(address_id)
+            if address and address.user_id == user.id and not address.is_default:
+                db.session.delete(address)
+
+        # Update or add addresses
         for i in range(5):
             address_id = request.form.get(f'address_id_{i}')
             address_text = request.form.get(f'address_{i}')
             address_type = request.form.get(f'address_type_{i}')
-            is_default = request.form.get(f'is_default_{i}') == 'on'
 
             if address_id:
                 # Update existing address
@@ -381,14 +387,12 @@ def edit_profile():
                 if address and address.user_id == user.id:  # Ensure address belongs to the user
                     address.address = address_text
                     address.address_type = address_type
-                    address.is_default = is_default
             elif address_text:
-                # Create new address if the text is provided and no existing address
+                # Create new address
                 new_address = Address(
                     user_id=user.id,
                     address=address_text,
                     address_type=address_type,
-                    is_default=is_default
                 )
                 db.session.add(new_address)
 

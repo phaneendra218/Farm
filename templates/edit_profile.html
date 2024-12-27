@@ -52,17 +52,6 @@
         padding-bottom: 5px;
     }
 
-    .edit-profile-container .checkbox-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .edit-profile-container .checkbox-container input[type="checkbox"] {
-        transform: scale(1.2);
-    }
-
     .edit-profile-container button {
         background-color: #4CAF50;
         color: white;
@@ -79,6 +68,14 @@
         background-color: #45a049;
     }
 
+    .edit-profile-container .btn-danger {
+        background-color: #f44336;
+    }
+
+    .edit-profile-container .btn-danger:hover {
+        background-color: #d32f2f;
+    }
+
     .edit-profile-container .btn-secondary {
         margin-left: 10px;
     }
@@ -93,34 +90,38 @@
     }
 </style>
 
-<div class="edit-profile-container" onsubmit="return validateForm()">
+<div class="edit-profile-container">
     <h2>Edit Profile</h2>
-    <form method="POST">
+    <form method="POST" id="edit-profile-form">
         <!-- Phone Number -->
         <label>Phone Number</label>
         <input type="text" name="phone_number" value="{{ user.phone_number }}" maxlength="10" pattern="\d{10}" title="Phone number must be exactly 10 digits." required>
         <label>New Password</label>
         <input type="password" name="password" placeholder="New password">
+
         <!-- Address Section -->
         <h3>Addresses</h3>
-        {% for i in range(5) %}
-        <div class="address-group">
-            <h4>Address {{ i + 1 }}</h4>
-            <label>Address</label>
-            <textarea name="address_{{ i }}" rows="2">{{ user.addresses[i].address if user.addresses|length > i else '' }}</textarea>
-        
-            <label>Type (e.g., Home, Office)</label>
-            <input type="text" name="address_type_{{ i }}" value="{{ user.addresses[i].address_type if user.addresses|length > i else '' }}">
+        <div id="addresses-container">
+            {% for i, address in enumerate(user.addresses) %}
+            <div class="address-group">
+                <h4>Address {{ i + 1 }}</h4>
+                <label>Address</label>
+                <textarea name="address_{{ i }}" rows="2">{{ address.address }}</textarea>
 
-            <!-- Default Checkbox -->
-            <div class="checkbox-container">
-                <input type="checkbox" id="is_default_{{ i }}" name="is_default_{{ i }}" {% if user.addresses|length > i and user.addresses[i].is_default %}checked{% endif %}>
-                <label for="is_default_{{ i }}">Check to make this address as default</label>
+                <label>Type (e.g., Home, Office)</label>
+                <input type="text" name="address_type_{{ i }}" value="{{ address.address_type }}">
+
+                {% if not address.is_default %}
+                <button type="button" class="btn-danger" onclick="deleteAddress('{{ address.id }}')">Delete Address</button>
+                {% else %}
+                <p>This is your default address and cannot be deleted.</p>
+                {% endif %}
+                <input type="hidden" name="address_id_{{ i }}" value="{{ address.id }}">
             </div>
-
-            <input type="hidden" name="address_id_{{ i }}" value="{{ user.addresses[i].id if user.addresses|length > i else '' }}">
+            {% endfor %}
         </div>
-        {% endfor %}
+
+        <button type="button" onclick="addNewAddress()">Add New Address</button>
 
         <!-- Submit and Cancel Buttons -->
         <button type="submit">Update Profile</button>
@@ -131,16 +132,40 @@
 </div>
 
 <script>
-    function validateForm() {
-        const phoneInput = document.querySelector('[name="phone_number"]');
-        const phoneRegex = /^\d{10}$/;
+    let addressCount = {{ user.addresses|length }};
+    const maxAddresses = 5;
 
-        if (!phoneRegex.test(phoneInput.value)) {
-            alert("Phone number must be exactly 10 digits.");
-            return false; // Prevent form submission
+    function addNewAddress() {
+        if (addressCount >= maxAddresses) {
+            alert("You can only add up to 5 addresses.");
+            return;
         }
 
-        return confirm("Are you sure you want to update your profile?");
+        const addressesContainer = document.getElementById('addresses-container');
+        const newAddressHTML = `
+            <div class="address-group">
+                <h4>Address ${addressCount + 1}</h4>
+                <label>Address</label>
+                <textarea name="address_${addressCount}" rows="2"></textarea>
+
+                <label>Type (e.g., Home, Office)</label>
+                <input type="text" name="address_type_${addressCount}">
+
+                <input type="hidden" name="address_id_${addressCount}" value="">
+            </div>`;
+        addressesContainer.insertAdjacentHTML('beforeend', newAddressHTML);
+        addressCount++;
+    }
+
+    function deleteAddress(addressId) {
+        if (confirm("Are you sure you want to delete this address?")) {
+            const form = document.getElementById('edit-profile-form');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'delete_address_ids[]';
+            input.value = addressId;
+            form.appendChild(input);
+        }
     }
 </script>
 
