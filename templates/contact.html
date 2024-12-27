@@ -1,5 +1,84 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Contact Us</h2>
-<p>For any queries, please email us at farming_support@gmail.com</p>
+<style>
+    /* Container styling */
+    .contact-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 30px 15px;
+        background-color: #f9f9f9;
+        min-height: 70vh;
+        font-family: 'Arial', sans-serif;
+        text-align: center;
+    }
+
+    /* Header */
+    .contact-header {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Contact Info */
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        font-size: 16px;
+        color: #555;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Icons */
+    .contact-icon {
+        font-size: 24px;
+        color: #4CAF50;
+    }
+
+    /* Footer Link */
+    .contact-footer {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .contact-footer a {
+        color: #4CAF50;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .contact-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="contact-container">
+    <h2 class="contact-header">Contact Us</h2>
+    <div class="contact-info">
+        <div class="contact-item">
+            <i class="fas fa-envelope contact-icon"></i>
+            <span>Email: <a href="mailto:farming_support@gmail.com">farming_support@gmail.com</a></span>
+        </div>
+        <div class="contact-item">
+            <i class="fas fa-phone-alt contact-icon"></i>
+            <span>Phone: <a href="tel:+918142515278">+91 81425 15278</a></span>
+        </div>
+    </div>
+    <div class="contact-footer">
+        <p>We’re here to help. Feel free to reach out to us!</p>
+    </div>
+</div>
+
+<!-- Include Font Awesome for Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %}
