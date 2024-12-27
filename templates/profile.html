@@ -423,8 +423,8 @@ cancelPasswordButton.addEventListener('click', () => {
 submitPasswordButton.addEventListener('click', () => {
     const newPassword = passwordInput.value.trim();
 
-    if (!newPassword || newPassword.length < 6) {
-        alert('Password must be at least 6 characters long.');
+    if (!newPassword || newPassword.length < 4) {
+        alert('Password must be at least 4 characters long.');
         return;
     }
 
