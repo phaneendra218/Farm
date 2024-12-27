@@ -149,7 +149,17 @@
                 <button id="cancel-edit" class="btn btn-danger">Cancel</button>
             </div>
         </div>
-
+        <div class="profile-section">
+            <h3>Update Password</h3>
+            <div id="password-display">
+                <button id="update-password-button" class="btn btn-secondary">Update Password</button>
+            </div>
+            <div id="password-edit" class="hidden">
+                <input type="password" id="password-input" placeholder="Enter new password" style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;">
+                <button id="submit-password" class="btn btn-primary">Update</button>
+                <button id="cancel-password" class="btn btn-danger">Cancel</button>
+            </div>
+        </div>
         <!-- Address Section -->
         <div class="profile-section">
             <h3>Addresses</h3>
@@ -391,6 +401,58 @@ document.querySelectorAll('.delete-address').forEach(button => {
                 alert('An error occurred. Please try again.');
             });
     });
+});
+const updatePasswordButton = document.getElementById('update-password-button');
+const passwordEdit = document.getElementById('password-edit');
+const passwordDisplay = document.getElementById('password-display');
+const submitPasswordButton = document.getElementById('submit-password');
+const cancelPasswordButton = document.getElementById('cancel-password');
+const passwordInput = document.getElementById('password-input');
+
+updatePasswordButton.addEventListener('click', () => {
+    passwordDisplay.classList.add('hidden');
+    passwordEdit.classList.remove('hidden');
+});
+
+cancelPasswordButton.addEventListener('click', () => {
+    passwordEdit.classList.add('hidden');
+    passwordDisplay.classList.remove('hidden');
+    passwordInput.value = '';
+});
+
+submitPasswordButton.addEventListener('click', () => {
+    const newPassword = passwordInput.value.trim();
+
+    if (!newPassword || newPassword.length < 6) {
+        alert('Password must be at least 6 characters long.');
+        return;
+    }
+
+    if (confirm('Are you sure you want to update your password?')) {
+        fetch('{{ url_for("profile") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+            body: new URLSearchParams({
+                action: 'update_password',
+                password: newPassword
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Password updated successfully!');
+                    passwordEdit.classList.add('hidden');
+                    passwordDisplay.classList.remove('hidden');
+                    passwordInput.value = '';
+                } else {
+                    alert(data.message || 'Failed to update the password.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+    }
 });
 
 </script>

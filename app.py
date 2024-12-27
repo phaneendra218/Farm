@@ -345,6 +345,8 @@ def update_item(item_id):
     # If GET request, render the update form with item details
     return render_template('update_item.html', item=item)
 
+from werkzeug.security import generate_password_hash
+
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'user_id' not in session:
@@ -356,8 +358,18 @@ def profile():
     if request.method == 'POST':
         action = request.form.get('action')
 
+        # Handle updating the password
+        if action == 'update_password':
+            new_password = request.form.get('password')
+            if not new_password or len(new_password) < 6:
+                return jsonify({'success': False, 'message': 'Password must be at least 6 characters long.'}), 400
+            
+            user.password = generate_password_hash(new_password)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Password updated successfully!'}), 200
+
         # Handle making an address default
-        if action == 'make_default':
+        elif action == 'make_default':
             address_id = request.form.get('address_id')
             address = Address.query.get(address_id)
             if address and address.user_id == user.id:
