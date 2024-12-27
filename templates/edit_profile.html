@@ -157,9 +157,6 @@
             alert("You can only add up to 5 addresses.");
             return;
         }
-    function confirmDelete() {
-        return confirm("Are you sure you want to delete this address?");
-        }
 
         const addressesContainer = document.getElementById('addresses-container');
         const newAddressHTML = `
@@ -179,6 +176,9 @@
             </div>`;
         addressesContainer.insertAdjacentHTML('beforeend', newAddressHTML);
         addressCount++;
+    }
+    function confirmDelete() {
+        return confirm("Are you sure you want to delete this address?");
     }
 </script>
 
