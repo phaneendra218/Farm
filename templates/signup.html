@@ -16,7 +16,7 @@
         align-items: center;
         height: 50vh;
         background-color: #f4f7fc;
-        padding-top: 10px;
+        padding-top: 70px; /* Adjusted padding to avoid overlapping with header */
         padding-bottom: 0px;
     }
 
@@ -43,6 +43,12 @@
         margin-bottom: 5px;
         display: block;
         font-size: 14px;
+    }
+
+    .mandatory {
+        color: red;
+        font-size: 14px;
+        margin-left: 3px;
     }
 
     input[type="text"],
@@ -99,13 +105,19 @@
     <div class="signup-box">
         <h2>Signup</h2>
         <form method="POST">
-            <label for="username">Username</label>
+            <label for="username">
+                Username <span class="mandatory">*</span>
+            </label>
             <input type="text" id="username" name="username" required>
 
-            <label for="password">Password</label>
+            <label for="password">
+                Password <span class="mandatory">*</span>
+            </label>
             <input type="password" id="password" name="password" required>
 
-            <label for="phone_number">Phone Number</label>
+            <label for="phone_number">
+                Phone Number <span class="mandatory">*</span>
+            </label>
             <input type="tel" id="phone_number" name="phone_number" required>
 
             <button type="submit">Signup</button>
