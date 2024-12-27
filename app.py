@@ -412,9 +412,9 @@ def profile():
                             address.is_default = False
 
                 db.session.commit()
-                return jsonify({'success': True})
+                return jsonify({'success': True, 'message': 'Address added successfully!'})
             else:
-                return jsonify({'success': False, 'message': 'Invalid input'})
+                return jsonify({'success': False, 'message': 'Please provide valid address details.'}), 400
 
     return render_template('profile.html', user=user)
 

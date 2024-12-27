@@ -190,6 +190,7 @@
         <div class="profile-section">
             <h3>Add New Address</h3>
             <form id="add-address-form">
+                <input type="hidden" name="action" value="add_new_address">
                 <input type="text" name="address_type" placeholder="Address Type (e.g., Home, Office)" required style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;">
                 <textarea name="address" placeholder="Enter Address" required style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;"></textarea>
                 <div style="margin-bottom: 10px;">
@@ -318,5 +319,29 @@
                 });
         });
     });
+    
+    document.getElementById('add-address-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+
+    fetch('{{ url_for("profile") }}', {
+        method: 'POST',
+        body: new URLSearchParams(formData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Reload the page to reflect the new address
+            } else {
+                alert(data.message || 'Failed to add the address.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+});
+
 </script>
 {% endblock %}
