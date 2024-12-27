@@ -369,27 +369,29 @@ def edit_profile():
         user.phone_number = request.form['phone_number']
         if request.form['password']:
             user.password = request.form['password']
+        
         # Handle addresses
-        for i in range(5):  # Iterate through up to 5 addresses
-            address_field = f'address_{i}'
-            address_type_field = f'address_type_{i}'
-            is_default_field = f'is_default_{i}'
+        address_ids = [int(key.split('_')[2]) for key in request.form.keys() if key.startswith('address_id_')]
 
-            if request.form.get(address_field):
-                # Check if the address already exists or add a new one
-                address = next((a for a in user.addresses if a.id == int(request.form.get(f'address_id_{i}', 0))), None)
-                if not address:
-                    address = Address(user=user)
-                    db.session.add(address)
+        for address_id in address_ids:
+            address_field = f'address_{address_id}'
+            address_type_field = f'address_type_{address_id}'
+            is_default_field = f'is_default_{address_id}'
 
-                address.address = request.form[address_field]
-                address.address_type = request.form[address_type_field]
-                address.is_default = request.form.get(is_default_field) == 'on'
+            # Check if the address exists, or add a new one
+            address = next((a for a in user.addresses if a.id == address_id), None)
+            if not address:
+                address = Address(user=user)
+                db.session.add(address)
+
+            address.address = request.form[address_field]
+            address.address_type = request.form[address_type_field]
+            address.is_default = request.form.get(is_default_field) == 'on'
 
         # Ensure only one default address
         if any(a.is_default for a in user.addresses):
             for address in user.addresses:
-                if not request.form.get(f'is_default_{address.id}'):
+                if address.is_default and request.form.get(f'is_default_{address.id}') != 'on':
                     address.is_default = False
 
         db.session.commit()
