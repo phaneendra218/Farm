@@ -390,6 +390,32 @@ def profile():
                 return jsonify({'message': 'Address updated successfully!', 'success': True}), 200
             return jsonify({'message': 'Failed to update the address.', 'success': False}), 400
 
+        # Handle adding a new address
+        elif action == 'add_new_address':
+            address_text = request.form.get('address')
+            address_type = request.form.get('address_type')
+            is_default = request.form.get('is_default') == 'on'
+
+            if address_text and address_type:
+                new_address = Address(
+                    user_id=user.id,
+                    address=address_text,
+                    address_type=address_type,
+                    is_default=is_default
+                )
+                db.session.add(new_address)
+
+                # Ensure only one default address
+                if is_default:
+                    for address in user.addresses:
+                        if address.id != new_address.id:
+                            address.is_default = False
+
+                db.session.commit()
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'message': 'Invalid input'})
+
     return render_template('profile.html', user=user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
