@@ -372,6 +372,7 @@ def edit_profile():
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
+    addresses = list(user.addresses)  # Convert query object to a list
 
     if request.method == 'POST':
         # Update phone number
@@ -379,10 +380,9 @@ def edit_profile():
         if request.form['password']:
             user.password = request.form['password']
         
-        # Handle addresses
+        # Handle new addresses
         for key in request.form:
             if key.startswith('address_') and 'new' in key:
-                # New address fields
                 idx = key.split('_')[-1]
                 address = request.form.get(f'address_new_{idx}')
                 address_type = request.form.get(f'address_type_new_{idx}')
@@ -399,7 +399,7 @@ def edit_profile():
         
         # Ensure only one default address
         default_set = False
-        for address in user.addresses:
+        for address in addresses:
             if address.is_default and not default_set:
                 default_set = True
             else:
@@ -408,13 +408,13 @@ def edit_profile():
         try:
             db.session.commit()
             flash('Profile updated successfully!', 'success')
-        except Exception as e:
+        except SQLAlchemyError as e:
             db.session.rollback()
-            flash(f'Error updating profile: {e}', 'danger')
+            flash(f'Error updating profile: {str(e)}', 'danger')
 
         return redirect(url_for('profile'))
-    
-    return render_template('edit_profile.html', user=user)
+
+    return render_template('edit_profile.html', user=user, addresses=addresses)
 
 if __name__ == '__main__':
     with app.app_context():

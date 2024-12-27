@@ -78,7 +78,7 @@
         {% endfor %}
 
         <!-- Add blank fields for new addresses -->
-        {% for i in range(5 - user.addresses|length) %}
+        {% for i in range(5 - addresses|length) %}
         <div class="address-group">
             <label>New Address {{ user.addresses|length + i + 1 }}</label>
             <textarea name="address_new_{{ i }}" rows="2"></textarea>
