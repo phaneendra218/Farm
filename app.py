@@ -23,21 +23,31 @@ db = SQLAlchemy(app)
 
 # Models
 class Address(db.Model):
+    __tablename__ = 'address'  # Explicit table name for clarity
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)  # Ensure cascading delete
     address = db.Column(db.String(255), nullable=False)
-    address_type = db.Column(db.String(50), nullable=False)  # e.g., home, office, etc.
+    address_type = db.Column(db.String(50), nullable=False)  # Required field for address type
     is_default = db.Column(db.Boolean, default=False)
+    
+    # Relationship back to User
     user = db.relationship('User', back_populates='addresses')
 
 class User(db.Model):
+    __tablename__ = 'user'  # Explicit table name for clarity
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)  # Admin flag
-    phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
-    # addresses = db.relationship('Address', backref='user', lazy=True)
-    addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
+    is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
+    phone_number = db.Column(db.String(15), nullable=True)  # Max length reduced to 15 for realistic phone numbers
+    
+    # Relationship to addresses with cascade rules
+    addresses = db.relationship(
+        'Address',
+        back_populates='user',
+        cascade='all, delete-orphan',
+        lazy='dynamic'  # Allows querying like `user.addresses.filter_by(is_default=True)`
+    )
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -353,7 +363,6 @@ def profile():
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
-
     return render_template('profile.html', user=user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -371,31 +380,38 @@ def edit_profile():
             user.password = request.form['password']
         
         # Handle addresses
-        address_ids = [int(key.split('_')[2]) for key in request.form.keys() if key.startswith('address_id_')]
+        for key in request.form:
+            if key.startswith('address_') and 'new' in key:
+                # New address fields
+                idx = key.split('_')[-1]
+                address = request.form.get(f'address_new_{idx}')
+                address_type = request.form.get(f'address_type_new_{idx}')
+                is_default = request.form.get(f'is_default_new_{idx}') == 'on'
 
-        for address_id in address_ids:
-            address_field = f'address_{address_id}'
-            address_type_field = f'address_type_{address_id}'
-            is_default_field = f'is_default_{address_id}'
-
-            # Check if the address exists, or add a new one
-            address = next((a for a in user.addresses if a.id == address_id), None)
-            if not address:
-                address = Address(user=user)
-                db.session.add(address)
-
-            address.address = request.form[address_field]
-            address.address_type = request.form[address_type_field]
-            address.is_default = request.form.get(is_default_field) == 'on'
-
+                if address:
+                    new_address = Address(
+                        user_id=user.id,
+                        address=address,
+                        address_type=address_type,
+                        is_default=is_default
+                    )
+                    db.session.add(new_address)
+        
         # Ensure only one default address
-        if any(a.is_default for a in user.addresses):
-            for address in user.addresses:
-                if address.is_default and request.form.get(f'is_default_{address.id}') != 'on':
-                    address.is_default = False
+        default_set = False
+        for address in user.addresses:
+            if address.is_default and not default_set:
+                default_set = True
+            else:
+                address.is_default = False
 
-        db.session.commit()
-        flash('Profile updated successfully!', 'success')
+        try:
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating profile: {e}', 'danger')
+
         return redirect(url_for('profile'))
     
     return render_template('edit_profile.html', user=user)

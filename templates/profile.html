@@ -77,14 +77,18 @@
         <!-- Address Section -->
         <div class="profile-section">
             <h3>Addresses</h3>
-            {% for address in user.addresses %}
-            <div class="address-section">
-                <p>{{ address.address }} ({{ address.address_type }})</p>
-                {% if address.is_default %}
-                <p><strong>Default Address</strong></p>
-                {% endif %}
-            </div>
-            {% endfor %}
+            {% if user.addresses %}
+                {% for address in user.addresses %}
+                <div class="address-section">
+                    <p>{{ address.address }} ({{ address.address_type }})</p>
+                    {% if address.is_default %}
+                    <p><strong>Default Address</strong></p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No addresses available.</p>
+            {% endif %}
         </div>
     </div>
 
