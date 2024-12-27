@@ -25,7 +25,8 @@
         display: block;
     }
 
-    .edit-profile-container input {
+    .edit-profile-container input,
+    .edit-profile-container textarea {
         width: 100%;
         padding: 10px;
         margin-bottom: 15px;
@@ -33,6 +34,33 @@
         border-radius: 5px;
         font-size: 14px;
         box-sizing: border-box;
+    }
+
+    .edit-profile-container .address-group {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+
+    .edit-profile-container .address-group h4 {
+        font-size: 16px;
+        margin-bottom: 10px;
+        color: #333;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+    }
+
+    .edit-profile-container .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .edit-profile-container .checkbox-container input[type="checkbox"] {
+        transform: scale(1.2);
     }
 
     .edit-profile-container button {
@@ -57,11 +85,24 @@
     .edit-profile-container .btn-danger:hover {
         background-color: #d32f2f;
     }
+
+    .edit-profile-container .btn-secondary {
+        margin-left: 10px;
+    }
+
+    .edit-profile-container .btn-secondary button {
+        background-color: #bbb;
+        color: #fff;
+    }
+
+    .edit-profile-container .btn-secondary button:hover {
+        background-color: #999;
+    }
 </style>
 
 <div class="edit-profile-container">
     <h2>Edit Profile</h2>
-    <form method="POST" action="/edit_profile">
+    <form method="POST" action="/edit_profile" id="edit-profile-form">
         <!-- Phone Number -->
         <label>Phone Number</label>
         <input type="text" name="phone_number" value="{{ user.phone_number }}" maxlength="10" pattern="\d{10}" title="Phone number must be exactly 10 digits." required>
@@ -70,12 +111,32 @@
 
         <!-- Address Section -->
         <h3>Addresses</h3>
-        {% for address in user.addresses %}
-        <div>
-            <input type="text" name="address_{{ loop.index0 }}" value="{{ address.address }}" />
-            <button type="submit" formaction="/delete_address/{{ address.id }}" class="btn-danger">Delete Address</button>
+        <div id="addresses-container">
+            {% for i, address in enumerate(user.addresses) %}
+            <div class="address-group">
+                <h4>Address {{ i + 1 }}</h4>
+                <label>Address</label>
+                <textarea name="address_{{ i }}" rows="2">{{ address.address }}</textarea>
+
+                <label>Type (e.g., Home, Office)</label>
+                <input type="text" name="address_type_{{ i }}" value="{{ address.address_type }}">
+
+                <!-- Default Checkbox -->
+                <div class="checkbox-container">
+                    <input type="checkbox" id="is_default_{{ i }}" name="is_default_{{ i }}" {% if address.is_default %}checked{% endif %}>
+                    <label for="is_default_{{ i }}">Check to make this address as default</label>
+                </div>
+
+                <input type="hidden" name="address_id_{{ i }}" value="{{ address.id }}">
+
+                {% if not address.is_default %}
+                <button type="submit" class="btn-danger" formaction="/delete_address/{{ address.id }}">Delete Address</button>
+                {% else %}
+                <p>This is your default address and cannot be deleted.</p>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
 
         <button type="button" onclick="addNewAddress()">Add New Address</button>
 
@@ -97,12 +158,23 @@
             return;
         }
 
-        const form = document.querySelector('form[action="/edit_profile"]');
+        const addressesContainer = document.getElementById('addresses-container');
         const newAddressHTML = `
-            <div>
-                <input type="text" name="address_${addressCount}" placeholder="Enter new address" />
+            <div class="address-group">
+                <h4>Address ${addressCount + 1}</h4>
+                <label>Address</label>
+                <textarea name="address_${addressCount}" rows="2"></textarea>
+
+                <label>Type (e.g., Home, Office)</label>
+                <input type="text" name="address_type_${addressCount}">
+
+                <div class="checkbox-container">
+                    <input type="checkbox" id="is_default_${addressCount}" name="is_default_${addressCount}">
+                    <label for="is_default_${addressCount}">Check to make this address as default</label>
+                </div>
+                <input type="hidden" name="address_id_${addressCount}" value="">
             </div>`;
-        form.insertAdjacentHTML('beforeend', newAddressHTML);
+        addressesContainer.insertAdjacentHTML('beforeend', newAddressHTML);
         addressCount++;
     }
 </script>
