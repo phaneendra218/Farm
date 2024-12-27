@@ -135,9 +135,9 @@ def update_password():
         if new_password != confirm_password:
             flash('Passwords do not match. Please try again.', 'danger')
         else:
-            # Update the password in the database
+            # Directly update the plaintext password
             user = User.query.get(session['reset_user_id'])
-            user.password = new_password  # Consider hashing passwords here
+            user.password = new_password  # Plaintext storage
             db.session.commit()
             session.pop('reset_user_id')  # Remove reset_user_id from session
             flash('Password updated successfully. You can now login.', 'success')
