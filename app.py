@@ -431,6 +431,7 @@ def delete_address(address_id):
         flash('Address not found or unauthorized.', 'danger')
     return redirect(url_for('edit_profile'))
 
+
 @app.route('/delete_address', methods=['POST'])
 def delete_address_by_id():
     if 'user_id' not in session:
