@@ -108,7 +108,6 @@
         <input type="text" name="phone_number" value="{{ user.phone_number }}" maxlength="10" pattern="\d{10}" title="Phone number must be exactly 10 digits." required>
         <label>New Password</label>
         <input type="password" name="password" placeholder="New password">
-
         <!-- Address Section -->
         <h3>Addresses</h3>
         <div id="addresses-container">
@@ -139,7 +138,6 @@
         </div>
 
         <button type="button" onclick="addNewAddress()">Add New Address</button>
-
         <!-- Submit and Cancel Buttons -->
         <button type="submit">Update Profile</button>
         <a href="{{ url_for('profile') }}" class="btn btn-secondary">
@@ -158,7 +156,6 @@
             alert("You can only add up to 5 addresses.");
             return;
         }
-
         const addressesContainer = document.getElementById('addresses-container');
         const newAddressHTML = `
             <div class="address-group">
@@ -178,17 +175,14 @@
         addressesContainer.insertAdjacentHTML('beforeend', newAddressHTML);
         addressCount++;
     }
-
     // Function to confirm deletion of an address
     function confirmDelete() {
         return confirm("Are you sure you want to delete this address?");
     }
-
     // Validation for multiple "default" checkboxes
     document.getElementById('edit-profile-form').onsubmit = function () {
         const defaultCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="is_default_"]');
         let selectedCount = 0;
-
         defaultCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
                 selectedCount++;
@@ -199,7 +193,6 @@
             alert("Please select only one checkbox to set a default address.");
             return false; // Prevent form submission
         }
-
         return true; // Allow form submission
     };
 </script>
