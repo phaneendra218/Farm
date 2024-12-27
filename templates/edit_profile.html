@@ -36,6 +36,33 @@
         box-sizing: border-box;
     }
 
+    .edit-profile-container .address-group {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+
+    .edit-profile-container .address-group h4 {
+        font-size: 16px;
+        margin-bottom: 10px;
+        color: #333;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+    }
+
+    .edit-profile-container .checkbox-container {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .edit-profile-container .checkbox-container input[type="checkbox"] {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+
     .edit-profile-container button {
         background-color: #4CAF50;
         color: white;
@@ -45,16 +72,31 @@
         cursor: pointer;
         font-size: 16px;
         transition: background-color 0.3s ease;
+        display: inline-block;
     }
 
     .edit-profile-container button:hover {
         background-color: #45a049;
+    }
+
+    .edit-profile-container .btn-secondary {
+        margin-left: 10px;
+    }
+
+    .edit-profile-container .btn-secondary button {
+        background-color: #bbb;
+        color: #fff;
+    }
+
+    .edit-profile-container .btn-secondary button:hover {
+        background-color: #999;
     }
 </style>
 
 <div class="edit-profile-container" onsubmit="return validateForm()">
     <h2>Edit Profile</h2>
     <form method="POST">
+        <!-- Phone Number -->
         <label>Phone Number</label>
         <input type="text" name="phone_number" value="{{ user.phone_number }}" maxlength="10" pattern="\d{10}" title="Phone number must be exactly 10 digits." required>
 
@@ -62,20 +104,28 @@
         <h3>Addresses</h3>
         {% for i in range(5) %}
         <div class="address-group">
-            <label>Address {{ i + 1 }}</label>
+            <h4>Address {{ i + 1 }}</h4>
+            <label>Address</label>
             <textarea name="address_{{ i }}" rows="2">{{ user.addresses[i].address if user.addresses|length > i else '' }}</textarea>
         
             <label>Type (e.g., Home, Office)</label>
-            <input type="text" name="address_type_{{ i }}" value="{{ user.addresses[i].address_type if user.addresses|length > i else '' }}">        
-            <label>
-                <input type="checkbox" name="is_default_{{ i }}" {% if user.addresses|length > i and user.addresses[i].is_default %}checked{% endif %}> Make Default
-            </label>        
+            <input type="text" name="address_type_{{ i }}" value="{{ user.addresses[i].address_type if user.addresses|length > i else '' }}">
+
+            <!-- Default Checkbox -->
+            <div class="checkbox-container">
+                <input type="checkbox" id="is_default_{{ i }}" name="is_default_{{ i }}" {% if user.addresses|length > i and user.addresses[i].is_default %}checked{% endif %}>
+                <label for="is_default_{{ i }}">Make Default</label>
+            </div>
+
             <input type="hidden" name="address_id_{{ i }}" value="{{ user.addresses[i].id if user.addresses|length > i else '' }}">
         </div>
         {% endfor %}
 
+        <!-- Submit and Cancel Buttons -->
         <button type="submit">Update Profile</button>
-        <a href="{{ url_for('profile') }}" class="btn btn-secondary"><button type="button">Cancel</button></a>
+        <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+            <button type="button">Cancel</button>
+        </a>
     </form>
 </div>
 
