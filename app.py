@@ -365,6 +365,8 @@ def edit_profile():
     if request.method == 'POST':
         # Update phone number
         user.phone_number = request.form.get('phone_number')
+        if request.form['password']:
+            user.password = request.form['password']
 
         # Update addresses
         for i in range(5):
