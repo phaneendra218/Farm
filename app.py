@@ -361,7 +361,6 @@ def profile():
             address_id = request.form.get('address_id')
             address = Address.query.get(address_id)
             if address and address.user_id == user.id:
-                # Clear other default addresses
                 for addr in user.addresses:
                     addr.is_default = False
                 address.is_default = True
@@ -376,6 +375,20 @@ def profile():
             user.phone_number = phone_number
             db.session.commit()
             return jsonify({'message': 'Phone number updated successfully!', 'success': True}), 200
+
+        # Handle updating an address
+        elif action == 'update_address':
+            address_id = request.form.get('address_id')
+            address_type = request.form.get('address_type')
+            address_text = request.form.get('address')
+
+            address = Address.query.get(address_id)
+            if address and address.user_id == user.id:
+                address.address_type = address_type
+                address.address = address_text
+                db.session.commit()
+                return jsonify({'message': 'Address updated successfully!', 'success': True}), 200
+            return jsonify({'message': 'Failed to update the address.', 'success': False}), 400
 
     return render_template('profile.html', user=user)
 

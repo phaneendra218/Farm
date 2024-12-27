@@ -159,14 +159,26 @@
                     {% if address.is_default %}
                         <span class="badge">Default</span>
                     {% endif %}
-                    <p><strong>{{ address.address_type }}</strong></p>
-                    <p>{{ address.address }}</p>
-                    <form method="post" action="{{ url_for('profile') }}" style="display: inline-block;">
-                        <input type="hidden" name="address_id" value="{{ address.id }}">
-                        <input type="hidden" name="action" value="make_default">
-                        <button type="submit" class="btn btn-secondary" {% if address.is_default %}disabled{% endif %}>Make Default</button>
-                    </form>
-                    <button class="btn btn-danger delete-address" data-id="{{ address.id }}">Delete</button>
+                    <!-- Address Display Section -->
+                    <div id="address-display-{{ address.id }}">
+                        <p><strong>{{ address.address_type }}</strong></p>
+                        <p>{{ address.address }}</p>
+                        <button class="btn btn-secondary edit-address" data-id="{{ address.id }}">Edit</button>
+                        <form method="post" action="{{ url_for('profile') }}" style="display: inline-block;">
+                            <input type="hidden" name="address_id" value="{{ address.id }}">
+                            <input type="hidden" name="action" value="make_default">
+                            <button type="submit" class="btn btn-secondary" {% if address.is_default %}disabled{% endif %}>Make Default</button>
+                        </form>
+                        <button class="btn btn-danger delete-address" data-id="{{ address.id }}">Delete</button>
+                    </div>
+        
+                    <!-- Address Edit Section -->
+                    <div id="address-edit-{{ address.id }}" class="hidden">
+                        <input type="text" id="address-type-{{ address.id }}" value="{{ address.address_type }}" placeholder="Address Type" style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;">
+                        <textarea id="address-input-{{ address.id }}" placeholder="Enter address" style="padding: 10px; width: calc(100% - 120px); border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;">{{ address.address }}</textarea>
+                        <button class="btn btn-primary update-address" data-id="{{ address.id }}">Update</button>
+                        <button class="btn btn-danger cancel-edit-address" data-id="{{ address.id }}">Cancel</button>
+                    </div>
                 </div>
                 {% endfor %}
             {% else %}
@@ -184,33 +196,32 @@
 <div class="toast" id="toast">Phone number updated successfully!</div>
 
 <script>
-    const editButton = document.getElementById('edit-phone');
-    const updateButton = document.getElementById('update-phone');
-    const cancelButton = document.getElementById('cancel-edit');
-    const phoneDisplay = document.getElementById('phone-display');
-    const phoneEdit = document.getElementById('phone-edit');
-    const phoneNumber = document.getElementById('phone-number');
-    const phoneInput = document.getElementById('phone-input');
     const toast = document.getElementById('toast');
-
     const showToast = (message) => {
         toast.textContent = message;
         toast.classList.add('active');
         setTimeout(() => toast.classList.remove('active'), 3000);
     };
+    const editPhoneButton = document.getElementById('edit-phone');
+    const updatePhoneButton = document.getElementById('update-phone');
+    const cancelPhoneButton = document.getElementById('cancel-edit');
+    const phoneDisplay = document.getElementById('phone-display');
+    const phoneEdit = document.getElementById('phone-edit');
+    const phoneNumber = document.getElementById('phone-number');
+    const phoneInput = document.getElementById('phone-input');
 
-    editButton.addEventListener('click', () => {
+    editPhoneButton.addEventListener('click', () => {
         phoneDisplay.classList.add('hidden');
         phoneEdit.classList.remove('hidden');
     });
 
-    cancelButton.addEventListener('click', () => {
+    cancelPhoneButton.addEventListener('click', () => {
         phoneEdit.classList.add('hidden');
         phoneDisplay.classList.remove('hidden');
         phoneInput.value = phoneNumber.textContent.trim();
     });
 
-    updateButton.addEventListener('click', () => {
+    updatePhoneButton.addEventListener('click', () => {
         const newPhoneNumber = phoneInput.value.trim();
         if (!/^[0-9]{10}$/.test(newPhoneNumber)) {
             showToast('Please enter a valid 10-digit phone number.');
@@ -237,6 +248,59 @@
                 console.error('Error:', error);
                 showToast('An error occurred. Please try again.');
             });
+    });
+
+    // Address Editing
+    document.querySelectorAll('.edit-address').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.dataset.id;
+            document.getElementById(`address-display-${id}`).classList.add('hidden');
+            document.getElementById(`address-edit-${id}`).classList.remove('hidden');
+        });
+    });
+
+    document.querySelectorAll('.cancel-edit-address').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.dataset.id;
+            document.getElementById(`address-edit-${id}`).classList.add('hidden');
+            document.getElementById(`address-display-${id}`).classList.remove('hidden');
+        });
+    });
+
+    document.querySelectorAll('.update-address').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.dataset.id;
+            const addressType = document.getElementById(`address-type-${id}`).value.trim();
+            const addressInput = document.getElementById(`address-input-${id}`).value.trim();
+
+            if (!addressType || !addressInput) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            fetch('{{ url_for("profile") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+                body: new URLSearchParams({
+                    action: 'update_address',
+                    address_id: id,
+                    address_type: addressType,
+                    address: addressInput,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload(); // Reload to reflect changes
+                    } else {
+                        alert(data.message || 'Failed to update the address.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        });
     });
 </script>
 {% endblock %}
