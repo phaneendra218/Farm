@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session, url_for, f
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -91,8 +92,8 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username, password=password).first()
-        if user:
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['username'] = user.username  # Store username in session
             session['is_admin'] = user.is_admin  # Store admin status in session
@@ -361,8 +362,8 @@ def profile():
         # Handle updating the password
         if action == 'update_password':
             new_password = request.form.get('password')
-            if not new_password or len(new_password) < 6:
-                return jsonify({'success': False, 'message': 'Password must be at least 6 characters long.'}), 400
+            if not new_password or len(new_password) < 4:
+                return jsonify({'success': False, 'message': 'Password must be at least 4 characters long.'}), 400
             
             user.password = generate_password_hash(new_password)
             db.session.commit()
