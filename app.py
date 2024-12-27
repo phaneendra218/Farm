@@ -432,7 +432,7 @@ def delete_address(address_id):
     return redirect(url_for('edit_profile'))
 
 @app.route('/delete_address', methods=['POST'])
-def delete_address():
+def delete_address_by_id():
     if 'user_id' not in session:
         return jsonify({'message': 'Unauthorized access'}), 401
 
