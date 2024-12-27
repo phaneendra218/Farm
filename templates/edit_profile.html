@@ -58,21 +58,23 @@
         <label>Phone Number</label>
         <input type="text" name="phone_number" value="{{ user.phone_number }}" maxlength="10" pattern="\d{10}" title="Phone number must be exactly 10 digits." required>
 
-        {% for address in user.addresses %}
-        <label>{{ address.address_type.capitalize() }} Address</label>
-        <textarea name="addresses" rows="3" required>{{ address.address }}</textarea>
-        <input type="hidden" name="address_types" value="{{ address.address_type }}">
-        <label>
-            <input type="radio" name="default_address" value="{{ address.address_type }}" {% if address.is_default %}checked{% endif %}> Make this address default
-        </label>
+        <!-- Address Section -->
+        <h3>Addresses</h3>
+        {% for i in range(5) %}
+        <div class="address-group">
+            <label>Address {{ i + 1 }}</label>
+            <textarea name="address_{{ i }}" rows="2">{{ user.addresses[i].address if user.addresses|length > i else '' }}</textarea>
+
+            <label>Type (e.g., Home, Office)</label>
+            <input type="text" name="address_type_{{ i }}" value="{{ user.addresses[i].address_type if user.addresses|length > i else '' }}">
+
+            <label>
+                <input type="checkbox" name="is_default_{{ i }}" {% if user.addresses|length > i and user.addresses[i].is_default %}checked{% endif %}> Make Default
+            </label>
+        </div>
         {% endfor %}
 
-        <label>New Password</label>
-        <input type="password" name="password" placeholder="New password">
-
         <button type="submit">Update Profile</button>
-        
-        <!-- Cancel Button -->
         <a href="{{ url_for('profile') }}" class="btn btn-secondary"><button type="button">Cancel</button></a>
     </form>
 </div>

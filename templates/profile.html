@@ -93,35 +93,23 @@
 
 <div class="profile-container">
     <h2>My Profile</h2>
-    <form method="POST" id="profileForm" onsubmit="return validateForm()">
-        <!-- Personal Information Section -->
-        <div class="profile-section">
-            <h3>Personal Information</h3>
-            <label>Username</label>
-            <input type="text" name="username" id="username" value="{{ user.username }}" readonly>
-
-            <label>Phone Number</label>
-            <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number }}" maxlength="10"
-                   pattern="\d{10}" title="Phone number must be exactly 10 digits." required readonly>
-
-            <label>Password</label>
-            <input type="password" name="password" id="password" placeholder="New password" readonly>
-        </div>
+    <form method="POST">
+        <!-- Phone Number -->
+        <label>Phone Number</label>
+        <input type="text" value="{{ user.phone_number }}" readonly>
 
         <!-- Address Section -->
-        <div class="profile-section">
-            <h3>Addresses</h3>
-            {% for address in addresses %}
-            <label>{{ address.address_type.capitalize() }} Address</label>
-            <textarea name="addresses" id="address" rows="3" readonly>{{ address.address }}</textarea>
+        <h3>Addresses</h3>
+        {% for address in user.addresses %}
+        <div class="address-section">
+            <p>{{ address.address }} ({{ address.address_type }})</p>
             {% if address.is_default %}
             <p><strong>Default Address</strong></p>
             {% endif %}
-            {% endfor %}
         </div>
-
-        <!-- Buttons -->
-        <div id="button-group">
+        {% endfor %}
+		
+		<div id="button-group">
             <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
                 <button type="button">Edit Profile</button>
             </a>

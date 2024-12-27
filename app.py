@@ -22,20 +22,22 @@ if not os.path.exists(UPLOAD_FOLDER):
 db = SQLAlchemy(app)
 
 # Models
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)  # Admin flag
-    phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
-    addresses = db.relationship('Address', backref='user', lazy=True)
-
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     address = db.Column(db.String(255), nullable=False)
     address_type = db.Column(db.String(50), nullable=False)  # e.g., home, office, etc.
     is_default = db.Column(db.Boolean, default=False)
+    user = db.relationship('User', back_populates='addresses')
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)  # Admin flag
+    phone_number = db.Column(db.String(255), nullable=True)  # New field for phone number
+    # addresses = db.relationship('Address', backref='user', lazy=True)
+    addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -351,24 +353,12 @@ def profile():
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
-    addresses = Address.query.filter_by(user_id=user.id).all()
 
     if request.method == 'POST':
         # Update profile information
         user.phone_number = request.form['phone_number']
-        addresses = request.form.getlist('addresses')
-        address_types = request.form.getlist('address_types')
-        default_address = request.form['default_address']
-
-        # Clear existing addresses
-        Address.query.filter_by(user_id=user.id).delete()
-
-        # Add new addresses
-        for i in range(len(addresses)):
-            is_default = (default_address == address_types[i])
-            new_address = Address(user_id=user.id, address=addresses[i], address_type=address_types[i], is_default=is_default)
-            db.session.add(new_address)
-
+        user.address = request.form['address']
+        user.alternate_address = request.form['alternate_address'] if request.form.get('alternate_address') else None
         # Update password if provided
         if request.form['password']:
             user.password = request.form['password']
@@ -377,7 +367,7 @@ def profile():
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
     
-    return render_template('profile.html', user=user, addresses=addresses)
+    return render_template('profile.html', user=user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():
@@ -388,25 +378,32 @@ def edit_profile():
     user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        # Update profile information
+        # Update phone number
         user.phone_number = request.form['phone_number']
-        addresses = request.form.getlist('addresses')
-        address_types = request.form.getlist('address_types')
-        default_address = request.form['default_address']
-
-        # Clear existing addresses
-        Address.query.filter_by(user_id=user.id).delete()
-
-        # Add new addresses
-        for i in range(len(addresses)):
-            is_default = (default_address == address_types[i])
-            new_address = Address(user_id=user.id, address=addresses[i], address_type=address_types[i], is_default=is_default)
-            db.session.add(new_address)
-
-        # Update password if provided
-        if request.form['password']:
-            user.password = request.form['password']
         
+        # Handle addresses
+        for i in range(5):  # Iterate through up to 5 addresses
+            address_field = f'address_{i}'
+            address_type_field = f'address_type_{i}'
+            is_default_field = f'is_default_{i}'
+
+            if request.form.get(address_field):
+                # Check if the address already exists or add a new one
+                address = next((a for a in user.addresses if a.id == int(request.form.get(f'address_id_{i}', 0))), None)
+                if not address:
+                    address = Address(user=user)
+                    db.session.add(address)
+
+                address.address = request.form[address_field]
+                address.address_type = request.form[address_type_field]
+                address.is_default = request.form.get(is_default_field) == 'on'
+
+        # Ensure only one default address
+        if any(a.is_default for a in user.addresses):
+            for address in user.addresses:
+                if not request.form.get(f'is_default_{address.id}'):
+                    address.is_default = False
+
         db.session.commit()
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
