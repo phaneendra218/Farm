@@ -57,6 +57,8 @@
     <form method="POST">
         <label>Phone Number</label>
         <input type="text" name="phone_number" value="{{ user.phone_number }}" maxlength="10" pattern="\d{10}" title="Phone number must be exactly 10 digits." required>
+        <label>New Password</label>
+        <input type="password" name="password" placeholder="New password">
 
         <!-- Address Section -->
         <h3>Addresses</h3>

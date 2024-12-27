@@ -346,7 +346,7 @@ def update_item(item_id):
     # If GET request, render the update form with item details
     return render_template('update_item.html', item=item)
 
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile', methods=['GET'])
 def profile():
     if 'user_id' not in session:
         flash('Please login to view your profile', 'danger')
@@ -354,19 +354,6 @@ def profile():
     
     user = User.query.get(session['user_id'])
 
-    if request.method == 'POST':
-        # Update profile information
-        user.phone_number = request.form['phone_number']
-        user.address = request.form['address']
-        user.alternate_address = request.form['alternate_address'] if request.form.get('alternate_address') else None
-        # Update password if provided
-        if request.form['password']:
-            user.password = request.form['password']
-        
-        db.session.commit()
-        flash('Profile updated successfully!', 'success')
-        return redirect(url_for('profile'))
-    
     return render_template('profile.html', user=user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -380,7 +367,8 @@ def edit_profile():
     if request.method == 'POST':
         # Update phone number
         user.phone_number = request.form['phone_number']
-        
+        if request.form['password']:
+            user.password = request.form['password']
         # Handle addresses
         for i in range(5):  # Iterate through up to 5 addresses
             address_field = f'address_{i}'

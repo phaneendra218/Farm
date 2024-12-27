@@ -41,22 +41,8 @@
         display: block;
     }
 
-    .profile-container input,
-    .profile-container textarea {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-
-    .profile-container input[readonly],
-    .profile-container textarea[readonly] {
-        background-color: #e9ecef;
-        color: #555;
-        cursor: not-allowed;
+    .address-section p {
+        margin: 5px 0;
     }
 
     .profile-container button {
@@ -74,47 +60,40 @@
         background-color: #45a049;
     }
 
-    .profile-container .cancel-btn {
-        background-color: #ccc;
-        color: black;
-    }
-
-    .profile-container .cancel-btn:hover {
-        background-color: #b3b3b3;
-    }
-
-    .error-message {
-        color: red;
-        font-size: 12px;
-        margin-top: -10px;
-        margin-bottom: 10px;
+    .profile-container .btn-primary {
+        text-decoration: none;
     }
 </style>
 
 <div class="profile-container">
     <h2>My Profile</h2>
-    <form method="POST">
+    <div>
         <!-- Phone Number -->
-        <label>Phone Number</label>
-        <input type="text" value="{{ user.phone_number }}" readonly>
+        <div class="profile-section">
+            <label>Phone Number:</label>
+            <p>{{ user.phone_number }}</p>
+        </div>
 
         <!-- Address Section -->
-        <h3>Addresses</h3>
-        {% for address in user.addresses %}
-        <div class="address-section">
-            <p>{{ address.address }} ({{ address.address_type }})</p>
-            {% if address.is_default %}
-            <p><strong>Default Address</strong></p>
-            {% endif %}
+        <div class="profile-section">
+            <h3>Addresses</h3>
+            {% for address in user.addresses %}
+            <div class="address-section">
+                <p>{{ address.address }} ({{ address.address_type }})</p>
+                {% if address.is_default %}
+                <p><strong>Default Address</strong></p>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-		
-		<div id="button-group">
-            <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
-                <button type="button">Edit Profile</button>
-            </a>
-        </div>
-    </form>
+    </div>
+
+    <!-- Edit Profile Button -->
+    <div style="text-align: center;">
+        <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+            <button type="button">Edit Profile</button>
+        </a>
+    </div>
 </div>
 
 {% endblock %}
