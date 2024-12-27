@@ -77,7 +77,6 @@
         border-left: 4px solid #ccc;
         padding: 10px;
         border-radius: 5px;
-        position: relative;
     }
 
     .profile-container button {
@@ -99,32 +98,6 @@
         text-decoration: none;
         display: inline-block;
         text-align: center;
-    }
-
-    .action-buttons {
-        margin-top: 10px;
-    }
-
-    .action-buttons button {
-        margin-right: 10px;
-    }
-
-    .btn-danger {
-        background-color: #f44336;
-        color: white;
-    }
-
-    .btn-danger:hover {
-        background-color: #d32f2f;
-    }
-
-    .btn-secondary {
-        background-color: #bbb;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background-color: #999;
     }
 
     @media (max-width: 768px) {
@@ -163,9 +136,6 @@
                     <span class="badge">{{ default_address.address_type }}</span>
                     <p><strong>Default Address</strong></p>
                     <p>{{ default_address.address }}</p>
-                    <div class="action-buttons">
-                        <button class="btn-secondary" onclick="setDefault({{ default_address.id }})">Make Default</button>
-                    </div>
                 </div>
                 {% endif %}
 
@@ -174,10 +144,6 @@
                 <div class="address-section non-default-address">
                     <p><strong>{{ address.address_type }}</strong></p>
                     <p>{{ address.address }}</p>
-                    <div class="action-buttons">
-                        <button class="btn-secondary" onclick="setDefault({{ address.id }})">Make Default</button>
-                        <button class="btn-danger" onclick="deleteAddress({{ address.id }})">Delete</button>
-                    </div>
                 </div>
                 {% endfor %}
             {% else %}
@@ -193,45 +159,5 @@
         </a>
     </div>
 </div>
-
-<script>
-    function deleteAddress(addressId) {
-        if (confirm("Are you sure you want to delete this address?")) {
-            fetch(`/delete_address/${addressId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'same-origin'
-            }).then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert('Failed to delete address.');
-                }
-            });
-        }
-    }
-
-    function setDefault(addressId) {
-        fetch('/edit_profile', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                address_id: addressId,
-                set_default: true
-            }),
-            credentials: 'same-origin'
-        }).then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                alert('Failed to set default address.');
-            }
-        });
-    }
-</script>
 
 {% endblock %}

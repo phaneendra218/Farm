@@ -363,19 +363,7 @@ def edit_profile():
     user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        if request.json and request.json.get('make_default'):  # Handle AJAX make default request
-            address_id = request.json.get('address_id')
-            address = Address.query.get(address_id)
-            if address and address.user_id == user.id:
-                # Clear other default addresses
-                for addr in user.addresses:
-                    addr.is_default = False
-                address.is_default = True
-                db.session.commit()
-                return '', 200  # Success response
-            return '', 400  # Bad request
-
-        # Handle regular form submission
+        # Update phone number
         user.phone_number = request.form.get('phone_number')
         if request.form['password']:
             user.password = request.form['password']
@@ -414,18 +402,19 @@ def edit_profile():
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
 
+    # Pass 'enumerate' explicitly to the template context
     return render_template('edit_profile.html', user=user, enumerate=enumerate)
 
 @app.route('/delete_address/<int:address_id>', methods=['POST'])
 def delete_address(address_id):
     address = Address.query.get(address_id)
     if address and address.user_id == session['user_id']:
-        if address.is_default:
-            return 'Cannot delete the default address.', 400
         db.session.delete(address)
         db.session.commit()
-        return '', 200  # Success response
-    return 'Address not found or unauthorized.', 400
+        flash('Address deleted successfully!', 'success')
+    else:
+        flash('Address not found or unauthorized.', 'danger')
+    return redirect(url_for('edit_profile'))
 
 if __name__ == '__main__':
     with app.app_context():
