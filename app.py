@@ -345,13 +345,28 @@ def update_item(item_id):
     # If GET request, render the update form with item details
     return render_template('update_item.html', item=item)
 
-@app.route('/profile', methods=['GET'])
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'user_id' not in session:
         flash('Please login to view your profile', 'danger')
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+        address_id = request.form.get('address_id')
+
+        if action == 'make_default':
+            address = Address.query.get(address_id)
+            if address and address.user_id == user.id:
+                # Clear other default addresses
+                for addr in user.addresses:
+                    addr.is_default = False
+                address.is_default = True
+                db.session.commit()
+                flash('Address set as default successfully!', 'success')
+
     return render_template('profile.html', user=user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -415,6 +430,21 @@ def delete_address(address_id):
     else:
         flash('Address not found or unauthorized.', 'danger')
     return redirect(url_for('edit_profile'))
+
+@app.route('/delete_address', methods=['POST'])
+def delete_address():
+    if 'user_id' not in session:
+        return jsonify({'message': 'Unauthorized access'}), 401
+
+    address_id = request.form.get('address_id')
+    address = Address.query.get(address_id)
+
+    if address and address.user_id == session['user_id']:
+        db.session.delete(address)
+        db.session.commit()
+        return jsonify({'message': 'Address deleted successfully!'}), 200
+
+    return jsonify({'message': 'Address not found or unauthorized'}), 404
 
 if __name__ == '__main__':
     with app.app_context():
