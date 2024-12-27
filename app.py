@@ -357,17 +357,15 @@ def profile():
 
     if request.method == 'POST':
         action = request.form.get('action')
-
         # Handle updating the password
         if action == 'update_password':
             new_password = request.form.get('password')
             if not new_password or len(new_password) < 4:
                 return jsonify({'success': False, 'message': 'Password must be at least 4 characters long.'}), 400
             
-            user.password = generate_password_hash(new_password)
+            user.password = new_password  # Directly saving plain-text password
             db.session.commit()
             return jsonify({'success': True, 'message': 'Password updated successfully!'}), 200
-
         # Handle making an address default
         elif action == 'make_default':
             address_id = request.form.get('address_id')
@@ -378,7 +376,6 @@ def profile():
                 address.is_default = True
                 db.session.commit()
                 flash('Address set as default successfully!', 'success')
-
         # Handle updating phone number
         elif action == 'update_phone_number':
             phone_number = request.form.get('phone_number')
@@ -387,7 +384,6 @@ def profile():
             user.phone_number = phone_number
             db.session.commit()
             return jsonify({'message': 'Phone number updated successfully!', 'success': True}), 200
-
         # Handle updating an address
         elif action == 'update_address':
             address_id = request.form.get('address_id')
@@ -401,7 +397,6 @@ def profile():
                 db.session.commit()
                 return jsonify({'message': 'Address updated successfully!', 'success': True}), 200
             return jsonify({'message': 'Failed to update the address.', 'success': False}), 400
-
         # Handle adding a new address
         elif action == 'add_new_address':
             address_text = request.form.get('address')
@@ -416,7 +411,6 @@ def profile():
                     is_default=is_default
                 )
                 db.session.add(new_address)
-
                 # Ensure only one default address
                 if is_default:
                     for address in user.addresses:
@@ -427,7 +421,6 @@ def profile():
                 return jsonify({'success': True, 'message': 'Address added successfully!'})
             else:
                 return jsonify({'success': False, 'message': 'Please provide valid address details.'}), 400
-
         # Handle deleting an address
         elif action == 'delete_address':
             address_id = request.form.get('address_id')
