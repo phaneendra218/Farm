@@ -150,17 +150,17 @@ def update_password():
 
 @app.route('/forget_user', methods=['GET', 'POST'])
 def forget_user():
+    username = None
     if request.method == 'POST':
         phone_number = request.form['phone_number']
         user = User.query.filter_by(phone_number=phone_number).first()
 
         if user:
-            flash(f'Your username is: {user.username}', 'success')
-            return redirect(url_for('login')) 
+            username = user.username  # Pass username to the template for the popup
         else:
             flash('Phone number not found. Please try again.', 'danger')
 
-    return render_template('forget_user.html')
+    return render_template('forget_user.html', username=username)
 
 @app.route('/items', methods=['GET', 'POST'])
 def items():

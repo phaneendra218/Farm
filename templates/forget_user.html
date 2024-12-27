@@ -31,11 +31,19 @@
 <div class="forget-user-container">
     <div class="forget-user-box">
         <h2>Forgot Username</h2>
-        <form method="POST">
+        <form method="POST" id="forgetUserForm">
             <label for="phone_number">Phone Number<span class="mandatory">*</span></label>
             <input type="text" id="phone_number" name="phone_number" required>
             <button type="submit">Submit</button>
         </form>
     </div>
 </div>
+
+<script>
+    // Handle the server response for username
+    {% if username %}
+    alert("Your username is: {{ username }}");
+    window.location.href = "{{ url_for('login') }}";
+    {% endif %}
+</script>
 {% endblock %}
