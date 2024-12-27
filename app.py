@@ -430,67 +430,67 @@ def profile():
 
     return render_template('profile.html', user=user)
 
-@app.route('/edit_profile', methods=['GET', 'POST'])
-def edit_profile():
-    if 'user_id' not in session:
-        flash('Please login to edit your profile', 'danger')
-        return redirect(url_for('login'))
+# @app.route('/edit_profile', methods=['GET', 'POST'])
+# def edit_profile():
+#     if 'user_id' not in session:
+#         flash('Please login to edit your profile', 'danger')
+#         return redirect(url_for('login'))
 
-    user = User.query.get(session['user_id'])
+#     user = User.query.get(session['user_id'])
 
-    if request.method == 'POST':
-        # Update phone number
-        user.phone_number = request.form.get('phone_number')
-        if request.form['password']:
-            user.password = request.form['password']
+#     if request.method == 'POST':
+#         # Update phone number
+#         user.phone_number = request.form.get('phone_number')
+#         if request.form['password']:
+#             user.password = request.form['password']
 
-        # Update addresses
-        for i in range(5):
-            address_id = request.form.get(f'address_id_{i}')
-            address_text = request.form.get(f'address_{i}')
-            address_type = request.form.get(f'address_type_{i}')
-            is_default = request.form.get(f'is_default_{i}') == 'on'
+#         # Update addresses
+#         for i in range(5):
+#             address_id = request.form.get(f'address_id_{i}')
+#             address_text = request.form.get(f'address_{i}')
+#             address_type = request.form.get(f'address_type_{i}')
+#             is_default = request.form.get(f'is_default_{i}') == 'on'
 
-            if address_id:
-                # Update existing address
-                address = Address.query.get(address_id)
-                if address and address.user_id == user.id:  # Ensure address belongs to the user
-                    address.address = address_text
-                    address.address_type = address_type
-                    address.is_default = is_default
-            elif address_text:
-                # Create new address if the text is provided and no existing address
-                new_address = Address(
-                    user_id=user.id,
-                    address=address_text,
-                    address_type=address_type,
-                    is_default=is_default
-                )
-                db.session.add(new_address)
+#             if address_id:
+#                 # Update existing address
+#                 address = Address.query.get(address_id)
+#                 if address and address.user_id == user.id:  # Ensure address belongs to the user
+#                     address.address = address_text
+#                     address.address_type = address_type
+#                     address.is_default = is_default
+#             elif address_text:
+#                 # Create new address if the text is provided and no existing address
+#                 new_address = Address(
+#                     user_id=user.id,
+#                     address=address_text,
+#                     address_type=address_type,
+#                     is_default=is_default
+#                 )
+#                 db.session.add(new_address)
 
-        # Ensure only one default address
-        default_addresses = [a for a in user.addresses if a.is_default]
-        if len(default_addresses) > 1:
-            for address in default_addresses[1:]:
-                address.is_default = False
+#         # Ensure only one default address
+#         default_addresses = [a for a in user.addresses if a.is_default]
+#         if len(default_addresses) > 1:
+#             for address in default_addresses[1:]:
+#                 address.is_default = False
 
-        db.session.commit()
-        flash('Profile updated successfully!', 'success')
-        return redirect(url_for('profile'))
+#         db.session.commit()
+#         flash('Profile updated successfully!', 'success')
+#         return redirect(url_for('profile'))
 
-    # Pass 'enumerate' explicitly to the template context
-    return render_template('edit_profile.html', user=user, enumerate=enumerate)
+#     # Pass 'enumerate' explicitly to the template context
+#     return render_template('edit_profile.html', user=user, enumerate=enumerate)
 
-@app.route('/delete_address/<int:address_id>', methods=['POST'])
-def delete_address(address_id):
-    address = Address.query.get(address_id)
-    if address and address.user_id == session['user_id']:
-        db.session.delete(address)
-        db.session.commit()
-        flash('Address deleted successfully!', 'success')
-    else:
-        flash('Address not found or unauthorized.', 'danger')
-    return redirect(url_for('edit_profile'))
+# @app.route('/delete_address/<int:address_id>', methods=['POST'])
+# def delete_address(address_id):
+#     address = Address.query.get(address_id)
+#     if address and address.user_id == session['user_id']:
+#         db.session.delete(address)
+#         db.session.commit()
+#         flash('Address deleted successfully!', 'success')
+#     else:
+#         flash('Address not found or unauthorized.', 'danger')
+#     return redirect(url_for('edit_profile'))
 
 
 @app.route('/delete_address', methods=['POST'])
