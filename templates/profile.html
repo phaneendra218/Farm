@@ -146,10 +146,13 @@
 <div class="profile-container">
     <h2>My Profile</h2>
     <div>
-        <!-- Phone Number -->
+        <!-- Phone Number Section -->
         <div class="profile-section">
-            <label>Phone Number:</label>
-            <p>{{ user.phone_number }}</p>
+            <label><strong>Phone Number:</strong></label>
+            <div>
+                <input type="text" id="phone-number" value="{{ user.phone_number }}" placeholder="Enter your phone number" style="padding: 8px; width: 80%; border: 1px solid #ccc; border-radius: 5px;">
+                <button id="update-phone-number" class="btn btn-primary" style="margin-left: 10px;">Update</button>
+            </div>
         </div>
 
         <!-- Address Section -->
@@ -192,36 +195,62 @@
 </div>
 
 <script>
+    // Update phone number
+    document.getElementById('update-phone-number').addEventListener('click', function () {
+        const phoneNumber = document.getElementById('phone-number').value.trim();
+
+        // Validate phone number format
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(phoneNumber)) {
+            alert('Please enter a valid 10-digit phone number.');
+            return;
+        }
+
+        // Send updated phone number to the server
+        fetch('{{ url_for("profile") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'update_phone_number',
+                phone_number: phoneNumber,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                if (data.success) {
+                    window.location.reload();
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Delete address functionality (existing)
     document.querySelectorAll('.delete-address').forEach(button => {
         button.addEventListener('click', function () {
             const addressId = this.getAttribute('data-id');
             if (confirm('Are you sure you want to delete this address?')) {
                 fetch('{{ url_for("delete_address_by_id") }}', {
-                     method: 'POST',
-                     headers: {
-                         'Content-Type': 'application/x-www-form-urlencoded',
-                     },
-                     body: new URLSearchParams({
-                         address_id: addressId,
-                     }),
-                 })
-                 .then(response => {
-                     if (response.ok) {
-                         return response.json(); // Parse JSON response
-                     } else {
-                         return response.text().then(text => {
-                             console.error('Server Error:', text);
-                             throw new Error('Failed to delete address');
-                         });
-                     }
-                 })
-                 .then(data => {
-                     if (data.message) {
-                         alert(data.message);
-                         window.location.reload();
-                     }
-                 })
-                 .catch(error => console.error('Error:', error));
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        address_id: addressId,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        window.location.reload();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
             }
         });
     });

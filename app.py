@@ -355,9 +355,10 @@ def profile():
 
     if request.method == 'POST':
         action = request.form.get('action')
-        address_id = request.form.get('address_id')
 
+        # Handle making an address default
         if action == 'make_default':
+            address_id = request.form.get('address_id')
             address = Address.query.get(address_id)
             if address and address.user_id == user.id:
                 # Clear other default addresses
@@ -366,6 +367,15 @@ def profile():
                 address.is_default = True
                 db.session.commit()
                 flash('Address set as default successfully!', 'success')
+
+        # Handle updating phone number
+        elif action == 'update_phone_number':
+            phone_number = request.form.get('phone_number')
+            if not phone_number or not phone_number.isdigit() or len(phone_number) != 10:
+                return jsonify({'message': 'Invalid phone number. Please enter a valid 10-digit number.', 'success': False})
+            user.phone_number = phone_number
+            db.session.commit()
+            return jsonify({'message': 'Phone number updated successfully!', 'success': True})
 
     return render_template('profile.html', user=user)
 
@@ -438,21 +448,12 @@ def delete_address_by_id():
         return jsonify({'message': 'Unauthorized access'}), 401
 
     address_id = request.form.get('address_id')
-    if not address_id:
-        return jsonify({'message': 'Address ID is required'}), 400
-
-    try:
-        address = Address.query.get(address_id)
-    except Exception as e:
-        return jsonify({'message': f'Error querying address: {str(e)}'}), 500
+    address = Address.query.get(address_id)
 
     if address and address.user_id == session['user_id']:
-        try:
-            db.session.delete(address)
-            db.session.commit()
-            return jsonify({'message': 'Address deleted successfully!'}), 200
-        except Exception as e:
-            return jsonify({'message': f'Error deleting address: {str(e)}'}), 500
+        db.session.delete(address)
+        db.session.commit()
+        return jsonify({'message': 'Address deleted successfully!'}), 200
 
     return jsonify({'message': 'Address not found or unauthorized'}), 404
 
