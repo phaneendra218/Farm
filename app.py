@@ -35,7 +35,7 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
-    phone_number = db.Column(db.String(15), nullable=True)  # Max length reduced to 15 for realistic phone numbers
+    phone_number = db.Column(db.String(15), nullable=False)  # Max length reduced to 15 for realistic phone numbers
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
 
 class Item(db.Model):
@@ -76,10 +76,14 @@ def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        phone_number = request.form['phone_number']
+
+        # Check if the username already exists
         if User.query.filter_by(username=username).first():
             flash('Username already exists', 'danger')
         else:
-            user = User(username=username, password=password)
+            # Create a new user with the phone number
+            user = User(username=username, password=password, phone_number=phone_number)
             db.session.add(user)
             db.session.commit()
             flash('Signup successful!', 'success')

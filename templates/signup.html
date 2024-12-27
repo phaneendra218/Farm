@@ -16,13 +16,13 @@
         align-items: center;
         height: 50vh;
         background-color: #f4f7fc;
-        padding-top: 10px;  /* Reduced space at the top */
-        padding-bottom: 0px; /* Reduced space at the bottom */
+        padding-top: 10px;
+        padding-bottom: 0px;
     }
 
     .signup-box {
         background-color: #fff;
-        padding: 20px;  /* Reduced padding */
+        padding: 20px;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         width: 100%;
@@ -32,45 +32,45 @@
 
     h2 {
         text-align: center;
-        margin-bottom: 15px;  /* Reduced space below header */
+        margin-bottom: 15px;
         color: #333;
-        font-size: 20px;  /* Reduced font size */
+        font-size: 20px;
     }
 
     label {
         font-weight: bold;
         color: #555;
-        margin-bottom: 5px;  /* Reduced space below labels */
+        margin-bottom: 5px;
         display: block;
-        font-size: 14px;  /* Reduced font size */
+        font-size: 14px;
     }
 
     input[type="text"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="tel"] {
         width: 100%;
-        padding: 10px;  /* Reduced padding */
-        margin-bottom: 15px;  /* Reduced space between input fields */
+        padding: 10px;
+        margin-bottom: 15px;
         border: 1px solid #ddd;
         border-radius: 5px;
         font-size: 14px;
         box-sizing: border-box;
     }
 
-    input[type="text"]:focus,
-    input[type="password"]:focus {
+    input:focus {
         outline: none;
         border-color: #4CAF50;
     }
 
     button {
         width: 100%;
-        padding: 10px;  /* Reduced padding */
+        padding: 10px;
         background-color: #4CAF50;
         color: white;
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        font-size: 16px;  /* Reduced font size */
+        font-size: 16px;
         transition: background-color 0.3s ease;
     }
 
@@ -80,9 +80,9 @@
 
     .footer {
         text-align: center;
-        margin-top: 20px;  /* Reduced space between form and footer */
+        margin-top: 20px;
         color: #888;
-        font-size: 14px;  /* Reduced font size */
+        font-size: 14px;
     }
 
     .footer a {
@@ -104,6 +104,9 @@
 
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
+
+            <label for="phone_number">Phone Number</label>
+            <input type="tel" id="phone_number" name="phone_number" required>
 
             <button type="submit">Signup</button>
         </form>
