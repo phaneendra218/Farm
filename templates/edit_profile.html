@@ -55,11 +55,11 @@
     .edit-profile-container .checkbox-container {
         display: flex;
         align-items: center;
+        gap: 10px;
         margin-top: 10px;
     }
 
     .edit-profile-container .checkbox-container input[type="checkbox"] {
-        margin-right: 10px;
         transform: scale(1.2);
     }
 
@@ -114,7 +114,7 @@
             <!-- Default Checkbox -->
             <div class="checkbox-container">
                 <input type="checkbox" id="is_default_{{ i }}" name="is_default_{{ i }}" {% if user.addresses|length > i and user.addresses[i].is_default %}checked{% endif %}>
-                <label for="is_default_{{ i }}">Make Default</label>
+                <label for="is_default_{{ i }}">Check to make this address as default</label>
             </div>
 
             <input type="hidden" name="address_id_{{ i }}" value="{{ user.addresses[i].id if user.addresses|length > i else '' }}">
