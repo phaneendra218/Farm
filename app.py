@@ -356,16 +356,21 @@ def profile():
     if request.method == 'POST':
         action = request.form.get('action')
 
-        # Handle making an address default
+        # Handle making an address default (AJAX support included)
         if action == 'make_default':
             address_id = request.form.get('address_id')
             address = Address.query.get(address_id)
             if address and address.user_id == user.id:
-                # Clear other default addresses
-                for addr in user.addresses:
-                    addr.is_default = False
+                # Reset all addresses to non-default
+                Address.query.update({Address.is_default: False})
+
+                # Set the selected address as default
                 address.is_default = True
                 db.session.commit()
+
+                # Check if the request is AJAX
+                if request.headers.get('Accept') == 'application/json':
+                    return jsonify(success=True)  # AJAX response
                 flash('Address set as default successfully!', 'success')
 
         # Handle updating phone number
