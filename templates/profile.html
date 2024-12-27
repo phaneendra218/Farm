@@ -78,12 +78,21 @@
         <div class="profile-section">
             <h3>Addresses</h3>
             {% if user.addresses %}
-                {% for address in user.addresses %}
+                <!-- Default Address -->
+                {% set default_address = user.addresses|selectattr('is_default')|first %}
+                {% if default_address %}
                 <div class="address-section">
-                    <p>{{ address.address }} ({{ address.address_type }})</p>
-                    {% if address.is_default %}
                     <p><strong>Default Address</strong></p>
-                    {% endif %}
+                    <p>{{ default_address.address_type }}</p>
+                    <p>{{ default_address.address }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Non-default Addresses -->
+                {% for address in user.addresses if not address.is_default %}
+                <div class="address-section">
+                    <p><strong>{{ address.address_type }}</strong></p>
+                    <p>{{ address.address }}</p>
                 </div>
                 {% endfor %}
             {% else %}
