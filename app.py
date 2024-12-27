@@ -35,7 +35,7 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
-    phone_number = db.Column(db.String(15), nullable=False)  # Max length reduced to 15 for realistic phone numbers
+    phone_number = db.Column(db.String(15), nullable=False)
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
 
 class Item(db.Model):
@@ -108,6 +108,42 @@ def login():
         else:
             flash('Invalid credentials', 'danger')
     return render_template('login.html')
+
+@app.route('/forget_password', methods=['GET', 'POST'])
+def forget_password():
+    if request.method == 'POST':
+        phone_number = request.form['phone_number']
+        user = User.query.filter_by(phone_number=phone_number).first()
+        if user:
+            session['reset_user_id'] = user.id  # Temporarily store user ID in session
+            flash('Phone number validated. Please update your password.', 'success')
+            return redirect(url_for('update_password'))
+        else:
+            flash('Phone number not matched. Please try again.', 'danger')
+    return render_template('forget_password.html')
+
+@app.route('/update_password', methods=['GET', 'POST'])
+def update_password():
+    if 'reset_user_id' not in session:
+        flash('Unauthorized access. Please start the reset process again.', 'danger')
+        return redirect(url_for('forget_password'))
+
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if new_password != confirm_password:
+            flash('Passwords do not match. Please try again.', 'danger')
+        else:
+            # Update the password in the database
+            user = User.query.get(session['reset_user_id'])
+            user.password = new_password  # Consider hashing passwords here
+            db.session.commit()
+            session.pop('reset_user_id')  # Remove reset_user_id from session
+            flash('Password updated successfully. You can now login.', 'success')
+            return redirect(url_for('login'))
+
+    return render_template('update_password.html')
 
 @app.route('/items', methods=['GET', 'POST'])
 def items():
