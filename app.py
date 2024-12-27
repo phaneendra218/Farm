@@ -438,12 +438,21 @@ def delete_address_by_id():
         return jsonify({'message': 'Unauthorized access'}), 401
 
     address_id = request.form.get('address_id')
-    address = Address.query.get(address_id)
+    if not address_id:
+        return jsonify({'message': 'Address ID is required'}), 400
+
+    try:
+        address = Address.query.get(address_id)
+    except Exception as e:
+        return jsonify({'message': f'Error querying address: {str(e)}'}), 500
 
     if address and address.user_id == session['user_id']:
-        db.session.delete(address)
-        db.session.commit()
-        return jsonify({'message': 'Address deleted successfully!'}), 200
+        try:
+            db.session.delete(address)
+            db.session.commit()
+            return jsonify({'message': 'Address deleted successfully!'}), 200
+        except Exception as e:
+            return jsonify({'message': f'Error deleting address: {str(e)}'}), 500
 
     return jsonify({'message': 'Address not found or unauthorized'}), 404
 
