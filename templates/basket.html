@@ -9,7 +9,7 @@
             <div class="basket-item-card" style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0px 3px 6px rgba(0,0,0,0.1);">
                 <h4 style="color: #333; margin-bottom: 10px;">{{ item.name }}</h4>
                 <p style="margin: 5px 0;"><strong>Price:</strong> ₹{{ item.price }} /{{ item.unit }}</p>
-                <p style="margin: 5px 0;"><strong>Quantity:</strong> {{ basket_item.quantity }}</p>
+                <p style="margin: 5px 0;"><strong>Quantity:</strong> {{ basket_item.quantity | int }}</p>
 
                 {% if item.image_path %}
                     <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width: 150px; height: 100px; object-fit: cover; margin-bottom: 10px;">
@@ -21,7 +21,7 @@
                 <form method="POST" action="{{ url_for('update_basket_quantity', item_id=item.id) }}" style="margin: 10px 0;">
                     <input type="number" 
                            name="quantity" 
-                           value="{{ basket_item.quantity }}" 
+                           value="{{ basket_item.quantity | int }}" 
                            min="1" 
                            max="50" 
                            step="1" 
