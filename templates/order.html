@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>My Orders</h1>
+
+{% if orders %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Delivery Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.item.name }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>${{ order.item.price }}</td>
+                <td>${{ order.item.price * order.quantity }}</td>
+                <td>
+                    {% for address in user.addresses %}
+                        {% if address.is_default %}
+                            {{ address.address }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No orders found. Start shopping now!</p>
+    <a href="{{ url_for('items') }}" class="btn btn-primary">View Items</a>
+{% endif %}
+{% endblock %}

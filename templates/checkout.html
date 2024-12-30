@@ -1,10 +1,73 @@
-<!-- templates/checkout.html -->
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Checkout</h1>
-  <form method="POST" action="{{ url_for('process_checkout') }}">
-    <!-- Add form fields for checkout, like shipping information, payment details, etc. -->
-    <button type="submit">Submit Order</button>
-  </form>
+<h1>Checkout</h1>
+
+<!-- Step 2: Confirm Delivery Address -->
+<form method="POST" action="{{ url_for('checkout') }}">
+    <input type="hidden" name="step" value="address">
+    <h2>Select Delivery Address</h2>
+
+    {% if addresses %}
+        <ul>
+            {% for address in addresses %}
+                <li>
+                    <input type="radio" name="selected_address_id" value="{{ address.id }}"
+                           {% if default_address and address.id == default_address.id %}checked{% endif %}>
+                    {{ address.address_type }}: {{ address.address }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No addresses found. Please add a new one.</p>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Proceed to Order Summary</button>
+</form>
+
+<!-- Add New Address Logic -->
+<div id="add-new-address">
+    <h3>Add New Address</h3>
+    <form method="POST" action="{{ url_for('profile') }}">
+        <input type="hidden" name="action" value="add_new_address">
+        <input type="text" name="address_type" placeholder="Address Type (e.g., Home)" required>
+        <textarea name="address" placeholder="Enter Address" required></textarea>
+        <input type="checkbox" name="is_default"> Set as Default
+        <button type="submit">Add Address</button>
+    </form>
+</div>
 {% endblock %}
+{% if step == 'summary' %}
+<h2>Order Summary</h2>
+<form method="POST" action="{{ url_for('checkout') }}">
+    <input type="hidden" name="step" value="place_order">
+    <ul>
+        {% for basket_item in basket_items %}
+        <li>
+            {{ basket_item.item.name }} - ${{ basket_item.item.price }} x
+            <input type="number" name="quantity" value="{{ basket_item.quantity }}" min="1">
+        </li>
+        {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-primary">Place Order</button>
+</form>
+{% endif %}
+{% if step == 'place_order' %}
+<h2>Place Order</h2>
+<p>Delivery Address: {{ selected_address.address }}</p>
+<ul>
+    {% for basket_item in basket_items %}
+    <li>{{ basket_item.item.name }} - ${{ basket_item.item.price }} x {{ basket_item.quantity }}</li>
+    {% endfor %}
+</ul>
+<p>Total: ${{ total_price }}</p>
+<form method="POST" action="{{ url_for('checkout') }}">
+    <input type="hidden" name="step" value="confirm_order">
+    <button type="submit" class="btn btn-success">Confirm Order</button>
+</form>
+{% endif %}
+{% if step == 'confirm_order' %}
+<h2>Order Confirmed!</h2>
+<p>Thank you for your order. Your invoice is ready.</p>
+<a href="{{ url_for('orders') }}">View My Orders</a>
+{% endif %}

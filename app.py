@@ -381,8 +381,61 @@ def remove_from_basket(item_id):
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
-    # Handle checkout logic here
-    return render_template('checkout.html')
+    if 'user_id' not in session:
+        flash('Please log in to proceed to checkout.', 'danger')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+
+    # Step 2: Fetch addresses and set default
+    addresses = user.addresses
+    default_address = next((addr for addr in addresses if addr.is_default), None)
+
+    if request.method == 'POST':
+        step = request.form.get('step', 'address')
+
+        if step == 'address':
+            # Handle address selection or creation
+            selected_address_id = request.form.get('selected_address_id')
+            if not selected_address_id:
+                flash('Please select or add a delivery address.', 'danger')
+            else:
+                session['selected_address_id'] = selected_address_id
+
+        elif step == 'summary':
+            # Handle order summary adjustments
+            quantities = request.form.getlist('quantity')
+            basket_items = Basket.query.filter_by(user_id=user.id).all()
+            for item, quantity in zip(basket_items, quantities):
+                item.quantity = float(quantity)
+            db.session.commit()
+            return redirect(url_for('checkout', step='place_order'))
+
+        elif step == 'place_order':
+            # Handle placing the order
+            selected_address_id = session.get('selected_address_id')
+            if not selected_address_id:
+                flash('Please select a delivery address.', 'danger')
+                return redirect(url_for('checkout'))
+
+            # Create order entries
+            basket_items = Basket.query.filter_by(user_id=user.id).all()
+            for basket_item in basket_items:
+                order = Order(
+                    user_id=user.id,
+                    item_id=basket_item.item_id,
+                    quantity=basket_item.quantity
+                )
+                db.session.add(order)
+            db.session.commit()
+
+            # Clear basket
+            Basket.query.filter_by(user_id=user.id).delete()
+            db.session.commit()
+
+            return render_template('order_confirmation.html', user=user)
+
+    return render_template('checkout.html', user=user, addresses=addresses, default_address=default_address)
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
@@ -633,6 +686,17 @@ def delete_address_by_id():
         return jsonify({'message': 'Address deleted successfully!'}), 200
 
     return jsonify({'message': 'Address not found or unauthorized'}), 404
+
+@app.route('/orders', methods=['GET'])
+def orders():
+    if 'user_id' not in session:
+        flash('Please login to view your orders', 'danger')
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    orders = Order.query.filter_by(user_id=user.id).all()
+
+    return render_template('orders.html', user=user, orders=orders)
 
 if __name__ == '__main__':
     with app.app_context():
