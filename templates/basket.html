@@ -52,4 +52,42 @@
 {% else %}
     <p class="text-center" style="color: #777; margin-top: 20px;">Your basket is empty. <a href="{{ url_for('items') }}" style="color: #007bff;">Browse items</a> to add something!</p>
 {% endif %}
+
+<style>
+    /* Responsive layout for smaller screens */
+    @media (max-width: 1200px) {
+        .basket-container {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 900px) {
+        .basket-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .basket-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Button sizes and form adjustments for small screens */
+    @media (max-width: 600px) {
+        .basket-item-card {
+            padding: 10px;
+        }
+
+        .btn {
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+
+        input[type="number"] {
+            width: 60px;
+        }
+    }
+</style>
+
 {% endblock %}
