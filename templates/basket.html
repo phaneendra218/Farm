@@ -61,40 +61,42 @@
 
 <!-- JavaScript for dynamic quantity update -->
 <script>
-    function updateQuantity(itemId, change) {
-        const quantityInput = document.getElementById('quantity-input-' + itemId);
-        let newQuantity = parseFloat(quantityInput.value) + change;
+    // Function to handle quantity updates
+    function updateQuantity(itemId, operation) {
+        // Get the current quantity from the input field
+        var quantityInput = document.getElementById('quantity-input-' + itemId);
+        var currentQuantity = parseFloat(quantityInput.value);
 
-        // Ensure the quantity is within the valid range
-        if (newQuantity >= 0.5 && newQuantity <= 50) {
-            // Update the input field and display dynamically
-            quantityInput.value = newQuantity.toFixed(1);
-
-            // Send AJAX request to update quantity in the backend
-            fetch(`/update_basket_quantity/${itemId}`, {
-                method: 'POST',
-                body: new URLSearchParams({
-                    'quantity': newQuantity.toFixed(1)
-                }),
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update quantity in the display
-                    document.getElementById('quantity-value-' + itemId).innerText = newQuantity.toFixed(1);
-                } else {
-                    console.log('Error:', data.message);
-                    alert(data.message);  // Show error message to the user
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        } else {
-            console.log('Invalid quantity');
-            alert('Quantity should be between 0.5 and 50.');
+        // Update the quantity based on the operation (+ or -)
+        if (operation === 0.5) {
+            currentQuantity += 0.5; // Increase by 0.5
+        } else if (operation === -0.5 && currentQuantity > 0.5) {
+            currentQuantity -= 0.5; // Decrease by 0.5, but don't go below 0.5
         }
+
+        // Update the input field with the new quantity
+        quantityInput.value = currentQuantity;
+
+        // Send the updated quantity to the server using AJAX
+        fetch('/update_basket_quantity/' + itemId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'quantity=' + encodeURIComponent(currentQuantity),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Quantity updated successfully:', data.new_quantity);
+                // Optionally update the total price or other UI elements
+                // Example: document.getElementById('total_price').innerHTML = '₹' + data.new_total;
+            } else {
+                alert(data.message);  // Show error message if update fails
+            }
+        })
+        .catch(error => {
+            console.error('Error updating quantity:', error);
+        });
     }
 </script>
-
