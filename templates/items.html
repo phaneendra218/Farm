@@ -26,7 +26,7 @@
                     <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" style="width:100px; height:100px; position:absolute; top:40%; right:10px; transform:translateY(-50%);">
                 {% else %}
                     <!-- Quantity input for adding to basket -->
-                    <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="margin-top:10px;">
+                    <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="margin-top:10px; position:relative;">
                         <label for="quantity_{{ item.id }}">Quantity:</label>
                         <select name="quantity" id="quantity_{{ item.id }}" onchange="toggleCustomInput(this, '{{ item.id }}')" required>
                             <option value="0.5">1/2</option>
@@ -36,7 +36,10 @@
                             <option value="10">10</option>
                             <option value="custom">Custom</option>
                         </select>
-                        <input type="number" name="custom_quantity" id="custom_quantity_{{ item.id }}" min="0.5" max="50" step="0.5" style="display:none; margin-top:10px;" placeholder="Enter custom quantity">
+                        
+                        <!-- Custom quantity input field -->
+                        <input type="number" name="custom_quantity" id="custom_quantity_{{ item.id }}" min="0.5" max="50" step="0.5" style="display:none; margin-top:10px; position: absolute; top: 30px;" placeholder="Enter custom quantity">
+                        
                         <button type="submit">Add to Basket</button>
                     </form>                    
                     <!-- Order item button -->
@@ -45,7 +48,7 @@
                         <button type="submit">Order</button>
                     </form>
                 {% endif %}
-                
+
                 <!-- Admin actions -->
                 {% if session.get('is_admin') %}
                     <form action="{{ url_for('update_item', item_id=item.id) }}" method="get" style="display:inline;">
