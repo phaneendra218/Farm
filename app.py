@@ -488,10 +488,15 @@ def profile():
         elif action == 'update_phone_number':
             phone_number = request.form.get('phone_number')
             if not phone_number or not phone_number.isdigit() or len(phone_number) != 10:
-                return jsonify({'message': 'Invalid phone number. Please enter a valid 10-digit number.', 'success': False}), 400
+                return jsonify({'message': 'Invalid phone number. Please enter a valid 10-digit number.', 'success': False}), 400            
+            # Check if the phone number already exists in the database
+            existing_user = User.query.filter(User.phone_number == phone_number, User.id != user.id).first()
+            if existing_user:
+                return jsonify({'message': 'This phone number is already in use. Please choose a different number.', 'success': False}), 400            
             user.phone_number = phone_number
             db.session.commit()
             return jsonify({'message': 'Phone number updated successfully!', 'success': True}), 200
+        
         # Handle updating an address
         elif action == 'update_address':
             address_id = request.form.get('address_id')

@@ -272,34 +272,33 @@
     });
 
     updatePhoneButton.addEventListener('click', () => {
-        const newPhoneNumber = phoneInput.value.trim();
-        if (!/^[0-9]{10}$/.test(newPhoneNumber)) {
-            showToast('Please enter a valid 10-digit phone number.');
-            return;
-        }
+    const newPhoneNumber = phoneInput.value.trim();
+    if (!/^[0-9]{10}$/.test(newPhoneNumber)) {
+        showToast('Please enter a valid 10-digit phone number.');
+        return;
+    }
 
-        fetch('{{ url_for("profile") }}', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
-            body: new URLSearchParams({ action: 'update_phone_number', phone_number: newPhoneNumber }),
+    fetch('{{ url_for("profile") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+        body: new URLSearchParams({ action: 'update_phone_number', phone_number: newPhoneNumber }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                phoneNumber.textContent = newPhoneNumber;
+                showToast('Phone number updated successfully!');
+                phoneEdit.classList.add('hidden');
+                phoneDisplay.classList.remove('hidden');
+            } else {
+                showToast(data.message || 'Failed to update the phone number.');
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    phoneNumber.textContent = newPhoneNumber;
-                    showToast('Phone number updated successfully!');
-                    phoneEdit.classList.add('hidden');
-                    phoneDisplay.classList.remove('hidden');
-                } else {
-                    showToast(data.message || 'Failed to update the phone number.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('An error occurred. Please try again.');
-            });
-    });
-
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('An error occurred. Please try again.');
+        });
+      });
     // Address Editing
     document.querySelectorAll('.edit-address').forEach(button => {
         button.addEventListener('click', () => {
