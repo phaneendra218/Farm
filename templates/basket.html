@@ -63,14 +63,12 @@
 <script>
     function updateQuantity(itemId, change) {
         const quantityInput = document.getElementById('quantity-input-' + itemId);
-        const quantityValue = document.getElementById('quantity-value-' + itemId);
         let newQuantity = parseFloat(quantityInput.value) + change;
 
         // Ensure the quantity is within the valid range
         if (newQuantity >= 0.5 && newQuantity <= 50) {
             // Update the input field and display dynamically
             quantityInput.value = newQuantity.toFixed(1);
-            quantityValue.innerText = newQuantity.toFixed(1);
 
             // Send AJAX request to update quantity in the backend
             fetch(`/update_basket_quantity/${itemId}`, {
@@ -85,12 +83,18 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    console.log('Quantity updated successfully');
+                    // Update quantity in the display
+                    document.getElementById('quantity-value-' + itemId).innerText = newQuantity.toFixed(1);
                 } else {
-                    console.log('Failed to update quantity');
+                    console.log('Error:', data.message);
+                    alert(data.message);  // Show error message to the user
                 }
             })
             .catch(error => console.error('Error:', error));
+        } else {
+            console.log('Invalid quantity');
+            alert('Quantity should be between 0.5 and 50.');
         }
     }
 </script>
+

@@ -309,8 +309,7 @@ def add_to_basket(item_id):
 @app.route('/update_basket_quantity/<int:item_id>', methods=['POST'])
 def update_basket_quantity(item_id):
     if 'user_id' not in session:
-        flash('Please login to update items in your basket.', 'danger')
-        return redirect(url_for('login'))
+        return jsonify({"success": False, "message": "Please login to update items in your basket."}), 401
 
     user_id = session['user_id']
     try:
@@ -320,8 +319,7 @@ def update_basket_quantity(item_id):
 
         # Validate the maximum quantity
         if new_quantity > 50:
-            flash('Please enter a quantity less than or equal to 50. Contact support for bulk orders.', 'danger')
-            return redirect(url_for('basket'))
+            return jsonify({"success": False, "message": "Please enter a quantity less than or equal to 50."}), 400
 
         # Fetch the basket item for the user and item
         basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
@@ -330,12 +328,13 @@ def update_basket_quantity(item_id):
             # Update the quantity
             basket_item.quantity = new_quantity
             db.session.commit()
-            return jsonify({"success": True})  # Return success response in JSON format
+            return jsonify({"success": True, "new_quantity": new_quantity}), 200  # Return success with the updated quantity
         else:
-            return jsonify({"success": False})  # Return failure response if item not found
+            return jsonify({"success": False, "message": "Item not found in your basket."}), 404
 
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})  # Return error response if exception occurs
+        return jsonify({"success": False, "message": str(e)}), 500  # Return error if exception occurs
+
 
 @app.route('/basket')
 def basket():
