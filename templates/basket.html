@@ -30,7 +30,7 @@
                 </form>
 
                 <!-- Remove Item Button -->
-                <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}" style="margin: 10px 0;">
+                <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}" style="margin: 10px 0; color: #a10c0c;">
                     <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                 </form>
             </div>
@@ -49,7 +49,7 @@
         </form>
         
         <!-- Back to Items Button Styled as a Button -->
-        <form action="{{ url_for('items') }}" method="get" style="display:inline;">
+        <form action="{{ url_for('items') }}" method="get" style="display:inline; color: #abaca3;">
             <button type="submit" class="btn btn-secondary mt-3">Back to Items</button>
           </form>
     </div>
