@@ -429,7 +429,7 @@ def checkout():
 
         basket_items = Basket.query.all()
         # Ensure consistent types for calculation
-        total_price = sum(float(item.item.price) * item.quantity for item in basket_items)
+        total_price = sum(float(item.item.price) * float(item.quantity) for item in basket_items)
 
         return render_template('checkout.html', step='place_order', selected_address=selected_address, basket_items=basket_items, total_price=total_price)
 
