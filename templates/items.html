@@ -21,7 +21,7 @@
                 <!-- Check if item is hidden (Sold Out) -->
                 {% if item.is_hidden %}
                     <!-- Sold Out Message -->
-                    <p class="text-danger" style="font-weight: bold;">Sold Out</p>
+                    <p class="text-danger sold-out-text" style="font-weight: bold;">Sold Out</p>
                     <!-- Coming Soon Stamp -->
                     <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" style="width:100px; height:100px; position:absolute; top:40%; right:10px; transform:translateY(-50%);">
                 {% else %}
