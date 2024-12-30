@@ -9,7 +9,7 @@
             <div class="basket-item-card" style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0px 3px 6px rgba(0,0,0,0.1);">
                 <h4 style="color: #333; margin-bottom: 10px;">{{ item.name }}</h4>
                 <p style="margin: 5px 0;"><strong>Price:</strong> ₹{{ item.price }} /{{ item.unit }}</p>
-                <p style="margin: 5px 0;"><strong>Quantity:</strong> <span id="quantity-value-{{ item.id }}">{{ basket_item.quantity }}</span></p>
+                <p style="margin: 5px 0;"><strong>Quantity:</strong> {{ basket_item.quantity }}</p>
 
                 {% if item.image_path %}
                     <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width: 150px; height: 100px; object-fit: cover; margin-bottom: 10px;">
@@ -17,18 +17,17 @@
                     <p style="color: #999; font-size: 0.9em;">No image available</p>
                 {% endif %}
 
-                <!-- Update Quantity Controls -->
-                <div style="margin: 10px 0;">
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="updateQuantity({{ item.id }}, -0.5)">-</button>
+                <!-- Update Quantity Form -->
+                <form method="POST" action="{{ url_for('update_basket_quantity', item_id=item.id) }}" style="margin: 10px 0;">
                     <input type="number" 
-                           id="quantity-input-{{ item.id }}" 
+                           name="quantity" 
                            value="{{ basket_item.quantity }}" 
                            min="0.5" 
                            max="50" 
                            step="0.5" 
-                           style="width: 70px; padding: 5px; text-align: center; margin: 0 10px; border: 1px solid #ccc; border-radius: 5px;">
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="updateQuantity({{ item.id }}, 0.5)">+</button>
-                </div>
+                           style="width: 70px; padding: 5px; text-align: center; margin-right: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                </form>
 
                 <!-- Remove Item Button -->
                 <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}" style="margin: 10px 0;">
@@ -40,7 +39,7 @@
 
     <!-- Total Price Section -->
     <div class="total-price-container" style="text-align: center; margin-top: 20px;">
-        <p style="font-size: 1.2em; color: #333;"><strong>Total Amount:</strong> ₹{{ total_price }}</p>
+        <p style="font-size: 1.2em; color: #333;"><strong>Total Amount:</strong> <strong>₹{{ total_price }}</strong></p>
     </div>
 
     <!-- Action Buttons -->
@@ -58,45 +57,3 @@
     <p class="text-center" style="color: #777; margin-top: 20px;">Your basket is empty. <a href="{{ url_for('items') }}" style="color: #007bff;">Browse items</a> to add something!</p>
 {% endif %}
 {% endblock %}
-
-<!-- JavaScript for dynamic quantity update -->
-<script>
-    // Function to handle quantity updates
-    function updateQuantity(itemId, operation) {
-        // Get the current quantity from the input field
-        var quantityInput = document.getElementById('quantity-input-' + itemId);
-        var currentQuantity = parseFloat(quantityInput.value);
-
-        // Update the quantity based on the operation (+ or -)
-        if (operation === 0.5) {
-            currentQuantity += 0.5; // Increase by 0.5
-        } else if (operation === -0.5 && currentQuantity > 0.5) {
-            currentQuantity -= 0.5; // Decrease by 0.5, but don't go below 0.5
-        }
-
-        // Update the input field with the new quantity
-        quantityInput.value = currentQuantity;
-
-        // Send the updated quantity to the server using AJAX
-        fetch('/update_basket_quantity/' + itemId, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'quantity=' + encodeURIComponent(currentQuantity),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Quantity updated successfully:', data.new_quantity);
-                // Optionally update the total price or other UI elements
-                // Example: document.getElementById('total_price').innerHTML = '₹' + data.new_total;
-            } else {
-                alert(data.message);  // Show error message if update fails
-            }
-        })
-        .catch(error => {
-            console.error('Error updating quantity:', error);
-        });
-    }
-</script>
