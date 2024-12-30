@@ -6,26 +6,23 @@
 
 <h3>Available Items</h3>
 {% if items %}
-    <div class="item-container">
+    <div class="item-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
         {% for item in items %}
-            <div class="item-card" style="position:relative;">
+            <div class="item-card" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; position:relative; text-align:center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                 <h4>{{ item.name }}</h4>
                 <p>Price: ₹{{ item.price }} /{{ item.unit }}</p>
                 {% if item.image_path %}
-                    <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width:150px; height:100px;">
+                    <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width:100%; height:auto; max-width:150px; margin:0 auto;">
                 {% else %}
                     <p>No image available</p>
                 {% endif %}
-                
-                <!-- Check if item is hidden (Sold Out) -->
+
                 {% if item.is_hidden %}
-                    <!-- Sold Out Message -->
                     <p class="text-danger" style="font-weight: bold;">Sold Out</p>
-                    <!-- Coming Soon Stamp -->
-                    <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" style="width:100px; height:100px; position:absolute; top:40%; right:10px; transform:translateY(-50%);">
+                    <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" style="width:80px; height:80px; position:absolute; top:40%; right:10px; transform:translateY(-50%);">
                 {% else %}
                     <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
-                        <button type="submit">Order Now</button>
+                        <button type="submit" style="padding: 10px 15px; border: none; background-color: #28a745; color: white; border-radius: 5px; cursor: pointer;">Order Now</button>
                     </form>
                 {% endif %}
             </div>
