@@ -83,6 +83,8 @@ def signup():
         # Check if the username already exists
         if User.query.filter_by(username=username).first():
             flash('Username already exists', 'danger')
+        elif User.query.filter_by(phone_number=phone_number).first():
+            flash('Phone number is already taken', 'danger')
         else:
             # Create a new user with the phone number
             user = User(username=username, password=password, phone_number=phone_number)
