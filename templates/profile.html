@@ -264,6 +264,12 @@
         phoneDisplay.classList.remove('hidden');
         phoneInput.value = phoneNumber.textContent.trim();
     });
+    phoneInput.addEventListener('input', () => {
+    const currentValue = phoneInput.value.trim();
+    if (currentValue.length > 10) {
+        phoneInput.value = currentValue.slice(0, 10); // Limit the input to 10 digits
+    }
+    });
 
     updatePhoneButton.addEventListener('click', () => {
         const newPhoneNumber = phoneInput.value.trim();
