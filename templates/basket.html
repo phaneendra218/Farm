@@ -47,7 +47,7 @@
         <form method="POST" action="{{ url_for('checkout') }}" style="display: inline-block; margin-right: 10px;">
             <button type="submit" class="btn btn-success">Proceed to Checkout</button>
         </form>
-        <a href="{{ url_for('items') }}" class="btn btn-secondary">Back to Items</a>
+        <a href="{{ url_for('items') }}" class="btn btn-secondary btn-sm" role="button" style="font-size: 16px; padding: 8px 16px;">Back to Items</a>
     </div>
 {% else %}
     <p class="text-center" style="color: #777; margin-top: 20px;">Your basket is empty. <a href="{{ url_for('items') }}" style="color: #007bff;">Browse items</a> to add something!</p>
