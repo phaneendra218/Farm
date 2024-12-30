@@ -291,9 +291,9 @@ def add_to_basket(item_id):
             return redirect(url_for('items'))
 
     # Validate maximum quantity
-    if quantity > Decimal(50):
-        flash('Please enter a quantity less than or equal to 50. Contact customer support for bulk orders.', 'danger')
-        return redirect(url_for('items'))
+    # if quantity > Decimal(50):
+    #     flash('Please enter a quantity less than or equal to 50. Contact customer support for bulk orders.', 'danger')
+    #     return redirect(url_for('items'))
 
     # Check if the item already exists in the basket
     basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
