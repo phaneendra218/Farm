@@ -3,175 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Website{% endblock %}</title>
-
-    <!-- Bootstrap CSS (Optional for responsive design) -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- Custom Styles -->
+    <title>FreshlyFruited Farms</title>
+    <link rel="icon" href="{{ url_for('static', filename='tabcon.png') }}" type="image/x-icon">
     <style>
-        /* Base styles */
+        /* Existing styles */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column; /* Makes footer stick to the bottom */
+            min-height: 100vh;
         }
-
+    
         header {
-            background-color: #007bff;
+            background-color: #4CAF50;
+            padding: 12px 30px;  /* Reduced padding to decrease height */
             color: white;
-            padding: 20px 0;
             text-align: center;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-
-        .navbar {
-            margin-bottom: 20px;
-        }
-
-        .navbar-brand {
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .navbar-nav .nav-item .nav-link {
-            font-size: 1rem;
-        }
-
-        /* Main content */
-        .main-content {
-            margin-top: 20px;
-        }
-
-        .container {
-            padding: 30px;
-        }
-
-        /* Footer */
+    
         footer {
-            background-color: #343a40;
+            background-color: #4CAF50;
             color: white;
             text-align: center;
+            padding: 0px 30px;  /* Reduced padding to decrease height */
+            font-size: 10px;
+        }
+    
+        .logo {
+            height: 80px;  /* Reduced logo height to match header size */
+            width: auto;
+            margin-right: 20px; /* Adds gap between logo and nav */
+        }
+    
+        nav a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    
+        nav a:hover {
+            text-decoration: underline;
+        }
+    
+        main {
             padding: 20px;
-            margin-top: 40px;
+            flex-grow: 1; /* Ensures main content pushes the footer down */
         }
 
-        /* Button styling */
-        .btn-custom {
-            font-size: 16px;
-            padding: 10px 20px;
+        .flash-messages {
+            margin: 5px 0;
         }
-
-        /* Responsive adjustments for mobile */
-        @media (max-width: 1200px) {
-            .container {
-                padding: 15px;
-            }
-
-            .navbar {
-                padding: 10px;
-            }
-
-            header {
-                font-size: 1.2rem;
-            }
+        .flash-messages ul {
+            list-style-type: none;
+            padding: 0;
         }
-
-        @media (max-width: 768px) {
-            .navbar {
-                font-size: 0.9rem;
-            }
-
-            header {
-                font-size: 1.1rem;
-            }
-
-            footer {
-                padding: 15px 0;
-            }
-
-            .container {
-                padding: 10px;
-            }
-
-            .main-content {
-                margin-top: 10px;
-            }
+        .flash-messages li {
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            margin-bottom: 10px;
         }
-
-        @media (max-width: 576px) {
-            .navbar {
-                text-align: center;
-            }
-
-            header {
-                font-size: 1rem;
-                padding: 10px 0;
-            }
-
-            footer {
-                font-size: 0.9rem;
-                padding: 10px;
-            }
-
-            .container {
-                padding: 5px;
-            }
-
-            .btn {
-                font-size: 14px;
-                padding: 8px 15px;
-            }
-
-            .navbar-nav {
-                display: flex;
-                flex-direction: column;
-            }
+        .flash-messages li.success {
+            background-color: #d4edda;
+            color: #155724;
         }
-
+        .flash-messages li.info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .flash-messages li.warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    
+        .user-info {
+            text-align: right;
+        }
+    
+        .user-info p {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .delete-button {
+            background-color: #e3342f; /* Red color for delete button */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    
+        .delete-button:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+    
+        .user-info button {
+            margin-top: 10px;
+            background-color: #e6bd38;  /* Set logout button color */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .user-info button:hover {
+        background-color: #c28c0d;  /* Slightly darker color on hover */
+        }
+    
+        /* Basket Icon Style */
+        #basket-icon {
+            position: relative;
+        }
+        #basket-count {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background-color: red;
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+    
+        /* New styles for item and basket images */
+        .item-container, .basket-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+    
+        .item-card, .basket-item-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            width: 200px;
+        }
+    
+        .item-card img, .basket-item-card img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .item-card:hover, .basket-item-card:hover {
+            background-color: #f0f0f0;  /* Light background color on hover */
+            transition: background-color 0.3s ease;  /* Smooth transition effect */
+        }  
+    
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    
+        button:hover {
+            background-color: #45a049;
+        }
     </style>
+
 </head>
 <body>
-
-    <!-- Header -->
     <header>
-        <h1>{% block header %}Welcome to My Website{% endblock %}</h1>
+        <!-- Logo added here -->
+        <a href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Farming Logo" class="logo">
+        </a>
+        <h1>FreshlyFruited Farms</h1>
+        <nav>
+            <a href="/">Home</a>
+            {% if 'user_id' in session %}
+                <a href="/items">Items</a>
+                {% if session.get('is_admin') %}
+                    <a href="/add_item">Add Item</a>
+                {% endif %}
+                <a href="/contact">Contact Us</a>
+            {% else %}
+                <a href="/signup">Signup</a>
+                <a href="/login">Login</a>
+                <a href="/contact">Contact Us</a>
+            {% endif %}
+        </nav>
+
+        {% if 'user_id' in session %}
+        <!-- User info section positioned on the right side -->
+        <div class="user-info">
+            <p>Welcome, {{ session['username'] }}</p>
+            <a href="{{ url_for('profile') }}"><button>View Profile</button></a>
+            <a href="/logout"><button>Logout</button></a>
+        </div>
+        {% endif %}
+
+        <!-- Basket icon with count -->
+        <a href="/basket" id="basket-icon">
+            <img src="{{ url_for('static', filename='basket.png') }}" alt="Basket" style="width:36px; height:36px;">
+            <span id="basket-count">{{ session.get('basket_count', 0) }}</span>
+        </a>
     </header>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="{{ url_for('home') }}">My Site</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{{ url_for('home') }}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('about') }}">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container main-content">
-        {% block content %}{% endblock %}
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 My Website. All rights reserved.</p>
-    </footer>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
 
-    <!-- Bootstrap JS and dependencies (optional) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <footer>
+        <p>&copy; 2024 FreshlyFruited Farms</p>
+    </footer>
 </body>
 </html>
