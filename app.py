@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.utils import secure_filename
 from sqlalchemy.types import Numeric
+from decimal import Decimal
 
 
 app = Flask(__name__)
@@ -387,7 +388,6 @@ def checkout():
         step = request.form.get('step')  # Retrieve the step from the form data
 
         if step == 'address':
-            # Handle address selection or error
             selected_address_id = request.form.get('selected_address_id')
             if not selected_address_id:
                 flash("Please select a delivery address.", "error")
@@ -397,36 +397,47 @@ def checkout():
             return redirect(url_for('checkout', step='summary'))
 
         elif step == 'place_order':
-            # Handle order placement logic
             quantities = request.form.getlist('quantity')
-            # Validate and update basket quantities here
+            # Update basket quantities if needed
             return redirect(url_for('checkout', step='place_order'))
 
         elif step == 'confirm_order':
-            # Handle order confirmation logic
-            # Save order to database or perform necessary actions
+            # Confirm the order and save it to the database
             return redirect(url_for('checkout', step='confirm_order'))
 
-    # Render the appropriate template for the current step
+    # Handle GET requests for each step
     if step == 'address':
         addresses = Address.query.all()
         default_address = next((addr for addr in addresses if addr.is_default), None)
         return render_template('checkout.html', step='address', addresses=addresses, default_address=default_address)
 
     elif step == 'summary':
-        basket_items = Basket.query.all()  # Fetch basket items for the user
+        basket_items = Basket.query.all()
         return render_template('checkout.html', step='summary', basket_items=basket_items)
 
     elif step == 'place_order':
-        selected_address = Address.query.get(session.get('selected_address_id'))
+        selected_address_id = session.get('selected_address_id')
+        if not selected_address_id:
+            flash("No delivery address selected. Please select one.", "error")
+            return redirect(url_for('checkout', step='address'))
+
+        # Updated query for SQLAlchemy 2.0
+        selected_address = db.session.get(Address, selected_address_id)
+        if not selected_address:
+            flash("Delivery address not found.", "error")
+            return redirect(url_for('checkout', step='address'))
+
         basket_items = Basket.query.all()
-        total_price = sum(item.item.price * item.quantity for item in basket_items)
+        # Ensure consistent types for calculation
+        total_price = sum(float(item.item.price) * item.quantity for item in basket_items)
+
         return render_template('checkout.html', step='place_order', selected_address=selected_address, basket_items=basket_items, total_price=total_price)
 
     elif step == 'confirm_order':
         return render_template('checkout.html', step='confirm_order')
 
     return redirect(url_for('checkout', step='address'))
+
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
