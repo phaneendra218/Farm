@@ -8,12 +8,10 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
-
 h2, h3 {
     text-align: center;
     color: #333;
 }
-
 header {
     background-color: #4CAF50;
     padding: 12px 30px;
@@ -24,39 +22,6 @@ header {
     justify-content: space-between;
     align-items: center;
 }
-
-header .logo-container {
-    display: flex;
-    align-items: center;
-}
-
-header .logo {
-    height: 80px;
-    width: auto;
-    margin-right: 15px;
-}
-
-header .site-title {
-    font-size: 20px; /* Adjust size as needed */
-}
-
-nav {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-}
-
-nav a {
-    margin: 0 15px;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-nav a:hover {
-    text-decoration: underline;
-}
-
 footer {
     background-color: #4CAF50;
     color: white;
@@ -64,53 +29,58 @@ footer {
     padding: 0px 30px;
     font-size: 10px;
 }
-
+.logo {
+    height: 80px;
+    width: auto;
+    margin-right: 20px;
+}
+nav a {
+    margin: 0 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+nav a:hover {
+    text-decoration: underline;
+}
 main {
     padding: 20px;
     flex-grow: 1;
 }
-
 /* Flash Messages */
 .flash-messages {
     margin: 5px 0;
 }
-
 .flash-messages ul {
     list-style-type: none;
     padding: 0;
 }
-
 .flash-messages li {
     padding: 10px;
     background-color: #f8d7da;
     color: #721c24;
     margin-bottom: 10px;
 }
-
 .flash-messages li.success {
     background-color: #d4edda;
     color: #155724;
 }
-
 .flash-messages li.info {
     background-color: #cce5ff;
     color: #004085;
 }
-
 .flash-messages li.warning {
     background-color: #fff3cd;
     color: #856404;
 }
-
+/* User Info */
 .user-info {
     text-align: right;
 }
-
 .user-info p {
     display: inline-block;
     margin-right: 15px;
 }
-
 .delete-button {
     background-color: #e3342f;
     color: white;
@@ -120,11 +90,9 @@ main {
     cursor: pointer;
     margin-top: 10px;
 }
-
 .delete-button:hover {
     background-color: #c82333;
 }
-
 .user-info button {
     margin-top: 10px;
     background-color: #e6bd38;
@@ -134,17 +102,13 @@ main {
     border-radius: 5px;
     cursor: pointer;
 }
-
 .user-info button:hover {
     background-color: #c28c0d;
 }
-
+/* Basket Icon Style */
 #basket-icon {
-    position: absolute;
-    right: 20px;
-    top: 20px;
+    position: relative;
 }
-
 #basket-count {
     position: absolute;
     top: -5px;
@@ -155,13 +119,12 @@ main {
     padding: 2px 6px;
     border-radius: 50%;
 }
-
+/* Item and Basket Container Styles */
 .item-container, .basket-container {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
 }
-
 .item-card, .basket-item-card {
     border: 1px solid #ddd;
     padding: 10px;
@@ -171,24 +134,22 @@ main {
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
 .item-card:hover, .basket-item-card:hover {
     background-color: #f0f0f0;
     transition: background-color 0.3s ease;
 }
-
 .item-card img, .basket-item-card img {
     max-width: 100%;
     max-height: 150px;
     border-radius: 5px;
     margin-top: 10px;
 }
-
+/* Sold Out Text */
 .sold-out-text {
     font-weight: bold;
     color: red;
 }
-
+/* Coming Soon Image */
 .coming-soon-image {
     width: 80px;
     height: 80px;
@@ -197,11 +158,11 @@ main {
     right: 10px;
     transform: translateY(-50%);
 }
-
+/* Order Form */
 .order-form {
     margin-top: 10px;
 }
-
+/* Order Button */
 .order-button {
     padding: 10px 15px;
     border: none;
@@ -210,11 +171,9 @@ main {
     border-radius: 5px;
     cursor: pointer;
 }
-
 .order-button:hover {
     background-color: #218838;
 }
-
 button {
     background-color: #4CAF50;
     color: white;
@@ -224,12 +183,11 @@ button {
     cursor: pointer;
     margin-top: 10px;
 }
-
 button:hover {
     background-color: #45a049;
 }
-
 /* Media Queries for Responsive Design */
+/* For screens smaller than 768px (Tablets, small screens) */
 @media (max-width: 768px) {
     header {
         padding: 12px 20px;
@@ -249,19 +207,19 @@ button:hover {
     }
 }
 
+/* For screens smaller than 480px (Mobile) */
 @media (max-width: 480px) {
     header {
         padding: 10px 15px;
         flex-direction: column;
         align-items: flex-start;
     }
+    nav a {
+        margin: 5px 0;
+    }
     .logo {
         height: 50px;
         margin-right: 0;
-    }
-    .site-title {
-        font-size: 18px;
-        margin-left: 10px;
     }
     .item-card, .basket-item-card {
         width: 100%;
@@ -279,6 +237,7 @@ button:hover {
     }
 }
 
+/* For 360x640 screens */
 @media (max-width: 360px) {
     .logo {
         height: 40px;
@@ -298,6 +257,7 @@ button:hover {
     }
 }
 
+/* For 375x667 screens */
 @media (max-width: 375px) {
     header {
         padding: 10px 20px;
