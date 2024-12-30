@@ -50,13 +50,13 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(Numeric(10, 2), nullable=False)
 
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(Numeric(10, 2), nullable=False)
 
     user = db.relationship('User', backref='baskets')
     item = db.relationship('Item', backref='baskets')
@@ -162,6 +162,15 @@ def forget_user():
 
     return render_template('forget_user.html', username=username)
 
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 @app.route('/items', methods=['GET', 'POST'])
 def items():
     if 'user_id' not in session:
@@ -238,15 +247,6 @@ def add_item():
 
     return render_template('add_item.html')
 
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
 @app.route('/order_item/<int:item_id>', methods=['POST'])
 def order_item(item_id):
     if 'user_id' not in session:
@@ -269,7 +269,22 @@ def add_to_basket(item_id):
         return redirect(url_for('login'))
 
     user_id = session['user_id']
-    quantity = int(request.form.get('quantity', 1))
+    quantity = request.form.get('quantity')
+    
+    # Handle custom quantity
+    if quantity == 'custom':
+        try:
+            quantity = float(request.form.get('custom_quantity', 1))
+        except ValueError:
+            flash('Invalid custom quantity entered.', 'danger')
+            return redirect(url_for('items'))
+    else:
+        quantity = float(quantity)
+
+    # Validate maximum quantity
+    if quantity > 50:
+        flash('Please enter a quantity less than or equal to 50. Contact customer support for bulk orders.', 'danger')
+        return redirect(url_for('items'))
 
     # Check if the item already exists in the basket
     basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
