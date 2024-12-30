@@ -552,7 +552,7 @@ def edit_profile():
     user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        # Update phone number
+        # Retrieve the new phone number
         new_phone_number = request.form.get('phone_number')
 
         # Validate the phone number is unique
@@ -565,6 +565,7 @@ def edit_profile():
         # Update phone number if unique
         user.phone_number = new_phone_number
 
+        # Update password if provided
         if request.form['password']:
             user.password = request.form['password']
 
@@ -604,6 +605,7 @@ def edit_profile():
 
     # Pass 'enumerate' explicitly to the template context
     return render_template('edit_profile.html', user=user, enumerate=enumerate)
+
 
 # @app.route('/delete_address/<int:address_id>', methods=['POST'])
 # def delete_address(address_id):
