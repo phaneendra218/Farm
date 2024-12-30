@@ -118,7 +118,10 @@
             <label for="phone_number">
                 Phone Number <span class="mandatory">*</span>
             </label>
-            <input type="tel" id="phone_number" name="phone_number" required>
+            <input type="tel" id="phone_number" name="phone_number" required
+                   pattern="^\d{10}$" 
+                   title="Please enter a valid 10-digit phone number" 
+                   placeholder="Enter 10-digit phone number">
 
             <button type="submit">Signup</button>
         </form>
