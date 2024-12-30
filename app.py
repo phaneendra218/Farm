@@ -2,8 +2,6 @@ from flask import Flask, render_template, request, redirect, session, url_for, f
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.utils import secure_filename
-from models import Item, Order, Basket  # Assuming models are imported
-from sqlalchemy.exc import SQLAlchemyError  # For database error handling
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -253,64 +251,41 @@ def logout():
 def order_item(item_id):
     if 'user_id' not in session:
         flash('Please login to order items', 'danger')
-        return redirect(url_for('login'))    
-    try:
-        # Get the item and create an order (default quantity is 1)
-        item = Item.query.get_or_404(item_id)
-        order = Order(user_id=session['user_id'], item_id=item.id, quantity=1)
-        db.session.add(order)
-        db.session.commit()
-        flash('Item ordered successfully!', 'success')
-    except SQLAlchemyError:
-        db.session.rollback()
-        flash('Error occurred while processing your order.', 'danger')
+        return redirect(url_for('login'))
     
-    return redirect(url_for('items'))
+    # Get the item and create an order (assuming quantity is 1 for simplicity)
+    item = Item.query.get_or_404(item_id)
+    order = Order(user_id=session['user_id'], item_id=item.id, quantity=1)
+    db.session.add(order)
+    db.session.commit()
+    
+    flash('Item ordered successfully!', 'success')
+    return redirect(url_for('items'))  # Redirect to the items page
 
 @app.route('/add_to_basket/<int:item_id>', methods=['POST'])
 def add_to_basket(item_id):
     if 'user_id' not in session:
         flash('Please login to add items to your basket', 'danger')
         return redirect(url_for('login'))
+
     user_id = session['user_id']
-    quantity = request.form.get('quantity', '1')
-    # Handle "custom" quantity and fractional values
-    if quantity == 'custom':
-        custom_quantity = request.form.get('custom_quantity', '1')
-        try:
-            quantity = float(custom_quantity)  # Convert custom input to float
-        except ValueError:
-            flash('Invalid custom quantity. Please try again.', 'danger')
-            return redirect(url_for('items'))
+    quantity = int(request.form.get('quantity', 1))
+
+    # Check if the item already exists in the basket
+    basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
+    if basket_item:
+        basket_item.quantity += quantity  # Update quantity if item already exists
     else:
-        try:
-            quantity = float(quantity)  # Convert dropdown values to float
-        except ValueError:
-            flash('Invalid quantity. Please try again.', 'danger')
-            return redirect(url_for('items'))
-    # Validate quantity
-    if quantity < 0.5:
-        flash('Quantity must be at least 1/2.', 'danger')
-        return redirect(url_for('items'))
-    if quantity > 50:
-        flash('Quantity exceeds the maximum limit of 50. Please contact customer support for bulk orders.', 'warning')
-        return redirect(url_for('items'))
-    try:
-        # Check if the item already exists in the basket
-        basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
-        if basket_item:
-            basket_item.quantity += quantity  # Update quantity if item already exists
-        else:
-            basket_item = Basket(user_id=user_id, item_id=item_id, quantity=quantity)
-            db.session.add(basket_item)
-        db.session.commit()
-        # Update the basket count in session
-        basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
-        session['basket_count'] = basket_count
-        flash('Item added to basket successfully!', 'success')
-    except SQLAlchemyError:
-        db.session.rollback()
-        flash('Error occurred while adding the item to the basket.', 'danger')
+        basket_item = Basket(user_id=user_id, item_id=item_id, quantity=quantity)
+        db.session.add(basket_item)
+
+    db.session.commit()
+
+    # Update the basket count in session
+    basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
+    session['basket_count'] = basket_count
+
+    flash('Item added to basket successfully!', 'success')
     return redirect(url_for('items'))
 
 @app.route('/basket')
@@ -318,17 +293,17 @@ def basket():
     if 'user_id' not in session:
         flash('Please login to view your basket', 'danger')
         return redirect(url_for('login'))
+
     user_id = session['user_id']
-    try:
-        basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.user_id == user_id).all()
-        # Calculate the total price
-        total_price = sum(item.price * basket_item.quantity for basket_item, item in basket_items)
-        # Update the basket count
-        basket_count = len(basket_items)
-        session['basket_count'] = basket_count
-    except SQLAlchemyError:
-        flash('Error occurred while fetching the basket. Please try again.', 'danger')
-        return redirect(url_for('items'))
+    basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.user_id == user_id).all()
+
+    # Calculate the total price
+    total_price = sum(item.price * basket_item.quantity for basket_item, item in basket_items)
+
+    # Update the basket count
+    basket_count = len(basket_items)
+    session['basket_count'] = basket_count
+
     return render_template('basket.html', basket_items=basket_items, total_price=total_price)
 
 @app.route('/remove_from_basket/<int:item_id>', methods=['POST'])

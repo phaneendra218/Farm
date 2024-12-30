@@ -28,15 +28,7 @@
                     <!-- Quantity input for adding to basket -->
                     <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="margin-top:10px;">
                         <label for="quantity_{{ item.id }}">Quantity:</label>
-                        <select id="quantity_select_{{ item.id }}" name="quantity" onchange="handleQuantityChange('{{ item.id }}')" required>
-                            <option value="0.5">1/2</option>
-                            <option value="1" selected>1</option>
-                            <option value="2">2</option>
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="custom">Custom</option>
-                        </select>
-                        <input type="number" id="quantity_custom_{{ item.id }}" name="custom_quantity" min="0.5" max="50" style="display:none;" placeholder="Enter custom quantity">
+                        <input type="number" name="quantity" id="quantity_{{ item.id }}" min="1" value="1" required>
                         <button type="submit">Add to Basket</button>
                     </form>
                     
@@ -72,30 +64,3 @@
     <p>No items available at the moment.</p>
 {% endif %}
 {% endblock %}
-
-<script>
-function handleQuantityChange(itemId) {
-    const select = document.getElementById(`quantity_select_${itemId}`);
-    const customInput = document.getElementById(`quantity_custom_${itemId}`);
-
-    if (select.value === "custom") {
-        customInput.style.display = "block";
-        customInput.required = true;
-    } else {
-        customInput.style.display = "none";
-        customInput.required = false;
-    }
-}
-
-document.addEventListener("submit", function (e) {
-    const form = e.target;
-    const customInputs = form.querySelectorAll('input[type="number"]');
-    for (const input of customInputs) {
-        if (input.value > 50) {
-            e.preventDefault();
-            alert("Please enter a quantity below 50. For bulk orders, please contact our customer support.");
-            return false;
-        }
-    }
-});
-</script>
