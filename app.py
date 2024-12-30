@@ -423,20 +423,16 @@ def update_item(item_id):
         # Get the updated details from the form
         name = request.form['name']
         price = request.form['price']
-        unit = request.form['unit']
-        
+        unit = request.form['unit']        
         # Handle the image file
         image = request.files.get('image')
-
         if image and allowed_file(image.filename):
             # Check the file size first
             image.seek(0, os.SEEK_END)
             file_size = image.tell()
-
             if file_size > 100 * 1024:  # 100 KB limit
                 flash('File is too large. The image must be less than 100 KB.', 'danger')
                 return redirect(request.url)
-
             # Save the image
             filename = secure_filename(image.filename)
             image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -495,8 +491,7 @@ def profile():
                 return jsonify({'message': 'This phone number is already in use. Please choose a different number.', 'success': False}), 400            
             user.phone_number = phone_number
             db.session.commit()
-            return jsonify({'message': 'Phone number updated successfully!', 'success': True}), 200
-        
+            return jsonify({'message': 'Phone number updated successfully!', 'success': True}), 200        
         # Handle updating an address
         elif action == 'update_address':
             address_id = request.form.get('address_id')

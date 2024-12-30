@@ -277,7 +277,6 @@
         showToast('Please enter a valid 10-digit phone number.');
         return;
     }
-
     fetch('{{ url_for("profile") }}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
