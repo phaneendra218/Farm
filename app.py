@@ -264,6 +264,8 @@ def order_item(item_id):
     flash('Item ordered successfully!', 'success')
     return redirect(url_for('items'))  # Redirect to the items page
 
+from decimal import Decimal
+
 @app.route('/add_to_basket/<int:item_id>', methods=['POST'])
 def add_to_basket(item_id):
     if 'user_id' not in session:
@@ -272,19 +274,24 @@ def add_to_basket(item_id):
 
     user_id = session['user_id']
     quantity = request.form.get('quantity')
-    
+
     # Handle custom quantity
     if quantity == 'custom':
         try:
-            quantity = float(request.form.get('custom_quantity', 1))
-        except ValueError:
+            custom_quantity = request.form.get('custom_quantity', '1')
+            quantity = Decimal(custom_quantity)
+        except Exception:
             flash('Invalid custom quantity entered.', 'danger')
             return redirect(url_for('items'))
     else:
-        quantity = float(quantity)
+        try:
+            quantity = Decimal(quantity)
+        except Exception:
+            flash('Invalid quantity entered.', 'danger')
+            return redirect(url_for('items'))
 
     # Validate maximum quantity
-    if quantity > 50:
+    if quantity > Decimal(50):
         flash('Please enter a quantity less than or equal to 50. Contact customer support for bulk orders.', 'danger')
         return redirect(url_for('items'))
 
