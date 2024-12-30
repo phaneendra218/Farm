@@ -16,10 +16,11 @@ header {
     background-color: #4CAF50;
     padding: 12px 30px;
     color: white;
+    text-align: center;
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
 }
 footer {
     background-color: #4CAF50;
@@ -33,10 +34,6 @@ footer {
     width: auto;
     margin-right: 20px;
 }
-nav {
-    display: flex;
-    align-items: center;
-}
 nav a {
     margin: 0 15px;
     color: white;
@@ -46,12 +43,71 @@ nav a {
 nav a:hover {
     text-decoration: underline;
 }
+main {
+    padding: 20px;
+    flex-grow: 1;
+}
+/* Flash Messages */
+.flash-messages {
+    margin: 5px 0;
+}
+.flash-messages ul {
+    list-style-type: none;
+    padding: 0;
+}
+.flash-messages li {
+    padding: 10px;
+    background-color: #f8d7da;
+    color: #721c24;
+    margin-bottom: 10px;
+}
+.flash-messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+.flash-messages li.info {
+    background-color: #cce5ff;
+    color: #004085;
+}
+.flash-messages li.warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+/* User Info */
+.user-info {
+    text-align: right;
+}
+.user-info p {
+    display: inline-block;
+    margin-right: 15px;
+}
+.delete-button {
+    background-color: #e3342f;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.delete-button:hover {
+    background-color: #c82333;
+}
+.user-info button {
+    margin-top: 10px;
+    background-color: #e6bd38;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.user-info button:hover {
+    background-color: #c28c0d;
+}
 /* Basket Icon Style */
 #basket-icon {
-    position: absolute;
-    right: 30px; /* Adjust the spacing to your preference */
-    top: 50%;
-    transform: translateY(-50%);
+    position: relative;
 }
 #basket-count {
     position: absolute;
@@ -131,6 +187,7 @@ button:hover {
     background-color: #45a049;
 }
 /* Media Queries for Responsive Design */
+/* For screens smaller than 768px (Tablets, small screens) */
 @media (max-width: 768px) {
     header {
         padding: 12px 20px;
