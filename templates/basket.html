@@ -49,9 +49,9 @@
         </form>
         
         <!-- Back to Items Button Styled as a Button -->
-        <a href="{{ url_for('items') }}" class="btn btn-secondary btn-sm" role="button" style="font-size: 16px; padding: 8px 16px; text-decoration: none; display: inline-block; margin-top: 10px;">
-            Back to Items
-        </a>
+        <form action="{{ url_for('items') }}" method="get" style="display:inline;">
+            <button type="submit" class="btn btn-secondary mt-3">Back to Items</button>
+          </form>
     </div>
 {% else %}
     <p class="text-center" style="color: #777; margin-top: 20px;">Your basket is empty. <a href="{{ url_for('items') }}" style="color: #007bff;">Browse items</a> to add something!</p>
