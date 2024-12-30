@@ -8,7 +8,7 @@
 {% if items %}
     <div class="item-container">
         {% for item in items %}
-            <div class="item-card">
+            <div class="item-card" style="position:relative;"> <!-- Add position relative here -->
                 <h4>{{ item.name }}</h4>
                 <p>Price: ₹{{ item.price }} /{{ item.unit }}</p>
                 {% if item.image_path %}
@@ -19,7 +19,8 @@
 
                 {% if item.is_hidden %}
                     <p class="text-danger sold-out-text">Sold Out</p>
-                    <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" style="width:100px; height:100px; position:absolute; top:40%; right:10px; transform:translateY(-50%);">
+                    <!-- Coming Soon Image positioned correctly -->
+                    <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" class="coming-soon-image">
                 {% else %}
                     <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" class="order-form">
                         <button type="submit" class="order-button">Order Now</button>
