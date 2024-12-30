@@ -1,0 +1,220 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column; /* Makes footer stick to the bottom */
+    min-height: 100vh;
+}
+
+h2, h3 {
+    text-align: center;
+    color: #333;
+}
+
+header {
+    background-color: #4CAF50;
+    padding: 12px 30px; /* Reduced padding to decrease height */
+    color: white;
+    text-align: center;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 0px 30px; /* Reduced padding to decrease height */
+    font-size: 10px;
+}
+
+.logo {
+    height: 80px; /* Reduced logo height to match header size */
+    width: auto;
+    margin-right: 20px; /* Adds gap between logo and nav */
+}
+
+nav a {
+    margin: 0 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+main {
+    padding: 20px;
+    flex-grow: 1; /* Ensures main content pushes the footer down */
+}
+
+/* Flash Messages */
+.flash-messages {
+    margin: 5px 0;
+}
+
+.flash-messages ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.flash-messages li {
+    padding: 10px;
+    background-color: #f8d7da;
+    color: #721c24;
+    margin-bottom: 10px;
+}
+
+.flash-messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.flash-messages li.info {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.flash-messages li.warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+/* User Info */
+.user-info {
+    text-align: right;
+}
+
+.user-info p {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.delete-button {
+    background-color: #e3342f; /* Red color for delete button */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.delete-button:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+.user-info button {
+    margin-top: 10px;
+    background-color: #e6bd38; /* Set logout button color */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.user-info button:hover {
+    background-color: #c28c0d; /* Slightly darker color on hover */
+}
+
+/* Basket Icon Style */
+#basket-icon {
+    position: relative;
+}
+
+#basket-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+
+/* Item and Basket Container Styles */
+.item-container, .basket-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.item-card, .basket-item-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    width: 200px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.item-card:hover, .basket-item-card:hover {
+    background-color: #f0f0f0; /* Light background color on hover */
+    transition: background-color 0.3s ease; /* Smooth transition effect */
+}
+
+.item-card img, .basket-item-card img {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Sold Out Text */
+.sold-out-text {
+    font-weight: bold;
+    color: red;
+}
+
+/* Coming Soon Image */
+.coming-soon-image {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top: 40%;
+    right: 10px;
+    transform: translateY(-50%);
+}
+
+/* Order Form */
+.order-form {
+    margin-top: 10px;
+}
+
+/* Order Button */
+.order-button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.order-button:hover {
+    background-color: #218838;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
