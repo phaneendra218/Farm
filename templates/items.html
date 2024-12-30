@@ -28,18 +28,22 @@
                     <!-- Quantity input for adding to basket -->
                     <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="margin-top:10px; position:relative;">
                         <label for="quantity_{{ item.id }}">Quantity:</label>
-                        <select name="quantity" id="quantity_{{ item.id }}" onchange="toggleCustomInput(this, '{{ item.id }}')" required>
-                            <option value="0.5">1/2</option>
-                            <option value="1" selected>1</option>
-                            <option value="2">2</option>
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="custom">Custom</option>
-                        </select>
+                        
+                        <!-- Show the custom input or select based on the condition -->
+                        <div id="quantity-container-{{ item.id }}">
+                            <select name="quantity" id="quantity_{{ item.id }}" onchange="toggleCustomInput(this, '{{ item.id }}')" required>
+                                <option value="0.5">1/2</option>
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
                         
                         <!-- Custom quantity input field -->
-                        <input type="number" name="custom_quantity" id="custom_quantity_{{ item.id }}" min="0.5" max="50" step="0.5" style="display:none; margin-top:10px; position: absolute; top: 30px;" placeholder="Enter custom quantity">
-                        
+                        <input type="number" name="custom_quantity" id="custom_quantity_{{ item.id }}" min="0.5" max="50" step="0.5" style="display:none; margin-top:10px; width:100%;" placeholder="Enter custom quantity">
+
                         <button type="submit">Add to Basket</button>
                     </form>                    
                     <!-- Order item button -->
@@ -75,11 +79,26 @@
 {% endif %}
 <script>
     function toggleCustomInput(select, itemId) {
+        const quantityContainer = document.getElementById(`quantity-container-${itemId}`);
         const customInput = document.getElementById(`custom_quantity_${itemId}`);
+        
         if (select.value === 'custom') {
+            quantityContainer.innerHTML = `
+                <input type="number" name="custom_quantity" id="custom_quantity_${itemId}" min="0.5" max="50" step="0.5" style="margin-top:10px; width:100%;" placeholder="Enter custom quantity">
+            `;
             customInput.style.display = 'block';
             customInput.required = true;
         } else {
+            quantityContainer.innerHTML = `
+                <select name="quantity" id="quantity_${itemId}" onchange="toggleCustomInput(this, '${itemId}')" required>
+                    <option value="0.5">1/2</option>
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="custom">Custom</option>
+                </select>
+            `;
             customInput.style.display = 'none';
             customInput.required = false;
         }
