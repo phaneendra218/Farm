@@ -553,7 +553,18 @@ def edit_profile():
 
     if request.method == 'POST':
         # Update phone number
-        user.phone_number = request.form.get('phone_number')
+        new_phone_number = request.form.get('phone_number')
+
+        # Validate the phone number is unique
+        if new_phone_number != user.phone_number:
+            existing_user = User.query.filter_by(phone_number=new_phone_number).first()
+            if existing_user:
+                flash('This phone number is already in use. Please choose a different number.', 'danger')
+                return redirect(url_for('edit_profile'))
+
+        # Update phone number if unique
+        user.phone_number = new_phone_number
+
         if request.form['password']:
             user.password = request.form['password']
 
