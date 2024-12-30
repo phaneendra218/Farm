@@ -313,14 +313,11 @@ def basket():
 
     user_id = session['user_id']
     basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.user_id == user_id).all()
-
-    # Calculate the total price
-    total_price = sum(item.price * basket_item.quantity for basket_item, item in basket_items)
-
+    # Calculate the total price (convert Decimal to float)
+    total_price = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
     # Update the basket count
     basket_count = len(basket_items)
     session['basket_count'] = basket_count
-
     return render_template('basket.html', basket_items=basket_items, total_price=total_price)
 
 @app.route('/remove_from_basket/<int:item_id>', methods=['POST'])
