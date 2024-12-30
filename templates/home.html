@@ -19,7 +19,7 @@
 
                 {% if item.is_hidden %}
                     <p class="text-danger sold-out-text">Sold Out</p>
-                    <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" class="coming-soon-image">
+                    <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" style="width:100px; height:100px; position:absolute; top:40%; right:10px; transform:translateY(-50%);">
                 {% else %}
                     <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" class="order-form">
                         <button type="submit" class="order-button">Order Now</button>
