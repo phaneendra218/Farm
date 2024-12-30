@@ -167,8 +167,7 @@ def items():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    # Fetch all items for both admin and normal users
-    items = Item.query.all()  # Do not filter hidden items
+    items = Item.query.all()
     
     user_id = session['user_id']
     basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
