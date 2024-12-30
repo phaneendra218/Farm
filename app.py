@@ -314,10 +314,8 @@ def update_basket_quantity(item_id):
 
     user_id = session['user_id']
     try:
-        # Get the new quantity from the form
+        # Get the new quantity from the request form
         new_quantity = request.form.get('quantity', '1')
-
-        # Convert to Decimal for precision
         new_quantity = Decimal(new_quantity)
 
         # Validate the maximum quantity
@@ -332,14 +330,12 @@ def update_basket_quantity(item_id):
             # Update the quantity
             basket_item.quantity = new_quantity
             db.session.commit()
-            flash('Basket updated successfully!', 'success')
+            return jsonify({"success": True})  # Return success response in JSON format
         else:
-            flash('Item not found in your basket.', 'danger')
+            return jsonify({"success": False})  # Return failure response if item not found
 
-    except Exception:
-        flash('Invalid quantity entered.', 'danger')
-
-    return redirect(url_for('basket'))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})  # Return error response if exception occurs
 
 @app.route('/basket')
 def basket():
