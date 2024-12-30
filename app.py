@@ -382,65 +382,51 @@ def remove_from_basket(item_id):
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
-    if 'user_id' not in session:
-        flash('Please login to proceed with checkout.', 'danger')
-        return redirect(url_for('login'))
+    step = request.args.get('step', 'address')  # Default step is 'address'
+    if request.method == 'POST':
+        step = request.form.get('step')  # Retrieve the step from the form data
 
-    user = User.query.get(session['user_id'])
-    step = request.form.get('step', 'address')  # Default step is 'address'
-
-    if step == 'address':
-        if request.method == 'POST':
+        if step == 'address':
+            # Handle address selection or error
             selected_address_id = request.form.get('selected_address_id')
-            if selected_address_id:
-                session['selected_address_id'] = selected_address_id
-                return redirect(url_for('checkout', step='summary'))
-            else:
-                flash('Please select an address or add a new one.', 'warning')
+            if not selected_address_id:
+                flash("Please select a delivery address.", "error")
+                return redirect(url_for('checkout', step='address'))
 
-        addresses = user.addresses
+            session['selected_address_id'] = selected_address_id
+            return redirect(url_for('checkout', step='summary'))
+
+        elif step == 'place_order':
+            # Handle order placement logic
+            quantities = request.form.getlist('quantity')
+            # Validate and update basket quantities here
+            return redirect(url_for('checkout', step='place_order'))
+
+        elif step == 'confirm_order':
+            # Handle order confirmation logic
+            # Save order to database or perform necessary actions
+            return redirect(url_for('checkout', step='confirm_order'))
+
+    # Render the appropriate template for the current step
+    if step == 'address':
+        addresses = Address.query.all()
         default_address = next((addr for addr in addresses if addr.is_default), None)
         return render_template('checkout.html', step='address', addresses=addresses, default_address=default_address)
 
     elif step == 'summary':
-        basket_items = Basket.query.filter_by(user_id=user.id).all()
-        if request.method == 'POST':
-            quantities = request.form.getlist('quantity')
-            for i, basket_item in enumerate(basket_items):
-                basket_item.quantity = quantities[i]
-            db.session.commit()
-            return redirect(url_for('checkout', step='place_order'))
-
+        basket_items = Basket.query.all()  # Fetch basket items for the user
         return render_template('checkout.html', step='summary', basket_items=basket_items)
 
     elif step == 'place_order':
-        selected_address_id = session.get('selected_address_id')
-        selected_address = Address.query.get(selected_address_id)
-        basket_items = Basket.query.filter_by(user_id=user.id).all()
+        selected_address = Address.query.get(session.get('selected_address_id'))
+        basket_items = Basket.query.all()
         total_price = sum(item.item.price * item.quantity for item in basket_items)
-
-        if request.method == 'POST':
-            # Create orders from basket
-            for basket_item in basket_items:
-                new_order = Order(
-                    user_id=user.id,
-                    item_id=basket_item.item_id,
-                    quantity=basket_item.quantity
-                )
-                db.session.add(new_order)
-
-            # Clear the basket
-            Basket.query.filter_by(user_id=user.id).delete()
-            db.session.commit()
-
-            return redirect(url_for('checkout', step='confirm_order'))
-
         return render_template('checkout.html', step='place_order', selected_address=selected_address, basket_items=basket_items, total_price=total_price)
 
     elif step == 'confirm_order':
         return render_template('checkout.html', step='confirm_order')
 
-    return redirect(url_for('checkout'))
+    return redirect(url_for('checkout', step='address'))
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
