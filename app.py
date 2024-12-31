@@ -395,17 +395,17 @@ def checkout():
         address_id = request.form.get('address_id')
         payment_option = request.form.get('payment_option')
 
-        # # Check if an address was selected
-        # if not address_id:
-        #     flash('Please select a delivery address', 'danger')
-        #     return redirect(url_for('checkout'))
+        # Check if an address was selected
+        if not address_id:
+            flash('Please select a delivery address', 'danger')
+            return redirect(url_for('checkout'))
 
         address = Address.query.get(address_id)
 
         # Ensure the address exists and belongs to the current user
-        # if not address or address.user_id != user.id:
-        #     flash('Invalid address selected', 'danger')
-        #     return redirect(url_for('checkout'))
+        if not address or address.user_id != user.id:
+            flash('Invalid address selected', 'danger')
+            return redirect(url_for('checkout'))
 
         # Process the order, create order entries for items in the basket, etc.
         basket_items = Basket.query.filter_by(user_id=user.id).all()
