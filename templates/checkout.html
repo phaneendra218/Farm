@@ -4,10 +4,10 @@
 {% block content %}
   <h1>Checkout</h1>
   
-  <!-- Section: Delivery Address -->
-  <div id="delivery-address-section">
+  <!-- Address Section -->
+  <div id="delivery-address-section" class="address-box">
     <h2>Confirm Delivery Address</h2>
-
+    
     {% if addresses %}
       <ul>
         {% for address in addresses %}
@@ -29,16 +29,43 @@
     {% endif %}
   </div>
 
-  <!-- Section: Proceed to Payment -->
-  <div id="payment-section" class="hidden">
+  <!-- Order Summary Section (hidden initially) -->
+  <div id="order-summary-section" class="summary-box hidden">
+    <h2>Order Summary</h2>
+    
+    <div id="items-summary">
+      {% for basket_item in basket_items %}
+        <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ${{ basket_item.item.price * basket_item.quantity }}</p>
+      {% endfor %}
+    </div>
+
+    <div id="total-price">
+      <p><strong>Total: ${{ total_price }}</strong></p>
+    </div>
+    
     <form method="POST" action="{{ url_for('process_checkout') }}">
-      <!-- Add form fields for payment details -->
-      <button type="submit" class="btn btn-primary">Submit Order</button>
+      <button type="submit" class="btn btn-primary">Place Order</button>
     </form>
   </div>
 
+  <style>
+    .address-box, .summary-box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .address-box h2, .summary-box h2 {
+      margin-bottom: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+
   <script>
-    // JS to manage address selection and proceed to payment
+    // JS to manage address selection and show order summary
     document.getElementById('confirm-address-button')?.addEventListener('click', () => {
       const selectedAddress = document.querySelector('input[name="address_id"]:checked');
       if (!selectedAddress) {
@@ -46,9 +73,40 @@
         return;
       }
       
-      // Mark payment section visible and focus on it
-      document.getElementById('payment-section').classList.remove('hidden');
-      window.scrollTo(0, document.getElementById('payment-section').offsetTop);
+      // Get selected address id
+      const addressId = selectedAddress.value;
+      
+      // Fetch basket items and calculate total price via AJAX or pass them from backend
+      fetch(`/get_basket_items?address_id=${addressId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update order summary dynamically
+            const itemsSummaryDiv = document.getElementById('items-summary');
+            const totalPriceDiv = document.getElementById('total-price');
+            
+            itemsSummaryDiv.innerHTML = '';
+            let totalPrice = 0;
+
+            data.items.forEach(item => {
+              const itemTotal = item.price * item.quantity;
+              totalPrice += itemTotal;
+              itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - $${itemTotal.toFixed(2)}</p>`;
+            });
+
+            totalPriceDiv.innerHTML = `<p><strong>Total: $${totalPrice.toFixed(2)}</strong></p>`;
+            
+            // Display the order summary section and scroll to it
+            document.getElementById('order-summary-section').classList.remove('hidden');
+            window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
+          } else {
+            alert('Error fetching order summary.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Something went wrong. Please try again.');
+        });
     });
   </script>
 {% endblock %}

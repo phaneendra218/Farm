@@ -11,7 +11,7 @@ from decimal import Decimal
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# Database Configuration
+# Database Configuration (External Database URL)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://farmpsql_user:ilFpRrHEzsedKGwtrOtweM0ToOV6YmIW@dpg-ctc8ap5ds78s73flqmpg-a.oregon-postgres.render.com/farmpsql'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -383,8 +383,6 @@ def remove_from_basket(item_id):
 
     return redirect(url_for('basket'))
 
-from sqlalchemy.orm import Session
-
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if 'user_id' not in session:
@@ -408,22 +406,27 @@ def checkout():
         flash('Checkout logic for POST request not yet implemented.', 'warning')
         return redirect(url_for('checkout'))  # Placeholder for future logic
 
-@app.route('/process_checkout', methods=['POST'])
-def process_checkout():
+@app.route('/get_basket_items')
+def get_basket_items():
     if 'user_id' not in session:
-        flash('Please log in to proceed to checkout.', 'danger')
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'User not logged in'}), 400
+    
+    user = User.query.get(session['user_id'])
+    basket_items = Basket.query.filter_by(user_id=user.id).all()
 
-    address_id = request.form.get('address_id')
-    # Validate selected address
-    address = Address.query.filter_by(id=address_id, user_id=session['user_id']).first()
-    if not address:
-        flash('Invalid delivery address.', 'danger')
-        return redirect(url_for('checkout'))
-
-    # Add logic for payment and order placement
-    flash('Order placed successfully!', 'success')
-    return redirect(url_for('order_confirmation'))
+    items = []
+    total_price = 0.0
+    
+    for basket_item in basket_items:
+        item_data = {
+            'name': basket_item.item.name,
+            'price': basket_item.item.price,
+            'quantity': basket_item.quantity
+        }
+        items.append(item_data)
+        total_price += basket_item.item.price * basket_item.quantity
+    
+    return jsonify({'success': True, 'items': items, 'total_price': total_price})
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
@@ -692,7 +695,7 @@ if __name__ == '__main__':
 
         # # Ensure an admin user exists (for simplicity, hardcoding admin credentials here)
         # if not User.query.filter_by(username='admin').first():
-        #     admin_user = User(username='admin', password='admin', is_admin=True)
+        #     admin_user = User(username='admin', password='', is_admin=True)
         #     db.session.add(admin_user)
         #     db.session.commit()
 
