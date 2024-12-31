@@ -3,81 +3,42 @@
 {% block content %}
 <h1>Checkout</h1>
 
-<!-- Step 1: Select Delivery Address -->
-{% if step == 'address' %}
-<form method="POST" action="{{ url_for('checkout') }}">
-    <input type="hidden" name="step" value="address">
-    <h2>Select Delivery Address</h2>
-
-    {% if addresses %}
-        <ul>
-            {% for address in addresses %}
-                <li>
-                    <input type="radio" name="selected_address_id" value="{{ address.id }}"
-                           {% if default_address and address.id == default_address.id %}checked{% endif %}>
-                    {{ address.address_type }}: {{ address.address }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No addresses found. Please add a new one below.</p>
-    {% endif %}
-
-    <button type="submit" class="btn btn-primary">Proceed to Order Summary</button>
-</form>
-
-<!-- Add New Address -->
-<div id="add-new-address" class="mt-4">
-    <h3>Add New Address</h3>
-    <form method="POST" action="{{ url_for('profile') }}">
-        <input type="hidden" name="action" value="add_new_address">
-        <input type="text" name="address_type" placeholder="Address Type (e.g., Home)" required>
-        <textarea name="address" placeholder="Enter Address" required></textarea>
-        <label>
-            <input type="checkbox" name="is_default"> Set as Default
-        </label>
-        <button type="submit" class="btn btn-secondary">Add Address</button>
-    </form>
-</div>
-{% endif %}
-
-<!-- Step 2: Order Summary -->
-{% if step == 'summary' %}
-<h2>Order Summary</h2>
-<form method="POST" action="{{ url_for('checkout') }}">
-    <input type="hidden" name="step" value="place_order">
-    <ul>
-        {% for basket_item in basket_items %}
-            <li>
-                {{ basket_item.item.name }} - ₹{{ basket_item.item.price }} x
-                <input type="number" name="quantity" value="{{ basket_item.quantity }}" min="1">
-            </li>
-        {% endfor %}
-    </ul>
-    <button type="submit" class="btn btn-primary">Proceed to Place Order</button>
-</form>
-{% endif %}
-
-<!-- Step 3: Place Order -->
-{% if step == 'place_order' %}
-<h2>Place Order</h2>
-<p>Delivery Address: {{ selected_address.address }}</p>
-<ul>
-    {% for basket_item in basket_items %}
-        <li>{{ basket_item.item.name }} - ₹{{ basket_item.item.price }} x {{ basket_item.quantity }}</li>
+<!-- If no addresses are available -->
+{% if addresses|length == 0 %}
+  <p>No delivery addresses found. Please add an address.</p>
+  <button id="add-address-button" class="btn btn-primary">Add Address</button>
+  <div id="add-address-popup" class="hidden">
+    <iframe src="{{ url_for('profile') }}" frameborder="0" width="100%" height="400px"></iframe>
+    <button id="close-popup" class="btn btn-danger">Close</button>
+  </div>
+{% else %}
+  <form method="POST" action="{{ url_for('checkout') }}">
+    <h3>Select Delivery Address</h3>
+    {% for address in addresses %}
+      <div>
+        <input type="radio" name="address_id" value="{{ address.id }}" 
+               {% if default_address and address.id == default_address.id %} checked {% endif %}>
+        <label>{{ address.address_type }}: {{ address.address }}</label>
+      </div>
     {% endfor %}
-</ul>
-<p>Total: ₹{{ total_price }}</p>
-<form method="POST" action="{{ url_for('checkout') }}">
-    <input type="hidden" name="step" value="confirm_order">
-    <button type="submit" class="btn btn-success">Confirm Order</button>
-</form>
-{% endif %}
-
-<!-- Step 4: Confirm Order -->
-{% if step == 'confirm_order' %}
-<h2>Order Confirmed!</h2>
-<p>Thank you for your order. Your invoice is ready.</p>
-<a href="{{ url_for('orders') }}" class="btn btn-primary">View My Orders</a>
+    <button type="submit" class="btn btn-success">Proceed to Payment</button>
+  </form>
 {% endif %}
 {% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const addAddressButton = document.getElementById('add-address-button');
+  const addAddressPopup = document.getElementById('add-address-popup');
+  const closePopupButton = document.getElementById('close-popup');
+
+  addAddressButton.addEventListener('click', function () {
+    addAddressPopup.style.display = 'block';
+  });
+
+  closePopupButton.addEventListener('click', function () {
+    addAddressPopup.style.display = 'none';
+    location.reload(); // Reload page to fetch newly added address
+  });
+});
+</script>

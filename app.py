@@ -383,60 +383,38 @@ def remove_from_basket(item_id):
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
-    step = request.args.get('step', 'address')  # Default step is 'address'
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        flash('Please login to proceed with checkout', 'danger')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+
+    # Fetch all addresses for the user
+    addresses = Address.query.filter_by(user_id=user.id).all()
+
+    # Identify default address if available
+    default_address = next((addr for addr in addresses if addr.is_default), None)
+
     if request.method == 'POST':
-        step = request.form.get('step')  # Retrieve the step from the form data
+        selected_address_id = request.form.get('address_id')
+        selected_address = Address.query.get(selected_address_id)
 
-        if step == 'address':
-            selected_address_id = request.form.get('selected_address_id')
-            if not selected_address_id:
-                flash("Please select a delivery address.", "error")
-                return redirect(url_for('checkout', step='address'))
+        if not selected_address or selected_address.user_id != user.id:
+            flash('Invalid address selection', 'danger')
+            return redirect(url_for('checkout'))
 
-            session['selected_address_id'] = selected_address_id
-            return redirect(url_for('checkout', step='summary'))
+        # Proceed with order creation or other checkout steps here
 
-        elif step == 'place_order':
-            quantities = request.form.getlist('quantity')
-            # Update basket quantities if needed
-            return redirect(url_for('checkout', step='place_order'))
+        flash('Order successfully placed!', 'success')
+        return redirect(url_for('order_confirmation'))  # Redirect to confirmation page
 
-        elif step == 'confirm_order':
-            # Confirm the order and save it to the database
-            return redirect(url_for('checkout', step='confirm_order'))
-
-    # Handle GET requests for each step
-    if step == 'address':
-        addresses = Address.query.all()
-        default_address = next((addr for addr in addresses if addr.is_default), None)
-        return render_template('checkout.html', step='address', addresses=addresses, default_address=default_address)
-
-    elif step == 'summary':
-        basket_items = Basket.query.all()
-        return render_template('checkout.html', step='summary', basket_items=basket_items)
-
-    elif step == 'place_order':
-        selected_address_id = session.get('selected_address_id')
-        if not selected_address_id:
-            flash("No delivery address selected. Please select one.", "error")
-            return redirect(url_for('checkout', step='address'))
-
-        # Updated query for SQLAlchemy 2.0
-        selected_address = db.session.get(Address, selected_address_id)
-        if not selected_address:
-            flash("Delivery address not found.", "error")
-            return redirect(url_for('checkout', step='address'))
-
-        basket_items = Basket.query.all()
-        # Ensure consistent types for calculation
-        total_price = sum(float(item.item.price) * float(item.quantity) for item in basket_items)
-
-        return render_template('checkout.html', step='place_order', selected_address=selected_address, basket_items=basket_items, total_price=total_price)
-
-    elif step == 'confirm_order':
-        return render_template('checkout.html', step='confirm_order')
-
-    return redirect(url_for('checkout', step='address'))
+    return render_template(
+        'checkout.html',
+        user=user,
+        addresses=addresses,
+        default_address=default_address
+    )
 
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
