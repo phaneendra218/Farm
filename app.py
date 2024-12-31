@@ -403,9 +403,9 @@ def checkout():
         address = Address.query.get(address_id)
 
         # Ensure the address exists and belongs to the current user
-        if not address or address.user_id != user.id:
-            flash('Invalid address selected', 'danger')
-            return redirect(url_for('checkout'))
+        # if not address or address.user_id != user.id:
+        #     flash('Invalid address selected', 'danger')
+        #     return redirect(url_for('checkout'))
 
         # Process the order, create order entries for items in the basket, etc.
         basket_items = Basket.query.filter_by(user_id=user.id).all()
