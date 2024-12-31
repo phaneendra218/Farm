@@ -278,7 +278,7 @@ button:hover {
 .basket-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
-    gap: 10px; /* Thinner gap between items */
+    gap: 7px; /* Thinner gap between items */
     justify-content: center;
     margin: 20px auto;
     max-width: 1200px;
