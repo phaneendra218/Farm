@@ -385,26 +385,61 @@ def remove_from_basket(item_id):
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
+    # Ensure the user is logged in
     if 'user_id' not in session:
-        flash('Please log in to proceed to checkout.', 'danger')
+        flash('You must be logged in to complete the checkout process', 'danger')
         return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
 
-    # Use Session.get instead of Query.get
-    session_instance = db.session
-    user = session_instance.get(User, session['user_id'])
+    # Handle POST request for checkout processing
+    if request.method == 'POST':
+        address_id = request.form.get('address_id')
 
-    if not user:
-        flash('User not found. Please log in again.', 'danger')
-        return redirect(url_for('login'))
+        # Check if an address was selected
+        if not address_id:
+            flash('Please select a delivery address', 'danger')
+            return redirect(url_for('checkout'))
 
-    if request.method == 'GET':
-        addresses = Address.query.filter_by(user_id=user.id).all()
-        return render_template('checkout.html', addresses=addresses)
+        address = Address.query.get(address_id)
 
-    elif request.method == 'POST':
-        # Handle form submission (e.g., payment)
-        flash('Checkout logic for POST request not yet implemented.', 'warning')
-        return redirect(url_for('checkout'))  # Placeholder for future logic
+        # Ensure the address exists and belongs to the current user
+        if not address or address.user_id != user.id:
+            flash('Invalid address selected', 'danger')
+            return redirect(url_for('checkout'))
+
+        # Process the order, create order entries for items in the basket, etc.
+        basket_items = Basket.query.filter_by(user_id=user.id).all()
+        total_price = sum(item.item.price * item.quantity for item in basket_items)
+
+        # Example of creating an order from the basket
+        for basket_item in basket_items:
+            order = Order(
+                user_id=user.id,
+                item_id=basket_item.item_id,
+                quantity=basket_item.quantity
+            )
+            db.session.add(order)
+        
+        # Optionally clear the basket after placing the order
+        db.session.query(Basket).filter_by(user_id=user.id).delete()
+
+        # Commit the transaction
+        db.session.commit()
+
+        # Flash a success message and redirect to a confirmation page or profile
+        flash('Order placed successfully!', 'success')
+        return redirect(url_for('profile'))  # Or another page after checkout, like an order confirmation page
+
+    # Handle GET request to display checkout form
+    addresses = Address.query.filter_by(user_id=user.id).all()
+
+    # If the user doesn't have any addresses, prompt them to add one
+    if not addresses:
+        flash('Please add a delivery address before proceeding.', 'warning')
+        return redirect(url_for('profile'))
+
+    return render_template('checkout.html', addresses=addresses)
 
 @app.route('/get_basket_items')
 def get_basket_items():
