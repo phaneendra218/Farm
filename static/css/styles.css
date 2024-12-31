@@ -277,12 +277,12 @@ button:hover {
 /* Media Queries for Basket items*/
 .basket-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
-    gap: 10px; /* Thinner gap between items */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+    gap: 10px; 
     justify-content: center;
     margin: 20px auto;
     max-width: 1200px;
-    grid-auto-rows: minmax(100px, auto); /* Ensures items don't overlap vertically */
+    grid-auto-rows: minmax(100px, auto); 
 }
 
 .basket-item-card {
@@ -291,7 +291,7 @@ button:hover {
     padding: 12px;
     text-align: center;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-    min-height: 250px; /* Ensures each card has a minimum height */
+    min-height: 250px; 
 }
 
 .basket-item-card h4 {
@@ -338,16 +338,16 @@ button:hover {
 .basket-actions {
     text-align: center;
     margin-top: 20px;
-    display: flex; /* Use Flexbox to align buttons horizontally */
-    justify-content: center; /* Center the buttons horizontally */
-    gap: 10px; /* Add some space between the buttons */
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
 }
 .basket-actions form {
-    display: inline-block; /* Ensure each form is inline */
-    margin-right: 10px; /* Add margin between buttons */
+    display: inline-block; 
+    margin-right: 10px; 
 }
 .basket-actions .btn {
-    padding: 10px 20px; /* Ensure consistent button size */
+    padding: 10px 20px; 
 }
 .empty-basket-message {
     color: #777;
@@ -355,24 +355,23 @@ button:hover {
 }
 
 .empty-basket-message a {
-    color: #007bff;
+    color: #00eeba;
 }
-/* Custom blue button for the Update button */
 .basket-item-card .btn-update {
-    background-color: #327cca; /* Custom blue color */
+    background-color: #e6b940;
     color: white;
     border: none;
 }
 
 .basket-item-card .btn-update:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: #c28f04; 
 }
 
 /* Media Queries */
 @media (max-width: 768px) {
     .basket-container {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 8px; /* Even thinner gap for smaller screens */
+        gap: 8px; 
     }
 
     .basket-item-card img {
@@ -384,11 +383,11 @@ button:hover {
 @media (max-width: 480px) {
     .basket-container {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 6px; /* Further reduce the gap on very small screens */
+        gap: 6px; 
     }
 
     .basket-item-card {
-        padding: 8px; /* Less padding for smaller screens */
+        padding: 8px; 
     }
 
     .basket-item-card img {
