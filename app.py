@@ -388,43 +388,53 @@ def checkout():
     if 'user_id' not in session:
         flash('You must be logged in to complete the checkout process', 'danger')
         return redirect(url_for('login'))
-
-    # Use the new Session.get() method for SQLAlchemy 2.0
-    user = db.session.get(User, session['user_id'])
+    
+    user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        try:
-            data = request.get_json()
-            app.logger.debug(f"Received data: {data}")
-            address_id = data.get('address_id')
-            if not address_id:
-                return jsonify({'success': False, 'message': 'Please select a delivery address'})
-        except Exception as e:
-            app.logger.error(f"Error parsing JSON: {e}")
-            return jsonify({'success': False, 'message': 'Invalid request payload'})
+        address_id = request.form.get('address_id')
+        payment_option = request.form.get('payment_option')
+
+        # Check if an address was selected
+        if not address_id:
+            flash('Please select a delivery address', 'danger')
+            return redirect(url_for('checkout'))
+
+        address = Address.query.get(address_id)
 
         # Ensure the address exists and belongs to the current user
-        address = db.session.get(Address, address_id)
         if not address or address.user_id != user.id:
-            return jsonify({'success': False, 'message': 'Invalid address selected'})
+            flash('Invalid address selected', 'danger')
+            return redirect(url_for('checkout'))
 
-        # Process basket and order creation
+        # Process the order, create order entries for items in the basket, etc.
         basket_items = Basket.query.filter_by(user_id=user.id).all()
-        if not basket_items:
-            return jsonify({'success': False, 'message': 'Basket is empty'})
+        total_price = sum(item.item.price * item.quantity for item in basket_items)
 
-        for item in basket_items:
-            order = Order(user_id=user.id, item_id=item.item_id, quantity=item.quantity)
+        # Example of creating an order from the basket
+        for basket_item in basket_items:
+            order = Order(
+                user_id=user.id,
+                item_id=basket_item.item_id,
+                quantity=basket_item.quantity
+            )
             db.session.add(order)
 
-        # Clear the basket
         db.session.query(Basket).filter_by(user_id=user.id).delete()
+
+        # Commit the transaction
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'Order placed successfully!'})
+        flash('Order placed successfully!', 'success')
+        return redirect(url_for('profile'))
 
-    # Handle GET request
+    # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
+
+    if not addresses:
+        flash('Please add a delivery address before proceeding.', 'warning')
+        return redirect(url_for('profile'))
+
     return render_template('checkout.html', addresses=addresses)
 
 @app.route('/get_basket_items')

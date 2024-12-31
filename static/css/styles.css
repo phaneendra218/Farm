@@ -186,6 +186,77 @@ button {
 button:hover {
     background-color: #45a049;
 }
+.basket-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 1200px;
+}
+
+.basket-item-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.basket-item-card h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.basket-item-card p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.basket-item-card img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.no-image {
+    color: #999;
+    font-size: 0.9em;
+}
+
+.basket-item-card input[type="number"] {
+    width: 70px;
+    padding: 5px;
+    text-align: center;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.total-price-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.total-price-container p {
+    font-size: 1.2em;
+    color: #333;
+}
+
+.basket-actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.empty-basket-message {
+    color: #777;
+    margin-top: 20px;
+}
+
+.empty-basket-message a {
+    color: #007bff;
+}
 
 /* Media Queries for Responsive Design */
 /* For screens smaller than 768px (Tablets, small screens) */
@@ -272,5 +343,32 @@ button:hover {
     footer {
         font-size: 12px;
         padding: 10px 20px;
+    }
+}
+/* Media Queries for Basket items*/
+@media (max-width: 768px) {
+    .basket-container {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .basket-item-card img {
+        width: 120px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .basket-container {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .basket-item-card {
+        padding: 10px;
+    }
+
+    .basket-item-card img {
+        width: 100px;
+        height: 70px;
     }
 }

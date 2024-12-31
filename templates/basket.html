@@ -4,33 +4,27 @@
 <h2 class="text-center" style="margin-top: 20px;">Your Basket</h2>
 
 {% if basket_items %}
-    <div class="basket-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; justify-content: center; margin: 20px auto; max-width: 1200px;">
+    <div class="basket-container">
         {% for basket_item, item in basket_items %}
-            <div class="basket-item-card" style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0px 3px 6px rgba(0,0,0,0.1);">
-                <h4 style="color: #333; margin-bottom: 10px;">{{ item.name }}</h4>
-                <p style="margin: 5px 0;"><strong>Price:</strong> ₹{{ item.price }} /{{ item.unit }}</p>
-                <p style="margin: 5px 0;"><strong>Quantity:</strong> {{ basket_item.quantity | int }}</p>
+            <div class="basket-item-card">
+                <h4>{{ item.name }}</h4>
+                <p><strong>Price:</strong> ₹{{ item.price }} /{{ item.unit }}</p>
+                <p><strong>Quantity:</strong> {{ basket_item.quantity | int }}</p>
 
                 {% if item.image_path %}
-                    <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width: 150px; height: 100px; object-fit: cover; margin-bottom: 10px;">
+                    <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}">
                 {% else %}
-                    <p style="color: #999; font-size: 0.9em;">No image available</p>
+                    <p class="no-image">No image available</p>
                 {% endif %}
 
                 <!-- Update Quantity Form -->
-                <form method="POST" action="{{ url_for('update_basket_quantity', item_id=item.id) }}" style="margin: 10px 0;">
-                    <input type="number" 
-                           name="quantity" 
-                           value="{{ basket_item.quantity | int }}" 
-                           min="1" 
-                           max="50" 
-                           step="1" 
-                           style="width: 70px; padding: 5px; text-align: center; margin-right: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                <form method="POST" action="{{ url_for('update_basket_quantity', item_id=item.id) }}">
+                    <input type="number" name="quantity" value="{{ basket_item.quantity | int }}" min="1" max="50" step="1">
                     <button type="submit" class="btn btn-primary btn-sm">Update</button>
                 </form>
 
                 <!-- Remove Item Button -->
-                <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}" style="margin: 10px 0;">
+                <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}">
                     <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                 </form>
             </div>
@@ -38,22 +32,20 @@
     </div>
 
     <!-- Total Price Section -->
-    <div class="total-price-container" style="text-align: center; margin-top: 20px;">
-        <p style="font-size: 1.2em; color: #333;"><strong>Total Amount:</strong> <strong>₹{{ total_price }}</strong></p>
+    <div class="total-price-container">
+        <p><strong>Total Amount:</strong> ₹{{ total_price }}</p>
     </div>
 
     <!-- Action Buttons -->
-    <div class="basket-actions" style="text-align: center; margin-top: 20px;">
-        <form method="POST" action="{{ url_for('checkout') }}" style="display: inline-block; margin-right: 10px;">
+    <div class="basket-actions">
+        <form method="POST" action="{{ url_for('checkout') }}">
             <button type="submit" class="btn btn-success">Proceed to Checkout</button>
         </form>
-        
-        <!-- Back to Items Button Styled as a Button -->
-        <form action="{{ url_for('items') }}" method="get" style="display:inline;">
+        <form action="{{ url_for('items') }}" method="get">
             <button type="submit" class="btn btn-secondary mt-3">Back to Items</button>
-          </form>
+        </form>
     </div>
 {% else %}
-    <p class="text-center" style="color: #777; margin-top: 20px;">Your basket is empty. <a href="{{ url_for('items') }}" style="color: #007bff;">Browse items</a> to add something!</p>
+    <p class="text-center empty-basket-message">Your basket is empty. <a href="{{ url_for('items') }}">Browse items</a> to add something!</p>
 {% endif %}
 {% endblock %}

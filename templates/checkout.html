@@ -1,116 +1,138 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Checkout</h1>
-
-<!-- Address Section -->
-<div id="delivery-address-section" class="address-box">
-  <h2>Confirm Delivery Address</h2>
+  <h1>Checkout</h1>
   
-  {% if addresses %}
-    <ul>
-      {% for address in addresses %}
-        <li>
-          <input 
-            type="radio" 
-            name="address_id" 
-            value="{{ address.id }}" 
-            {% if address.is_default %} checked {% endif %}
-          >
-          {{ address.address_type }}: {{ address.address }}
-        </li>
-      {% endfor %}
-    </ul>
-    <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
-    <div id="address-error-message"></div>
-  {% else %}
-    <p>No addresses found. Please add an address to proceed.</p>
-    <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
-  {% endif %}
-</div>
+  <!-- Address Section -->
+  <div id="delivery-address-section" class="address-box">
+    <h2>Confirm Delivery Address</h2>
+    
+    {% if addresses %}
+      <ul>
+        {% for address in addresses %}
+          <li>
+            <input 
+              type="radio" 
+              name="address_id" 
+              value="{{ address.id }}" 
+              {% if address.is_default %} checked {% endif %}
+            >
+            {{ address.address_type }}: {{ address.address }}
+          </li>
+        {% endfor %}
+      </ul>
+      <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
+    {% else %}
+      <p>No addresses found. Please add an address to proceed.</p>
+      <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
+    {% endif %}
+  </div>
 
-<!-- Order Summary Section -->
+  <!-- Order Summary Section -->
 <div id="order-summary-section" class="summary-box hidden">
   <h2>Order Summary</h2>
-  <div id="items-summary"></div>
-  <div id="total-price"></div>
+  
+  <div id="items-summary">
+    {% for basket_item in basket_items %}
+      <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price * basket_item.quantity }}</p>
+    {% endfor %}
+  </div>
+
+  <div id="total-price">
+    <p><strong>Total: ₹{{ total_price }}</strong></p>
+  </div>
+
+  <!-- Update button -->
   <button id="place-order-button" class="btn btn-primary">Place Order</button>
 </div>
 
-<!-- Payment Options Section (hidden initially) -->
-<div id="payment-options-section" class="summary-box hidden">
-  <h2>Payment Options</h2>
-  <div id="payment-methods">
-    <label>
-      <input type="radio" name="payment_option" value="cash_on_delivery"> Cash on Delivery
-    </label><br>
-    <label>
-      <input type="radio" name="payment_option" value="upi"> UPI
-    </label>
+  <!-- Payment Options Section (hidden initially) -->
+  <div id="payment-options-section" class="summary-box hidden">
+    <h2>Payment Options</h2>
+    
+    <div id="payment-methods">
+      <label>
+        <input type="radio" name="payment_option" value="cash_on_delivery"> Cash on Delivery
+      </label><br>
+      <label>
+        <input type="radio" name="payment_option" value="upi"> UPI
+      </label>
+    </div>
+
+    <div id="payable-amount">
+      <p><strong>Payable Amount: ₹<span id="payable-amount-value"></span></strong></p>
+    </div>
+    
+    <button id="confirm-payment-button" class="btn btn-primary">Confirm Payment</button>
   </div>
-  <div id="payable-amount">
-    <p><strong>Payable Amount: ₹<span id="payable-amount-value"></span></strong></p>
-  </div>
-  <button id="confirm-payment-button" class="btn btn-primary">Confirm Payment</button>
-</div>
+
+  <style>
+    .address-box, .summary-box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .address-box h2, .summary-box h2 {
+      margin-bottom: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
 
 <script>
-  // Handle Confirm Address button click
+  // Manage address selection, order summary, and payment options
   document.getElementById('confirm-address-button')?.addEventListener('click', () => {
     const selectedAddress = document.querySelector('input[name="address_id"]:checked');
-    const messageDiv = document.getElementById('address-error-message');
-
     if (!selectedAddress) {
-      messageDiv.textContent = 'Please select a delivery address.';
-      messageDiv.style.color = 'red';
+      alert('Please select a delivery address.');
       return;
     }
-
+    
     const addressId = selectedAddress.value;
-
-    fetch('/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address_id: addressId })
-    })
+    
+    // Fetch basket items and calculate total price via AJAX
+    fetch(`/get_basket_items?address_id=${addressId}`)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          messageDiv.textContent = '';
+          const itemsSummaryDiv = document.getElementById('items-summary');
+          const totalPriceDiv = document.getElementById('total-price');
+          
+          itemsSummaryDiv.innerHTML = '';
+          let totalPrice = 0;
+
+          data.items.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            totalPrice += itemTotal;
+            itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)} /${item.unit}</p>`;
+          });
+
+          totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
+          
+          // Display the order summary section
           document.getElementById('order-summary-section').classList.remove('hidden');
-          loadOrderSummary();
+          window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
+          
+          // Store total price for payment options
+          document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
         } else {
-          messageDiv.textContent = data.message;
-          messageDiv.style.color = 'red';
+          alert('Error fetching order summary.');
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        messageDiv.textContent = 'An error occurred. Please try again.';
-        messageDiv.style.color = 'red';
+        alert('Something went wrong. Please try again.');
       });
   });
 
-  // Function to fetch and display order summary
-  function loadOrderSummary() {
-    fetch('/get_basket_items')
-      .then(response => response.json())
-      .then(data => {
-        const itemsSummaryDiv = document.getElementById('items-summary');
-        const totalPriceDiv = document.getElementById('total-price');
-        itemsSummaryDiv.innerHTML = '';
-        let totalPrice = 0;
-
-        data.items.forEach(item => {
-          const itemTotal = item.price * item.quantity;
-          totalPrice += itemTotal;
-          itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>`;
-        });
-
-        totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
-        document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
-      })
-      .catch(error => console.error('Error:', error));
-  }
+  document.getElementById('place-order-button')?.addEventListener('click', () => {
+    // Reveal the Payment Options section
+    document.getElementById('payment-options-section').classList.remove('hidden');
+    window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
+  });
 </script>
+
 {% endblock %}
