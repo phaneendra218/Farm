@@ -35,12 +35,12 @@
     
     <div id="items-summary">
       {% for basket_item in basket_items %}
-        <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ${{ basket_item.item.price * basket_item.quantity }}</p>
+        <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price * basket_item.quantity }}</p>
       {% endfor %}
     </div>
 
     <div id="total-price">
-      <p><strong>Total: ${{ total_price }}</strong></p>
+      <p><strong>Total: ₹{{ total_price }}</strong></p>
     </div>
     
     <form method="POST" action="{{ url_for('checkout') }}">
@@ -91,10 +91,10 @@
             data.items.forEach(item => {
               const itemTotal = item.price * item.quantity;
               totalPrice += itemTotal;
-              itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - $${itemTotal.toFixed(2)}</p>`;
+              itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>`;
             });
 
-            totalPriceDiv.innerHTML = `<p><strong>Total: $${totalPrice.toFixed(2)}</strong></p>`;
+            totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
             
             // Display the order summary section and scroll to it
             document.getElementById('order-summary-section').classList.remove('hidden');

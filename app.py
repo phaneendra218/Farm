@@ -455,11 +455,11 @@ def get_basket_items():
     for basket_item in basket_items:
         item_data = {
             'name': basket_item.item.name,
-            'price': basket_item.item.price,
+            'price': float(basket_item.item.price),  # Convert Decimal to float
             'quantity': basket_item.quantity
         }
         items.append(item_data)
-        total_price += basket_item.item.price * basket_item.quantity
+        total_price += float(basket_item.item.price) * basket_item.quantity  # Ensure price is a float
     
     return jsonify({'success': True, 'items': items, 'total_price': total_price})
 
