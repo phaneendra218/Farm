@@ -437,6 +437,41 @@ def checkout():
 
     return render_template('checkout.html', addresses=addresses)
 
+@app.route('/place_order', methods=['POST'])
+def place_order():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'You must be logged in to place an order'})
+
+    user = User.query.get(session['user_id'])
+    data = request.get_json()
+    address_id = data.get('address_id')
+    payment_option = data.get('payment_option')
+
+    # Validate address and payment option
+    address = Address.query.get(address_id)
+    if not address or address.user_id != user.id:
+        return jsonify({'success': False, 'message': 'Invalid address selected'})
+
+    if payment_option not in ['cash_on_delivery', 'upi']:
+        return jsonify({'success': False, 'message': 'Invalid payment option selected'})
+
+    # Process the order
+    basket_items = Basket.query.filter_by(user_id=user.id).all()
+    total_price = sum(item.item.price * item.quantity for item in basket_items)
+
+    for basket_item in basket_items:
+        order = Order(
+            user_id=user.id,
+            item_id=basket_item.item_id,
+            quantity=basket_item.quantity
+        )
+        db.session.add(order)
+
+    db.session.query(Basket).filter_by(user_id=user.id).delete()
+    db.session.commit()
+
+    return jsonify({'success': True})
+
 @app.route('/get_basket_items')
 def get_basket_items():
     if 'user_id' not in session:

@@ -219,6 +219,49 @@
         alert('Something went wrong. Please try again.');
       });
   });
+
+  // Place Order button logic
+  document.getElementById('place-order-button')?.addEventListener('click', () => {
+    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+    if (!selectedAddress) {
+      alert('Please select a delivery address.');
+      return;
+    }
+
+    const paymentOption = document.querySelector('input[name="payment_option"]:checked');
+    if (!paymentOption) {
+      alert('Please select a payment option.');
+      return;
+    }
+
+    const addressId = selectedAddress.value;
+    const paymentMethod = paymentOption.value;
+
+    // Submit the order via AJAX
+    fetch('/place_order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        address_id: addressId,
+        payment_option: paymentMethod,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Order placed successfully!');
+          window.location.href = '/profile'; // Redirect to profile or order history page
+        } else {
+          alert(data.message || 'Error placing order. Please try again.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong. Please try again.');
+      });
+  });
 </script>
 
 {% endblock %}
