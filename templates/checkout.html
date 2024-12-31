@@ -44,8 +44,28 @@
     </div>
     
     <form method="POST" action="{{ url_for('checkout') }}">
-      <button type="submit" class="btn btn-primary">Place Order</button>
+      <button type="submit" id="place-order-button" class="btn btn-primary">Place Order</button>
     </form>
+  </div>
+
+  <!-- Payment Options Section (hidden initially) -->
+  <div id="payment-options-section" class="summary-box hidden">
+    <h2>Payment Options</h2>
+    
+    <div id="payment-methods">
+      <label>
+        <input type="radio" name="payment_option" value="cash_on_delivery"> Cash on Delivery
+      </label><br>
+      <label>
+        <input type="radio" name="payment_option" value="upi"> UPI
+      </label>
+    </div>
+
+    <div id="payable-amount">
+      <p><strong>Payable Amount: ₹<span id="payable-amount-value"></span></strong></p>
+    </div>
+    
+    <button id="confirm-payment-button" class="btn btn-primary">Confirm Payment</button>
   </div>
 
   <style>
@@ -65,7 +85,7 @@
   </style>
 
   <script>
-    // JS to manage address selection and show order summary
+    // JS to manage address selection, show order summary, and navigate to payment options
     document.getElementById('confirm-address-button')?.addEventListener('click', () => {
       const selectedAddress = document.querySelector('input[name="address_id"]:checked');
       if (!selectedAddress) {
@@ -73,7 +93,6 @@
         return;
       }
       
-      // Get selected address id
       const addressId = selectedAddress.value;
       
       // Fetch basket items and calculate total price via AJAX or pass them from backend
@@ -81,7 +100,6 @@
         .then(response => response.json())
         .then(data => {
           if (data.success) {
-            // Update order summary dynamically
             const itemsSummaryDiv = document.getElementById('items-summary');
             const totalPriceDiv = document.getElementById('total-price');
             
@@ -99,6 +117,9 @@
             // Display the order summary section and scroll to it
             document.getElementById('order-summary-section').classList.remove('hidden');
             window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
+            
+            // Store the total price to show in the payment section
+            document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
           } else {
             alert('Error fetching order summary.');
           }
@@ -107,6 +128,12 @@
           console.error('Error:', error);
           alert('Something went wrong. Please try again.');
         });
+    });
+
+    document.getElementById('place-order-button')?.addEventListener('click', () => {
+      // After placing the order, show the payment options section
+      document.getElementById('payment-options-section').classList.remove('hidden');
+      window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
     });
   </script>
 {% endblock %}

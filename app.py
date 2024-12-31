@@ -385,16 +385,15 @@ def remove_from_basket(item_id):
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
-    # Ensure the user is logged in
     if 'user_id' not in session:
         flash('You must be logged in to complete the checkout process', 'danger')
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
 
-    # Handle POST request for checkout processing
     if request.method == 'POST':
         address_id = request.form.get('address_id')
+        payment_option = request.form.get('payment_option')
 
         # Check if an address was selected
         if not address_id:
@@ -420,21 +419,18 @@ def checkout():
                 quantity=basket_item.quantity
             )
             db.session.add(order)
-        
-        # Optionally clear the basket after placing the order
+
         db.session.query(Basket).filter_by(user_id=user.id).delete()
 
         # Commit the transaction
         db.session.commit()
 
-        # Flash a success message and redirect to a confirmation page or profile
         flash('Order placed successfully!', 'success')
-        return redirect(url_for('profile'))  # Or another page after checkout, like an order confirmation page
+        return redirect(url_for('profile'))
 
     # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
 
-    # If the user doesn't have any addresses, prompt them to add one
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
