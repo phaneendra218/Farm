@@ -45,34 +45,43 @@
 {% endblock %}
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const addAddressButton = document.getElementById('add-address-button');
-  const addAddressIframe = document.getElementById('addAddressIframe');
-  const addAddressModal = document.getElementById('addAddressModal');
-
-  // Load profile page in iframe only when "Add Address" button is clicked
-  addAddressButton.addEventListener('click', function () {
-    addAddressIframe.src = "{{ url_for('profile') }}";
-  });
-
-  // Clear iframe content when the modal is closed
-  addAddressModal.addEventListener('hidden.bs.modal', function () {
-    addAddressIframe.src = "";
-    // Refresh addresses dynamically
-    fetch('{{ url_for("checkout") }}', {
-      method: 'GET',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        const addressesContainer = document.getElementById('addresses-container');
-        if (data.addresses_html) {
-          addressesContainer.innerHTML = data.addresses_html;
+  document.addEventListener('DOMContentLoaded', function () {
+    const addAddressButton = document.getElementById('add-address-button');
+    const addAddressIframe = document.getElementById('addAddressIframe');
+    const addAddressModal = document.getElementById('addAddressModal');
+  
+    // Load profile page in iframe only when "Add Address" button is clicked
+    addAddressButton.addEventListener('click', function () {
+      addAddressIframe.src = "{{ url_for('profile') }}";
+    });
+  
+    // Clear iframe content when the modal is closed
+    addAddressModal.addEventListener('hidden.bs.modal', function () {
+      addAddressIframe.src = ""; // Clear iframe content
+  
+      // Refresh addresses dynamically
+      fetch('{{ url_for("checkout") }}', {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
         }
       })
-      .catch(error => console.error('Error fetching updated addresses:', error));
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const addressesContainer = document.getElementById('addresses-container');
+          if (data.addresses_html) {
+            addressesContainer.innerHTML = data.addresses_html;
+          } else {
+            console.error('No addresses HTML returned');
+          }
+        })
+        .catch(error => console.error('Error fetching updated addresses:', error));
+    });
   });
-});
-</script>
+  </script>
+  

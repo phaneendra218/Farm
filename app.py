@@ -405,7 +405,6 @@ def checkout():
             return redirect(url_for('checkout'))
 
         # Proceed with order creation or other checkout steps here
-
         flash('Order successfully placed!', 'success')
         return redirect(url_for('order_confirmation'))  # Redirect to confirmation page
 
@@ -418,6 +417,7 @@ def checkout():
         )
         return jsonify({'addresses_html': addresses_html})
 
+    # Render the normal checkout page
     return render_template(
         'checkout.html',
         user=user,
