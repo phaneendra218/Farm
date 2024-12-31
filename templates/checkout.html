@@ -152,25 +152,56 @@
 </style>
 
 <script>
-  // Automatically highlight the selected address when a radio button is clicked
-  document.addEventListener('DOMContentLoaded', () => {
-    const addressRadios = document.querySelectorAll('.address-radio');
+  // Manage address selection, order summary, and payment options
+  document.getElementById('confirm-address-button')?.addEventListener('click', () => {
+    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+    if (!selectedAddress) {
+      alert('Please select a delivery address.');
+      return;
+    }
+
+    // Highlight the selected address with a green border
     const addressCards = document.querySelectorAll('.address-card');
+    addressCards.forEach(card => card.classList.remove('selected')); // Remove previous highlights
 
-    // Event listener for radio button change
-    addressRadios.forEach(radio => {
-      radio.addEventListener('change', () => {
-        // Remove the "selected" class from all address cards
-        addressCards.forEach(card => card.classList.remove('selected'));
+    const selectedCard = selectedAddress.closest('.address-card');
+    selectedCard.classList.add('selected');
 
-        // Add the "selected" class to the parent card of the selected radio
-        const selectedCard = radio.closest('.address-card');
-        selectedCard.classList.add('selected');
+    const addressId = selectedAddress.value;
+    
+    // Fetch basket items and calculate total price via AJAX
+    fetch(`/get_basket_items?address_id=${addressId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const itemsSummaryDiv = document.getElementById('items-summary');
+          const totalPriceDiv = document.getElementById('total-price');
+          
+          itemsSummaryDiv.innerHTML = '';
+          let totalPrice = 0;
+
+          data.items.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            totalPrice += itemTotal;
+            itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)} /${item.unit}</p>`;
+          });
+
+          totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
+          
+          // Display the order summary section
+          document.getElementById('order-summary-section').classList.remove('hidden');
+          window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
+          
+          // Store total price for payment options
+          document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
+        } else {
+          alert('Error fetching order summary.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong. Please try again.');
       });
-    });
-
-    // Automatically highlight the default address on page load
-    document.querySelector('input[name="address_id"]:checked')?.closest('.address-card').classList.add('selected');
   });
 
   document.getElementById('place-order-button')?.addEventListener('click', () => {
