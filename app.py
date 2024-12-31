@@ -395,10 +395,10 @@ def checkout():
         address_id = request.form.get('address_id')
         payment_option = request.form.get('payment_option')
 
-        # Check if an address was selected
-        if not address_id:
-            flash('Please select a delivery address', 'danger')
-            return redirect(url_for('checkout'))
+        # # Check if an address was selected
+        # if not address_id:
+        #     flash('Please select a delivery address', 'danger')
+        #     return redirect(url_for('checkout'))
 
         address = Address.query.get(address_id)
 
