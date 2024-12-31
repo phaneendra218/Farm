@@ -383,46 +383,32 @@ def remove_from_basket(item_id):
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
-    # Check if the user is logged in
     if 'user_id' not in session:
-        flash('Please login to proceed with checkout', 'danger')
+        flash('Please log in to proceed to checkout.', 'danger')
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
 
-    # Fetch all addresses for the user
-    addresses = Address.query.filter_by(user_id=user.id).all()
+    if request.method == 'GET':
+        addresses = Address.query.filter_by(user_id=user.id).all()
+        return render_template('checkout.html', addresses=addresses)
 
-    # Identify default address if available
-    default_address = next((addr for addr in addresses if addr.is_default), None)
+@app.route('/process_checkout', methods=['POST'])
+def process_checkout():
+    if 'user_id' not in session:
+        flash('Please log in to proceed to checkout.', 'danger')
+        return redirect(url_for('login'))
 
-    if request.method == 'POST':
-        selected_address_id = request.form.get('address_id')
-        selected_address = Address.query.get(selected_address_id)
+    address_id = request.form.get('address_id')
+    # Validate selected address
+    address = Address.query.filter_by(id=address_id, user_id=session['user_id']).first()
+    if not address:
+        flash('Invalid delivery address.', 'danger')
+        return redirect(url_for('checkout'))
 
-        if not selected_address or selected_address.user_id != user.id:
-            flash('Invalid address selection', 'danger')
-            return redirect(url_for('checkout'))
-
-        # Proceed with order creation or other checkout steps here
-        flash('Order successfully placed!', 'success')
-        return redirect(url_for('order_confirmation'))  # Redirect to confirmation page
-
-    # Handle AJAX request for updating addresses
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        addresses_html = render_template(
-            'partial_addresses.html',
-            addresses=addresses,
-            default_address=default_address
-        )
-        return jsonify({'addresses_html': addresses_html})
-
-    return render_template(
-        'checkout.html',
-        user=user,
-        addresses=addresses,
-        default_address=default_address
-    )
+    # Add logic for payment and order placement
+    flash('Order placed successfully!', 'success')
+    return redirect(url_for('order_confirmation'))
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):

@@ -1,93 +1,54 @@
+<!-- templates/checkout.html -->
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Checkout</h1>
+  <h1>Checkout</h1>
+  
+  <!-- Section: Delivery Address -->
+  <div id="delivery-address-section">
+    <h2>Confirm Delivery Address</h2>
 
-<!-- If no addresses are available -->
-{% if addresses|length == 0 %}
-  <p>No delivery addresses found. Please add an address.</p>
-  <button id="add-address-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
-    Add Address
-  </button>
-{% else %}
-  <form method="POST" action="{{ url_for('checkout') }}">
-    <h3>Select Delivery Address</h3>
-    <div id="addresses-container">
-      {% for address in addresses %}
-        <div>
-          <input type="radio" name="address_id" value="{{ address.id }}" 
-                 {% if default_address and address.id == default_address.id %} checked {% endif %}>
-          <label>{{ address.address_type }}: {{ address.address }}</label>
-        </div>
-      {% endfor %}
-    </div>
-    <button type="submit" class="btn btn-success">Proceed to Payment</button>
-  </form>
-{% endif %}
-
-<!-- Modal for Adding Address -->
-<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <iframe id="addAddressIframe" src="" frameborder="0" width="100%" height="400px"></iframe>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
+    {% if addresses %}
+      <ul>
+        {% for address in addresses %}
+          <li>
+            <input 
+              type="radio" 
+              name="address_id" 
+              value="{{ address.id }}" 
+              {% if address.is_default %} checked {% endif %}
+            >
+            {{ address.address_type }}: {{ address.address }}
+          </li>
+        {% endfor %}
+      </ul>
+      <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
+    {% else %}
+      <p>No addresses found. Please add an address to proceed.</p>
+      <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
+    {% endif %}
   </div>
-</div>
-{% endblock %}
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const addAddressButton = document.getElementById('add-address-button');
-    const addAddressIframe = document.getElementById('addAddressIframe');
-    const addAddressModal = document.getElementById('addAddressModal');
-  
-    // Load the profile page only when "Add Address" is clicked
-    addAddressButton.addEventListener('click', function () {
-      console.log("Loading profile page in iframe");
-      addAddressIframe.src = "{{ url_for('profile') }}";
+  <!-- Section: Proceed to Payment -->
+  <div id="payment-section" class="hidden">
+    <form method="POST" action="{{ url_for('process_checkout') }}">
+      <!-- Add form fields for payment details -->
+      <button type="submit" class="btn btn-primary">Submit Order</button>
+    </form>
+  </div>
+
+  <script>
+    // JS to manage address selection and proceed to payment
+    document.getElementById('confirm-address-button')?.addEventListener('click', () => {
+      const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+      if (!selectedAddress) {
+        alert('Please select a delivery address.');
+        return;
+      }
+      
+      // Mark payment section visible and focus on it
+      document.getElementById('payment-section').classList.remove('hidden');
+      window.scrollTo(0, document.getElementById('payment-section').offsetTop);
     });
-  
-    // Clear the iframe and refresh addresses after the modal is closed
-    addAddressModal.addEventListener('hidden.bs.modal', function () {
-      console.log("Modal closed. Clearing iframe and refreshing addresses.");
-      addAddressIframe.src = ""; // Clear iframe content
-  
-      // Fetch updated addresses dynamically
-      fetch('{{ url_for("checkout") }}', {
-        method: 'GET',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log("Received updated addresses:", data);
-          const addressesContainer = document.getElementById('addresses-container');
-          if (data.addresses_html) {
-            addressesContainer.innerHTML = data.addresses_html;
-          } else {
-            console.error("No addresses HTML returned from server.");
-          }
-        })
-        .catch(error => {
-          console.error("Error fetching updated addresses:", error);
-        });
-    });
-  });
   </script>
-  
-  
+{% endblock %}

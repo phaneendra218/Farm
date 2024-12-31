@@ -1,7 +1,0 @@
-{% for address in addresses %}
-<div>
-  <input type="radio" name="address_id" value="{{ address.id }}" 
-         {% if default_address and address.id == default_address.id %} checked {% endif %}>
-  <label>{{ address.address_type }}: {{ address.address }}</label>
-</div>
-{% endfor %}
