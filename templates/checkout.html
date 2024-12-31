@@ -152,23 +152,32 @@
 </style>
 
 <script>
-  // Automatically highlight the selected address
-  const addressRadios = document.querySelectorAll('.address-radio');
-  const addressCards = document.querySelectorAll('.address-card');
+  // Automatically highlight the selected address when a radio button is clicked
+  document.addEventListener('DOMContentLoaded', () => {
+    const addressRadios = document.querySelectorAll('.address-radio');
+    const addressCards = document.querySelectorAll('.address-card');
 
-  addressRadios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      // Remove the "selected" class from all cards
-      addressCards.forEach(card => card.classList.remove('selected'));
+    // Event listener for radio button change
+    addressRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        // Remove the "selected" class from all address cards
+        addressCards.forEach(card => card.classList.remove('selected'));
 
-      // Add the "selected" class to the parent card of the selected radio
-      const selectedCard = radio.closest('.address-card');
-      selectedCard.classList.add('selected');
+        // Add the "selected" class to the parent card of the selected radio
+        const selectedCard = radio.closest('.address-card');
+        selectedCard.classList.add('selected');
+      });
     });
+
+    // Automatically highlight the default address on page load
+    document.querySelector('input[name="address_id"]:checked')?.closest('.address-card').classList.add('selected');
   });
 
-  // Automatically highlight the default address on page load
-  document.querySelector('input[name="address_id"]:checked')?.closest('.address-card').classList.add('selected');
+  document.getElementById('place-order-button')?.addEventListener('click', () => {
+    // Reveal the Payment Options section
+    document.getElementById('payment-options-section').classList.remove('hidden');
+    window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
+  });
 </script>
 
 {% endblock %}
