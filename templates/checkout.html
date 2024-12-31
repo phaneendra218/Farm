@@ -91,7 +91,7 @@
             data.items.forEach(item => {
               const itemTotal = item.price * item.quantity;
               totalPrice += itemTotal;
-              itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>`;
+              itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)} /{{ item.unit }}</p>`;
             });
 
             totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
