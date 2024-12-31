@@ -456,7 +456,8 @@ def get_basket_items():
         item_data = {
             'name': basket_item.item.name,
             'price': item_price,
-            'quantity': item_quantity
+            'quantity': item_quantity,
+            'unit': basket_item.item.unit
         }
         items.append(item_data)
         total_price += item_price * item_quantity  # Perform multiplication after conversion
