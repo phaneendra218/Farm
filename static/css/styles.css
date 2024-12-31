@@ -277,12 +277,12 @@ button:hover {
 /* Media Queries for Basket items*/
 .basket-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
-    gap: 7px; /* Thinner gap between items */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Flexible grid layout */
+    gap: 10px; /* Thin gap between items */
     justify-content: center;
     margin: 20px auto;
     max-width: 1200px;
-    grid-auto-rows: minmax(80px, auto); /* Ensures items don't overlap vertically */
+    grid-template-rows: auto; /* Allow rows to expand naturally */
 }
 
 .basket-item-card {
@@ -291,7 +291,10 @@ button:hover {
     padding: 12px;
     text-align: center;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-    min-height: 250px; /* Ensures each card has a minimum height */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensure equal spacing within the card */
+    height: 100%; /* Allow flexible height to accommodate content */
 }
 
 .basket-item-card h4 {
@@ -359,6 +362,10 @@ button:hover {
     .basket-item-card img {
         width: 120px;
         height: 80px;
+    }
+
+    .basket-item-card {
+        padding: 10px; /* Adjust padding */
     }
 }
 
