@@ -392,8 +392,10 @@ def checkout():
     user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        address_id = request.form.get('address_id')
-        payment_option = request.form.get('payment_option')
+        # Expecting JSON payload from the frontend
+        data = request.get_json()
+        address_id = data.get('address_id')
+        payment_option = data.get('payment_option')
 
         # Check if an address was selected
         if not address_id:
@@ -418,6 +420,7 @@ def checkout():
             )
             db.session.add(order)
 
+        # Clear the basket after creating the order
         db.session.query(Basket).filter_by(user_id=user.id).delete()
 
         # Commit the transaction

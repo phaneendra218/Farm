@@ -94,11 +94,33 @@
     messageDiv.style.color = 'red';
     return;
   }
-  
-  // Clear the error message if an address is selected
-  messageDiv.textContent = '';
-  
+
   const addressId = selectedAddress.value;
+
+  // Send a POST request to confirm the address
+  fetch('/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ address_id: addressId })
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (!data.success) {
+        // Display the error message from the server response
+        messageDiv.textContent = data.message;
+        messageDiv.style.color = 'red';
+      } else {
+        // Clear the error message and proceed with the next steps
+        messageDiv.textContent = '';
+        alert('Address confirmed. Proceeding to order summary...');
+        // Additional logic to show the next section can go here
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      messageDiv.textContent = 'An error occurred. Please try again.';
+      messageDiv.style.color = 'red';
+    });
 
   // Fetch basket items and calculate total price via AJAX
   fetch(`/get_basket_items?address_id=${addressId}`)
