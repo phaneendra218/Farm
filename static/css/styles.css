@@ -186,6 +186,10 @@ button {
 button:hover {
     background-color: #45a049;
 }
+.modal-body iframe {
+    border: none;
+  }
+  
 /* Media Queries for Responsive Design */
 /* For screens smaller than 768px (Tablets, small screens) */
 @media (max-width: 768px) {

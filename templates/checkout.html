@@ -6,11 +6,9 @@
 <!-- If no addresses are available -->
 {% if addresses|length == 0 %}
   <p>No delivery addresses found. Please add an address.</p>
-  <button id="add-address-button" class="btn btn-primary">Add Address</button>
-  <div id="add-address-popup" class="hidden">
-    <iframe src="{{ url_for('profile') }}" frameborder="0" width="100%" height="400px"></iframe>
-    <button id="close-popup" class="btn btn-danger">Close</button>
-  </div>
+  <button id="add-address-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+    Add Address
+  </button>
 {% else %}
   <form method="POST" action="{{ url_for('checkout') }}">
     <h3>Select Delivery Address</h3>
@@ -24,21 +22,33 @@
     <button type="submit" class="btn btn-success">Proceed to Payment</button>
   </form>
 {% endif %}
+
+<!-- Modal for Adding Address -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <iframe src="{{ url_for('profile') }}" frameborder="0" width="100%" height="400px"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const addAddressButton = document.getElementById('add-address-button');
-  const addAddressPopup = document.getElementById('add-address-popup');
-  const closePopupButton = document.getElementById('close-popup');
+  const addAddressModal = document.getElementById('addAddressModal');
 
-  addAddressButton.addEventListener('click', function () {
-    addAddressPopup.style.display = 'block';
-  });
-
-  closePopupButton.addEventListener('click', function () {
-    addAddressPopup.style.display = 'none';
-    location.reload(); // Reload page to fetch newly added address
+  // Refresh page after modal closes to reload new addresses
+  addAddressModal.addEventListener('hidden.bs.modal', function () {
+    location.reload();
   });
 });
 </script>
