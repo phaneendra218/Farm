@@ -326,7 +326,7 @@ def update_basket_quantity(item_id):
 
         # Validate the maximum quantity
         if new_quantity > 50:
-            flash('Please enter a quantity less than or equal to 50. Contact support for bulk orders.', 'danger')
+            flash('Please enter upto 50. Contact support for bulk orders.', 'danger')
             return redirect(url_for('basket'))
 
         # Fetch the basket item for the user and item
