@@ -409,13 +409,21 @@ def checkout():
         flash('Order successfully placed!', 'success')
         return redirect(url_for('order_confirmation'))  # Redirect to confirmation page
 
+    # Handle AJAX request for updating addresses
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        addresses_html = render_template(
+            'partial_addresses.html',
+            addresses=addresses,
+            default_address=default_address
+        )
+        return jsonify({'addresses_html': addresses_html})
+
     return render_template(
         'checkout.html',
         user=user,
         addresses=addresses,
         default_address=default_address
     )
-
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):

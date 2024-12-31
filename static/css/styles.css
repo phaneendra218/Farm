@@ -187,52 +187,6 @@ button:hover {
     background-color: #45a049;
 }
 
-/* Modal Custom Styles */
-.modal-content {
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-.modal-header {
-    background-color: #4CAF50;
-    color: white;
-    border-bottom: 1px solid #ddd;
-}
-.modal-body {
-    padding: 20px;
-    background-color: #f8f9fa;
-}
-.modal-footer {
-    border-top: 1px solid #ddd;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-.modal-footer button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-}
-.modal-footer button:hover {
-    background-color: #45a049;
-}
-.modal-body iframe {
-    border: none;
-    width: 100%;
-    height: 400px;
-}
-/* Adjust Flash Messages for Modal */
-.flash-messages {
-    margin-top: 10px;
-    text-align: center;
-}
-/* Ensure modal doesn't interfere with existing main styles */
-body.modal-open main {
-    filter: blur(2px);
-}
-
-
 /* Media Queries for Responsive Design */
 /* For screens smaller than 768px (Tablets, small screens) */
 @media (max-width: 768px) {
