@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, session, url_for, f
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.utils import secure_filename
+from sqlalchemy import Integer, String, Boolean, Float
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.types import Numeric
 from decimal import Decimal
 
@@ -381,17 +383,30 @@ def remove_from_basket(item_id):
 
     return redirect(url_for('basket'))
 
+from sqlalchemy.orm import Session
+
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if 'user_id' not in session:
         flash('Please log in to proceed to checkout.', 'danger')
         return redirect(url_for('login'))
 
-    user = User.query.get(session['user_id'])
+    # Use Session.get instead of Query.get
+    session_instance = db.session
+    user = session_instance.get(User, session['user_id'])
+
+    if not user:
+        flash('User not found. Please log in again.', 'danger')
+        return redirect(url_for('login'))
 
     if request.method == 'GET':
         addresses = Address.query.filter_by(user_id=user.id).all()
         return render_template('checkout.html', addresses=addresses)
+
+    elif request.method == 'POST':
+        # Handle form submission (e.g., payment)
+        flash('Checkout logic for POST request not yet implemented.', 'warning')
+        return redirect(url_for('checkout'))  # Placeholder for future logic
 
 @app.route('/process_checkout', methods=['POST'])
 def process_checkout():
