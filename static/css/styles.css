@@ -282,7 +282,7 @@ button:hover {
     justify-content: center;
     margin: 20px auto;
     max-width: 1200px;
-    grid-auto-rows: minmax(100px, auto); /* Ensures items don't overlap vertically */
+    grid-auto-rows: minmax(80px, auto); /* Ensures items don't overlap vertically */
 }
 
 .basket-item-card {
