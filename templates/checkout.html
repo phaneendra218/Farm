@@ -84,56 +84,64 @@
   </style>
 
 <script>
-  // Manage address selection, order summary, and payment options
   document.getElementById('confirm-address-button')?.addEventListener('click', () => {
-    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
-    if (!selectedAddress) {
-      alert('Please select a delivery address.');
-      return;
-    }
-    
-    const addressId = selectedAddress.value;
-    
-    // Fetch basket items and calculate total price via AJAX
-    fetch(`/get_basket_items?address_id=${addressId}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const itemsSummaryDiv = document.getElementById('items-summary');
-          const totalPriceDiv = document.getElementById('total-price');
-          
-          itemsSummaryDiv.innerHTML = '';
-          let totalPrice = 0;
+  const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+  const messageDiv = document.getElementById('address-error-message');
+  
+  if (!selectedAddress) {
+    // Show the error message dynamically
+    messageDiv.textContent = 'Please select a delivery address.';
+    messageDiv.style.color = 'red';
+    return;
+  }
+  
+  // Clear the error message if an address is selected
+  messageDiv.textContent = '';
+  
+  const addressId = selectedAddress.value;
 
-          data.items.forEach(item => {
-            const itemTotal = item.price * item.quantity;
-            totalPrice += itemTotal;
-            itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)} /${item.unit}</p>`;
-          });
+  // Fetch basket items and calculate total price via AJAX
+  fetch(`/get_basket_items?address_id=${addressId}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const itemsSummaryDiv = document.getElementById('items-summary');
+        const totalPriceDiv = document.getElementById('total-price');
+        
+        itemsSummaryDiv.innerHTML = '';
+        let totalPrice = 0;
 
-          totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
-          
-          // Display the order summary section
-          document.getElementById('order-summary-section').classList.remove('hidden');
-          window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
-          
-          // Store total price for payment options
-          document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
-        } else {
-          alert('Error fetching order summary.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Something went wrong. Please try again.');
-      });
+        data.items.forEach(item => {
+          const itemTotal = item.price * item.quantity;
+          totalPrice += itemTotal;
+          itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)} /${item.unit}</p>`;
+        });
+
+        totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
+        
+        // Display the order summary section
+        document.getElementById('order-summary-section').classList.remove('hidden');
+        window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
+        
+        // Store total price for payment options
+        document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
+      } else {
+        alert('Error fetching order summary.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Something went wrong. Please try again.');
+    });
+});
+
+// Clear error when a new address is selected
+document.querySelectorAll('input[name="address_id"]').forEach(input => {
+  input.addEventListener('change', () => {
+    const messageDiv = document.getElementById('address-error-message');
+    messageDiv.textContent = '';
   });
-
-  document.getElementById('place-order-button')?.addEventListener('click', () => {
-    // Reveal the Payment Options section
-    document.getElementById('payment-options-section').classList.remove('hidden');
-    window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
-  });
+});
 </script>
 
 {% endblock %}

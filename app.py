@@ -397,15 +397,13 @@ def checkout():
 
         # Check if an address was selected
         if not address_id:
-            flash('Please select a delivery address', 'danger')
-            return redirect(url_for('checkout'))
+            return jsonify({'success': False, 'message': 'Please select a delivery address'})
 
         address = Address.query.get(address_id)
 
         # Ensure the address exists and belongs to the current user
         if not address or address.user_id != user.id:
-            flash('Invalid address selected', 'danger')
-            return redirect(url_for('checkout'))
+            return jsonify({'success': False, 'message': 'Invalid address selected'})
 
         # Process the order, create order entries for items in the basket, etc.
         basket_items = Basket.query.filter_by(user_id=user.id).all()
@@ -425,8 +423,7 @@ def checkout():
         # Commit the transaction
         db.session.commit()
 
-        flash('Order placed successfully!', 'success')
-        return redirect(url_for('profile'))
+        return jsonify({'success': True, 'message': 'Order placed successfully!'})
 
     # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
