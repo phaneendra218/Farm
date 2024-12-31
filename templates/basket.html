@@ -20,7 +20,7 @@
                 <!-- Update Quantity Form -->
                 <form method="POST" action="{{ url_for('update_basket_quantity', item_id=item.id) }}">
                     <input type="number" name="quantity" value="{{ basket_item.quantity | int }}" min="1" max="50" step="1">
-                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                    <button type="submit" class="btn-update btn-sm">Update</button>
                 </form>
 
                 <!-- Remove Item Button -->
