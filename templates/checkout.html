@@ -50,16 +50,18 @@
     const addAddressIframe = document.getElementById('addAddressIframe');
     const addAddressModal = document.getElementById('addAddressModal');
   
-    // Load profile page in iframe only when "Add Address" button is clicked
+    // Load the profile page only when "Add Address" is clicked
     addAddressButton.addEventListener('click', function () {
+      console.log("Loading profile page in iframe");
       addAddressIframe.src = "{{ url_for('profile') }}";
     });
   
-    // Clear iframe content when the modal is closed
+    // Clear the iframe and refresh addresses after the modal is closed
     addAddressModal.addEventListener('hidden.bs.modal', function () {
+      console.log("Modal closed. Clearing iframe and refreshing addresses.");
       addAddressIframe.src = ""; // Clear iframe content
   
-      // Refresh addresses dynamically
+      // Fetch updated addresses dynamically
       fetch('{{ url_for("checkout") }}', {
         method: 'GET',
         headers: {
@@ -73,15 +75,19 @@
           return response.json();
         })
         .then(data => {
+          console.log("Received updated addresses:", data);
           const addressesContainer = document.getElementById('addresses-container');
           if (data.addresses_html) {
             addressesContainer.innerHTML = data.addresses_html;
           } else {
-            console.error('No addresses HTML returned');
+            console.error("No addresses HTML returned from server.");
           }
         })
-        .catch(error => console.error('Error fetching updated addresses:', error));
+        .catch(error => {
+          console.error("Error fetching updated addresses:", error);
+        });
     });
   });
   </script>
+  
   

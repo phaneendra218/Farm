@@ -417,7 +417,6 @@ def checkout():
         )
         return jsonify({'addresses_html': addresses_html})
 
-    # Render the normal checkout page
     return render_template(
         'checkout.html',
         user=user,
