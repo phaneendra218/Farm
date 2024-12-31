@@ -140,6 +140,12 @@
     font-size: 0.8em;
   }
 
+  /* Green border for selected address */
+  .address-card.selected {
+    border: 2px solid #28a745;
+    background-color: #eaf8e3; /* Light green background for better visibility */
+  }
+
   .hidden {
     display: none;
   }
@@ -153,7 +159,14 @@
       alert('Please select a delivery address.');
       return;
     }
-    
+
+    // Highlight the selected address with a green border
+    const addressCards = document.querySelectorAll('.address-card');
+    addressCards.forEach(card => card.classList.remove('selected')); // Remove previous highlights
+
+    const selectedCard = selectedAddress.closest('.address-card');
+    selectedCard.classList.add('selected');
+
     const addressId = selectedAddress.value;
     
     // Fetch basket items and calculate total price via AJAX
