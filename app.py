@@ -392,20 +392,20 @@ def checkout():
     user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        # Expecting JSON payload from the frontend
-        data = request.get_json()
-        address_id = data.get('address_id')
-        payment_option = data.get('payment_option')
+        address_id = request.form.get('address_id')
+        payment_option = request.form.get('payment_option')
 
         # Check if an address was selected
         if not address_id:
-            return jsonify({'success': False, 'message': 'Please select a delivery address'})
+            flash('Please select a delivery address', 'danger')
+            return redirect(url_for('checkout'))
 
         address = Address.query.get(address_id)
 
         # Ensure the address exists and belongs to the current user
         if not address or address.user_id != user.id:
-            return jsonify({'success': False, 'message': 'Invalid address selected'})
+            flash('Invalid address selected', 'danger')
+            return redirect(url_for('checkout'))
 
         # Process the order, create order entries for items in the basket, etc.
         basket_items = Basket.query.filter_by(user_id=user.id).all()
@@ -420,13 +420,13 @@ def checkout():
             )
             db.session.add(order)
 
-        # Clear the basket after creating the order
         db.session.query(Basket).filter_by(user_id=user.id).delete()
 
         # Commit the transaction
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'Order placed successfully!'})
+        flash('Order placed successfully!', 'success')
+        return redirect(url_for('profile'))
 
     # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()

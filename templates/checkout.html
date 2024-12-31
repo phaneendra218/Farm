@@ -84,48 +84,17 @@
   </style>
 
 <script>
-  // Event listener for the "Confirm Address" button
+  // Manage address selection, order summary, and payment options
   document.getElementById('confirm-address-button')?.addEventListener('click', () => {
     const selectedAddress = document.querySelector('input[name="address_id"]:checked');
-    const messageDiv = document.getElementById('address-error-message');
-
     if (!selectedAddress) {
-      // Show the error message dynamically if no address is selected
-      messageDiv.textContent = 'Please select a delivery address.';
-      messageDiv.style.color = 'red';
+      alert('Please select a delivery address.');
       return;
     }
-
+    
     const addressId = selectedAddress.value;
-
-    // Send a POST request to confirm the address
-    fetch('/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address_id: addressId })
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (!data.success) {
-          // Display the error message from the server response
-          messageDiv.textContent = data.message;
-          messageDiv.style.color = 'red';
-        } else {
-          // Clear the error message and proceed with the next steps
-          messageDiv.textContent = '';
-          alert('Address confirmed. Proceeding to order summary...');
-          loadOrderSummary(addressId); // Load the order summary dynamically
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        messageDiv.textContent = 'An error occurred. Please try again.';
-        messageDiv.style.color = 'red';
-      });
-  });
-
-  // Function to fetch and display order summary
-  function loadOrderSummary(addressId) {
+    
+    // Fetch basket items and calculate total price via AJAX
     fetch(`/get_basket_items?address_id=${addressId}`)
       .then(response => response.json())
       .then(data => {
@@ -136,7 +105,6 @@
           itemsSummaryDiv.innerHTML = '';
           let totalPrice = 0;
 
-          // Populate the items summary and calculate the total price
           data.items.forEach(item => {
             const itemTotal = item.price * item.quantity;
             totalPrice += itemTotal;
@@ -149,7 +117,7 @@
           document.getElementById('order-summary-section').classList.remove('hidden');
           window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
           
-          // Update the payable amount for payment options
+          // Store total price for payment options
           document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
         } else {
           alert('Error fetching order summary.');
@@ -159,14 +127,12 @@
         console.error('Error:', error);
         alert('Something went wrong. Please try again.');
       });
-  }
+  });
 
-  // Clear the error message when a new address is selected
-  document.querySelectorAll('input[name="address_id"]').forEach(input => {
-    input.addEventListener('change', () => {
-      const messageDiv = document.getElementById('address-error-message');
-      messageDiv.textContent = '';
-    });
+  document.getElementById('place-order-button')?.addEventListener('click', () => {
+    // Reveal the Payment Options section
+    document.getElementById('payment-options-section').classList.remove('hidden');
+    window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
   });
 </script>
 
