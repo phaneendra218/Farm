@@ -366,6 +366,15 @@ button:hover {
 .basket-item-card .btn-update:hover {
     background-color: #c28f04; 
 }
+.basket-item-card .btn-remove {
+    background-color: #cc2d22;
+    color: white;
+    border: none;
+}
+
+.basket-item-card .btn-remove:hover {
+    background-color: #920905; 
+}
 
 /* Media Queries */
 @media (max-width: 768px) {
