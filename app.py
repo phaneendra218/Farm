@@ -42,6 +42,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
     phone_number = db.Column(db.String(15), nullable=False)
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
+    orders = relationship("Order", backref="user", lazy=True)
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
