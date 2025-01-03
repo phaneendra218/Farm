@@ -138,17 +138,11 @@ main {
     background-color: #f0f0f0;
     transition: background-color 0.3s ease;
 }
-.item-card img {
+.item-card img, .basket-item-card img {
     max-width: 100%;
     max-height: 150px;
     border-radius: 5px;
     margin-top: 10px;
-}
-.basket-item-card img {
-    max-width: 100%;
-    max-height: 150px;
-    border-radius: 5px;
-    margin-top: 50px;
 }
 /* Sold Out Text */
 .sold-out-text {
