@@ -102,16 +102,23 @@
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
+    background-color: white;
   }
 
   .address-card:hover {
     background-color: #f9f9f9;
   }
-
-  .address-radio {
-    margin-right: 15px;
+  .address-card.selected {
+    background-color: #d4edda; /* Light green background for selected address */
+    border-color: #28a745; /* Green border */
   }
 
+  .address-radio:checked + .address-label .address-card {
+    border-color: #007bff; /* Ensure blue border for checked radio button */
+  }
+  /* .address-radio {
+    margin-right: 15px;
+  } */
   .address-label {
     display: flex;
     justify-content: space-between;
@@ -195,6 +202,19 @@
     // Reveal the Payment Options section
     document.getElementById('payment-options-section').classList.remove('hidden');
     window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
+  });
+  
+  document.querySelectorAll('.address-radio').forEach(radio => {
+    radio.addEventListener('change', () => {
+      // Remove 'selected' class from all address cards
+      document.querySelectorAll('.address-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      // Add 'selected' class to the currently checked radio button's parent
+      const selectedCard = radio.closest('.address-card');
+      selectedCard.classList.add('selected');
+    });
   });
 </script>
 
