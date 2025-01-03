@@ -5,10 +5,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.types import Numeric
-from models import db, Order, User
-import json
 from decimal import Decimal
-from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -56,10 +53,8 @@ class Item(db.Model):
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    order_details = db.Column(db.Text, nullable=False)  # JSON or string representation of the order
-    total_price = db.Column(db.Float, nullable=False)
-    order_date = db.Column(db.DateTime, default=datetime.utcnow)
-    user = db.relationship('User', backref=db.backref('orders', lazy=True))
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
+    quantity = db.Column(Numeric(10, 2), nullable=False)
 
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -713,37 +708,6 @@ def orders():
     orders = Order.query.filter_by(user_id=user.id).all()
 
     return render_template('orders.html', user=user, orders=orders)
-
-@app.route('/confirm_payment', methods=['POST'])
-def confirm_payment():
-    if 'user_id' not in session:
-        flash('Please log in to confirm the payment', 'error')
-        return redirect(url_for('login'))
-
-    user_id = session['user_id']
-    order_details = session.get('cart', {})  # Assuming cart is stored in session
-    total_price = sum(item['price'] * item['quantity'] for item in order_details.values())
-
-    # Create a new order
-    new_order = Order(user_id=user_id, order_details=json.dumps(order_details), total_price=total_price)
-    db.session.add(new_order)
-    db.session.commit()
-
-    # Clear the cart
-    session.pop('cart', None)
-
-    flash('Order placed successfully!', 'success')
-    return redirect(url_for('my_orders'))
-
-@app.route('/my_orders')
-def my_orders():
-    if 'user_id' not in session:
-        flash('Please log in to view your orders', 'error')
-        return redirect(url_for('login'))
-
-    user_id = session['user_id']
-    orders = Order.query.filter_by(user_id=user_id).all()
-    return render_template('my_orders.html', orders=orders)
 
 if __name__ == '__main__':
     with app.app_context():
