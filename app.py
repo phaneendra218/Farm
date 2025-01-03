@@ -42,6 +42,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
     phone_number = db.Column(db.String(15), nullable=False)
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
+    orders = db.relationship('Order', back_populates='user', cascade='all, delete-orphan')  # New relationship
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,17 +51,18 @@ class Item(db.Model):
     image_path = db.Column(db.String(255), nullable=True)
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
+    orders = db.relationship('Order', back_populates='item', cascade='all, delete-orphan')  # New relationship
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
-    order_date = db.Column(db.DateTime, default=datetime.utcnow)
-    payment_method = db.Column(db.String(50), nullable=False)
+    order_date = db.Column(db.DateTime, default=datetime.utcnow)  # Store the order creation timestamp
+    payment_method = db.Column(db.String(50), nullable=False)  # Store payment option (COD, UPI, etc.)
 
-    user = db.relationship('User', backref='orders')  # backref for User
-    item = db.relationship('Item', backref='orders')
+    user = db.relationship('User', back_populates='orders')
+    item = db.relationship('Item', back_populates='orders')
 
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -70,7 +72,7 @@ class Basket(db.Model):
 
     user = db.relationship('User', backref='baskets')
     item = db.relationship('Item', backref='baskets')
-    item = db.relationship('Item', backref='orders')
+    # item = db.relationship('Item', backref='orders')
 
 # Routes
 @app.route('/')
@@ -388,50 +390,49 @@ def remove_from_basket(item_id):
 
     return redirect(url_for('basket'))
 
-from datetime import datetime
-
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if 'user_id' not in session:
         flash('You must be logged in to complete the checkout process', 'danger')
-        return redirect(url_for('login'))    
-
+        return redirect(url_for('login'))
+    
     user = User.query.get(session['user_id'])
+    
     if request.method == 'POST':
         address_id = request.form.get('address_id')
         payment_option = request.form.get('payment_option')
-        
+
+        # Validate the payment option
+        if not payment_option:
+            flash('Please select a payment method', 'danger')
+            return redirect(url_for('checkout'))
+
         # Check if an address was selected
         if not address_id:
             flash('Please select a delivery address', 'danger')
             return redirect(url_for('checkout'))
         
         address = Address.query.get(address_id)
-        
-        # Ensure the address exists and belongs to the current user
         if not address or address.user_id != user.id:
             flash('Invalid address selected', 'danger')
             return redirect(url_for('checkout'))
-        
-        # Process the order, create order entries for items in the basket, etc.
+
+        # Process the order, create order entries for items in the basket
         basket_items = Basket.query.filter_by(user_id=user.id).all()
         total_price = sum(item.item.price * item.quantity for item in basket_items)
-
-        # Create orders for each item in the basket
+        
+        # Create orders for each basket item
         for basket_item in basket_items:
             order = Order(
                 user_id=user.id,
                 item_id=basket_item.item_id,
                 quantity=basket_item.quantity,
-                order_date=datetime.utcnow(),
-                payment_method=payment_option
+                payment_method=payment_option  # Store the selected payment option
             )
             db.session.add(order)
         
-        # Clear the basket after creating orders
+        # Clear the basket after order is placed
         db.session.query(Basket).filter_by(user_id=user.id).delete()
-        
-        # Commit the transaction
         db.session.commit()
 
         flash('Order placed successfully!', 'success')
@@ -439,16 +440,12 @@ def checkout():
 
     # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
-
-    # Clear flash messages on GET request
-    if request.method == 'GET':
-        session.pop('_flashes', None)
-
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
-
+    
     return render_template('checkout.html', addresses=addresses)
+
 
 @app.route('/get_basket_items')
 def get_basket_items():
