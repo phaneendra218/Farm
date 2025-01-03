@@ -430,7 +430,10 @@ def checkout():
 
     # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
-
+    # Clear flash messages on GET request
+    if request.method == 'GET':
+        session.pop('_flashes', None)
+        
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
