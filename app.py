@@ -3,10 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.utils import secure_filename
 from sqlalchemy import Integer, String, Boolean, Float
-from sqlalchemy.orm import sessionmaker, Session, relationship
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.types import Numeric
 from decimal import Decimal
-from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -33,10 +32,7 @@ class Address(db.Model):
     address = db.Column(db.String(255), nullable=False)
     address_type = db.Column(db.String(50), nullable=False)  # Required field for address type
     is_default = db.Column(db.Boolean, default=False)
-    
-    # Relationship with User
     user = db.relationship('User', back_populates='addresses')
-
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,12 +40,7 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
     phone_number = db.Column(db.String(15), nullable=False)
-    
-    # Relationships with Address, Order, and Basket
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
-    orders = db.relationship("Order", back_populates="user", lazy=True)
-    baskets = db.relationship("Basket", back_populates="user", lazy=True)
-
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,44 +49,22 @@ class Item(db.Model):
     image_path = db.Column(db.String(255), nullable=True)
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
-    
-    # Relationship with Basket and Order
-    baskets = db.relationship('Basket', back_populates='item', lazy=True)
-    orders = db.relationship('Order', back_populates='item', lazy=True)
-
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.String(20), unique=True, nullable=False)  # Unique order identifier
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
-    quantity = db.Column(db.Numeric(10, 2), nullable=False)
-    total_price = db.Column(db.Float, nullable=False)  # Store the total price for the order
-    date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)  # Order creation date
-    delivery_address = db.Column(db.String(255), nullable=False)  # Address for delivery
-    payment_method = db.Column(db.String(50), nullable=False)  # Payment method used
-    
-    # Relationships with User and Item
-    user = db.relationship('User', back_populates='orders')
-    item = db.relationship('Item', back_populates='orders')
-
+    quantity = db.Column(Numeric(10, 2), nullable=False)
 
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
-    quantity = db.Column(db.Numeric(10, 2), nullable=False)
-    
-    # Relationships with User and Item
-    user = db.relationship('User', back_populates='baskets')
-    item = db.relationship('Item', back_populates='baskets')
+    quantity = db.Column(Numeric(10, 2), nullable=False)
 
-
-    # user = db.relationship('User', backref='baskets')
-    # item = db.relationship('Item', backref='baskets')
+    user = db.relationship('User', backref='baskets')
+    item = db.relationship('Item', backref='baskets')
     item = db.relationship('Item', backref='orders')
-    user = db.relationship('User', back_populates='orders')
-    item = db.relationship('Item', back_populates='orders')
 
 # Routes
 @app.route('/')
@@ -417,59 +386,44 @@ def remove_from_basket(item_id):
 def checkout():
     if 'user_id' not in session:
         flash('You must be logged in to complete the checkout process', 'danger')
-        return redirect(url_for('login'))
-
+        return redirect(url_for('login'))    
     user = User.query.get(session['user_id'])
-
     if request.method == 'POST':
         address_id = request.form.get('address_id')
         payment_option = request.form.get('payment_option')
-
+        # Check if an address was selected
         if not address_id:
             flash('Please select a delivery address', 'danger')
             return redirect(url_for('checkout'))
-
         address = Address.query.get(address_id)
+        # Ensure the address exists and belongs to the current user
         if not address or address.user_id != user.id:
             flash('Invalid address selected', 'danger')
             return redirect(url_for('checkout'))
-
-        # Process the order
+        # Process the order, create order entries for items in the basket, etc.
         basket_items = Basket.query.filter_by(user_id=user.id).all()
-        if not basket_items:
-            flash('Your basket is empty.', 'danger')
-            return redirect(url_for('items'))
-
-        # Generate a unique order ID and create orders
-        order_id = str(uuid.uuid4())
+        total_price = sum(item.item.price * item.quantity for item in basket_items)
+        # Example of creating an order from the basket
         for basket_item in basket_items:
             order = Order(
-                order_id=order_id,
                 user_id=user.id,
                 item_id=basket_item.item_id,
-                quantity=basket_item.quantity,
-                order_date=datetime.utcnow(),
-                delivery_address=address.address
+                quantity=basket_item.quantity
             )
             db.session.add(order)
-
-        # Clear the basket
-        Basket.query.filter_by(user_id=user.id).delete()
-
+        db.session.query(Basket).filter_by(user_id=user.id).delete()
         # Commit the transaction
         db.session.commit()
-
         flash('Order placed successfully!', 'success')
-        return redirect(url_for('orders'))
-
+        return redirect(url_for('profile'))
+    # Handle GET request to display checkout form
+    addresses = Address.query.filter_by(user_id=user.id).all()
     # Clear flash messages on GET request
     if request.method == 'GET':
         session.pop('_flashes', None)
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
-
-    addresses = Address.query.filter_by(user_id=user.id).all()
     return render_template('checkout.html', addresses=addresses)
 
 @app.route('/get_basket_items')
@@ -747,13 +701,13 @@ def delete_address_by_id():
 @app.route('/orders', methods=['GET'])
 def orders():
     if 'user_id' not in session:
-        flash('Please login to view your orders.', 'danger')
+        flash('Please login to view your orders', 'danger')
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
     orders = Order.query.filter_by(user_id=user.id).all()
 
-    return render_template('orders.html', orders=orders)
+    return render_template('orders.html', user=user, orders=orders)
 
 if __name__ == '__main__':
     with app.app_context():
