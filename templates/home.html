@@ -19,7 +19,6 @@
 
                 {% if item.is_hidden %}
                     <p class="text-danger sold-out-text">Sold Out</p>
-                    <!-- Coming Soon Image positioned correctly -->
                     <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" class="coming-soon-image">
                 {% else %}
                     <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" class="order-form">

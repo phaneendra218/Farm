@@ -7,7 +7,6 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.types import Numeric
 from decimal import Decimal
 
-
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
@@ -413,12 +412,10 @@ def checkout():
             )
             db.session.add(order)
         db.session.query(Basket).filter_by(user_id=user.id).delete()
-
         # Commit the transaction
         db.session.commit()
         flash('Order placed successfully!', 'success')
         return redirect(url_for('profile'))
-
     # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
     # Clear flash messages on GET request
@@ -432,19 +429,15 @@ def checkout():
 @app.route('/get_basket_items')
 def get_basket_items():
     if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'User not logged in'}), 400
-    
+        return jsonify({'success': False, 'message': 'User not logged in'}), 400    
     user = User.query.get(session['user_id'])
     basket_items = Basket.query.filter_by(user_id=user.id).all()
-
     items = []
-    total_price = 0.0
-    
+    total_price = 0.0    
     for basket_item in basket_items:
         # Convert both price and quantity to float before calculating total
         item_price = float(basket_item.item.price)  # Convert price to float
-        item_quantity = float(basket_item.quantity)  # Convert quantity to float
-        
+        item_quantity = float(basket_item.quantity)  # Convert quantity to float        
         item_data = {
             'name': basket_item.item.name,
             'price': item_price,
@@ -452,8 +445,7 @@ def get_basket_items():
             'unit': basket_item.item.unit
         }
         items.append(item_data)
-        total_price += item_price * item_quantity  # Perform multiplication after conversion
-    
+        total_price += item_price * item_quantity  # Perform multiplication after conversion    
     return jsonify({'success': True, 'items': items, 'total_price': total_price})
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
