@@ -42,7 +42,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
     phone_number = db.Column(db.String(15), nullable=False)
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
-    orders = relationship("Order", backref="user", lazy=True)
+    orders = relationship("Order", back_populates="user")
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -62,12 +62,14 @@ class Order(db.Model):
     date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)  # Order creation date
     delivery_address = db.Column(db.String(255), nullable=False)  # Address for delivery
     payment_method = db.Column(db.String(50), nullable=False)  # Payment method used
+    user = relationship("User", back_populates="orders")
 
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
+    user = relationship("User", backref="baskets")
 
     user = db.relationship('User', backref='baskets')
     item = db.relationship('Item', backref='baskets')
