@@ -1,0 +1,20 @@
+<!-- templates/my_orders.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Orders</h2>
+{% if orders %}
+    <ul>
+    {% for order in orders %}
+        <li>
+            <strong>Order ID:</strong> {{ order.id }}<br>
+            <strong>Date:</strong> {{ order.order_date.strftime('%d-%m-%Y %H:%M:%S') }}<br>
+            <strong>Details:</strong> {{ order.order_details }}<br>
+            <strong>Total Price:</strong> ${{ order.total_price }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No orders found.</p>
+{% endif %}
+{% endblock %}
