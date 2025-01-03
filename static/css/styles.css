@@ -142,6 +142,12 @@ main {
     max-width: 100%;
     max-height: 150px;
     border-radius: 5px;
+    margin-top: 20px;
+}
+.basket-item-card img {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: 5px;
     margin-top: 50px;
 }
 /* Sold Out Text */
