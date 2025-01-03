@@ -33,7 +33,10 @@ class Address(db.Model):
     address = db.Column(db.String(255), nullable=False)
     address_type = db.Column(db.String(50), nullable=False)  # Required field for address type
     is_default = db.Column(db.Boolean, default=False)
+    
+    # Relationship with User
     user = db.relationship('User', back_populates='addresses')
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,9 +44,12 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
     phone_number = db.Column(db.String(15), nullable=False)
+    
+    # Relationships with Address, Order, and Basket
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
-    orders = relationship("Order", backref="user", lazy=True)
-    baskets = relationship("Basket", backref="user", lazy=True)
+    orders = db.relationship("Order", back_populates="user", lazy=True)
+    baskets = db.relationship("Basket", back_populates="user", lazy=True)
+
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +58,11 @@ class Item(db.Model):
     image_path = db.Column(db.String(255), nullable=True)
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
+    
+    # Relationship with Basket and Order
+    baskets = db.relationship('Basket', back_populates='item', lazy=True)
+    orders = db.relationship('Order', back_populates='item', lazy=True)
+
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -64,15 +75,24 @@ class Order(db.Model):
     delivery_address = db.Column(db.String(255), nullable=False)  # Address for delivery
     payment_method = db.Column(db.String(50), nullable=False)  # Payment method used
     
+    # Relationships with User and Item
+    user = db.relationship('User', back_populates='orders')
+    item = db.relationship('Item', back_populates='orders')
+
+
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
-    quantity = db.Column(Numeric(10, 2), nullable=False)
-    user = relationship("User", backref="baskets", lazy=True)
+    quantity = db.Column(db.Numeric(10, 2), nullable=False)
+    
+    # Relationships with User and Item
+    user = db.relationship('User', back_populates='baskets')
+    item = db.relationship('Item', back_populates='baskets')
 
-    user = db.relationship('User', backref='baskets')
-    item = db.relationship('Item', backref='baskets')
+
+    # user = db.relationship('User', backref='baskets')
+    # item = db.relationship('Item', backref='baskets')
     item = db.relationship('Item', backref='orders')
     user = db.relationship('User', back_populates='orders')
     item = db.relationship('Item', back_populates='orders')
