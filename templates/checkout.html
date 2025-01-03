@@ -216,6 +216,28 @@
       selectedCard.classList.add('selected');
     });
   });
+  // Function to update selected class for the currently checked address
+  const updateSelectedAddress = () => {
+    document.querySelectorAll('.address-card').forEach(card => {
+      card.classList.remove('selected'); // Remove the 'selected' class from all cards
+    });
+
+    const selectedRadio = document.querySelector('input[name="address_id"]:checked'); // Find the checked radio
+    if (selectedRadio) {
+      const selectedCard = selectedRadio.closest('.address-card'); // Find the corresponding card
+      selectedCard.classList.add('selected'); // Add the 'selected' class
+    }
+  };
+
+  // Add event listeners to handle address selection changes
+  document.querySelectorAll('.address-radio').forEach(radio => {
+    radio.addEventListener('change', updateSelectedAddress);
+  });
+
+  // Run the logic once on page load for the default selection
+  document.addEventListener('DOMContentLoaded', () => {
+    updateSelectedAddress();
+  });
 </script>
 
 {% endblock %}
