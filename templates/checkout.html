@@ -33,9 +33,8 @@
     </div>
     <div class="address-buttons">
       <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
-      <!-- <button href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</button> -->
       <form action="{{ url_for('profile') }}" method="get">
-        <button type="submit" class="btn btn-secondary mt-3">+ Add New Address</button>
+        <button type="submit" class="btn-secondary mt-3">+ Add New Address</button>
     </form>
     </div>
   {% else %}
@@ -82,6 +81,15 @@
 </div>
 
 <style>
+  .address-box .btn-secondary {
+    background-color: #e6b514;
+    color: white;
+    border: none;
+    }
+
+  .address-box .btn-secondary:hover {
+    background-color: #c5840b; 
+   }
   .address-box, .summary-box {
     border: 1px solid #ccc;
     padding: 20px;
