@@ -227,7 +227,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     updateSelectedAddress();
   });
-  document.getElementById('confirm-payment-button')?.addEventListener('click', function() {
+  document.getElementById('confirm-payment-button')?.addEventListener('click', () => {
     const paymentOption = document.querySelector('input[name="payment_option"]:checked');
     if (!paymentOption) {
         alert('Please select a payment option.');
@@ -237,12 +237,36 @@
     const paymentMethod = paymentOption.value;
     const payableAmount = document.getElementById('payable-amount-value').textContent;
 
-    alert(`Payment Method: ${paymentMethod}\nAmount: ₹${payableAmount}`);
-    
-    // Proceed with the payment processing (e.g., redirect, AJAX request)
-    // Example:
-    // fetch('/process_payment', { method: 'POST', body: JSON.stringify({ method: paymentMethod, amount: payableAmount }) })
+    // You can add more data to send if required (like address_id, basket items, etc.)
+
+    // Make an AJAX request to place the order
+    fetch('/place_order', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            payment_method: paymentMethod,
+            total_amount: payableAmount,
+            // If you need the selected address or basket items, include them here
+            // address_id: selectedAddressId,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Order placed successfully!');
+            window.location.href = '/orders';  // Redirect to the orders page or any other page after order success
+        } else {
+            alert('Error placing the order. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong. Please try again.');
+    });
 });
+
 </script>
 
 {% endblock %}

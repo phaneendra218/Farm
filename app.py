@@ -730,6 +730,49 @@ def orders():
 
     return render_template('orders.html', user=user, orders=orders)
 
+from flask import request, jsonify
+
+@app.route('/place_order', methods=['POST'])
+def place_order():
+    data = request.get_json()
+    
+    # Extract payment method and total amount from the request
+    payment_method = data.get('payment_method')
+    total_amount = data.get('total_amount')
+
+    # You may also extract the selected address_id or basket items here
+    # address_id = data.get('address_id')
+    # basket_items = get_basket_items_for_user(current_user.id)  # Example function to get items
+
+    # Process the payment (here you can add logic for actual payment processing)
+    # You can integrate with payment gateways or just mock the payment confirmation
+
+    # After successful payment, place the order in the database
+    try:
+        # Place the order in the database (You need to update the order table or create a new order record)
+        new_order = Order(
+            user_id=current_user.id,  # The user who is placing the order
+            payment_method=payment_method,
+            total_amount=total_amount,
+            # Add more fields as needed (address_id, basket_items, etc.)
+        )
+        db.session.add(new_order)
+        db.session.commit()
+
+        # Update the basket items as part of the order
+        # You might need to create a new entry in an order_items table to track items ordered
+        # Example: OrderItem(order_id=new_order.id, item_id=item.id, quantity=item.quantity)
+
+        # Mark the basket as empty after order placement
+        # Basket.query.filter_by(user_id=current_user.id).delete()  # Clear the basket after placing the order
+
+        return jsonify({"success": True, "message": "Order placed successfully!"})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error placing order: {e}")
+        return jsonify({"success": False, "message": "Error placing the order."})
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Ensures tables are created before starting the app
