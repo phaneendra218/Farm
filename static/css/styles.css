@@ -366,13 +366,13 @@ button:hover {
 .basket-item-card .btn-update:hover {
     background-color: #c28f04; 
 }
-.basket-item-card .btn-remove {
+.basket-item-card .btn-danger {
     background-color: #cc2d22;
     color: white;
     border: none;
 }
 
-.basket-item-card .btn-remove:hover {
+.basket-item-card .btn-danger:hover {
     background-color: #920905; 
 }
 
