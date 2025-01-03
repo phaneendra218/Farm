@@ -5,37 +5,40 @@
 
 <!-- Address Section -->
 <div id="delivery-address-section" class="address-box">
-    <h2>Delivery Address</h2>
+  <h2>Delivery Address</h2>
 
-    {% if addresses %}
-      <div class="address-cards-container">
-        {% for address in addresses %}
-          <div class="address-card">
-            <input 
-              type="radio" 
-              name="address_id" 
-              value="{{ address.id }}" 
-              {% if address.is_default %} checked {% endif %}
-              id="address-{{ address.id }}"
-              class="address-radio"
-            >
-            <label for="address-{{ address.id }}" class="address-label">
-              <div class="address-info">
-                <p class="address-type">{{ address.address_type }}</p>
-                <p class="address-text">{{ address.address }}</p>
-              </div>
-              {% if address.is_default %}
-                <span class="default-address">Default</span>
-              {% endif %}
-            </label>
-          </div>
-        {% endfor %}
-      </div>
+  {% if addresses %}
+    <div class="address-cards-container">
+      {% for address in addresses %}
+        <div class="address-card">
+          <input 
+            type="radio" 
+            name="address_id" 
+            value="{{ address.id }}" 
+            {% if address.is_default %} checked {% endif %}
+            id="address-{{ address.id }}"
+            class="address-radio"
+          >
+          <label for="address-{{ address.id }}" class="address-label">
+            <div class="address-info">
+              <p class="address-type">{{ address.address_type }}</p>
+              <p class="address-text">{{ address.address }}</p>
+            </div>
+            {% if address.is_default %}
+              <span class="default-address">Default</span>
+            {% endif %}
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="address-buttons">
       <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
-    {% else %}
-      <p>No addresses found. Please add an address to proceed.</p>
       <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
-    {% endif %}
+    </div>
+  {% else %}
+    <p>No addresses found. Please add an address to proceed.</p>
+    <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
+  {% endif %}
 </div>
 
 <!-- Order Summary Section -->
@@ -150,6 +153,12 @@
   .hidden {
     display: none;
   }
+.address-buttons {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
 </style>
 
 <script>
