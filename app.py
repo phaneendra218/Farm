@@ -59,6 +59,7 @@ class Order(db.Model):
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=True)
     total_price = db.Column(db.Numeric(10, 2), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    delivery_address = db.Column(db.String(255), nullable=False)
     
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
