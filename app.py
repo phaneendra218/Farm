@@ -27,6 +27,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 db = SQLAlchemy(app)
 
 # Models
+# Address Model
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)  # Ensure cascading delete
@@ -35,6 +36,7 @@ class Address(db.Model):
     is_default = db.Column(db.Boolean, default=False)
     user = db.relationship('User', back_populates='addresses')
 
+# User Model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -43,6 +45,7 @@ class User(db.Model):
     phone_number = db.Column(db.String(15), nullable=False)
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
 
+# Item Model
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
@@ -51,7 +54,9 @@ class Item(db.Model):
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
     orders = db.relationship('Order', backref='item', lazy=True)
+    basket_items = db.relationship('Basket', backref='item', lazy=True)  # Unique backref name
 
+# Order Model
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -62,9 +67,10 @@ class Order(db.Model):
 
     # Define relationships if needed
     user = db.relationship('User', backref='orders')
-    item = db.relationship('Item', backref='orders')
+    item = db.relationship('Item', backref='orders')  # Ensure 'orders' is unique here
     address = db.relationship('Address', backref='orders')
 
+# Basket Model
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -72,9 +78,7 @@ class Basket(db.Model):
     quantity = db.Column(Numeric(10, 2), nullable=False)
 
     user = db.relationship('User', backref='baskets')
-    item = db.relationship('Item', backref='baskets')
-    item = db.relationship('Item', backref='orders')
-    item = db.relationship('Item', backref='basket_items')
+    item = db.relationship('Item', backref='basket_items', lazy=True)  # Unique backref here
 
 # Routes
 @app.route('/')
