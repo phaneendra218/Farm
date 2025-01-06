@@ -6,8 +6,6 @@ from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.types import Numeric
 from decimal import Decimal
-from datetime import datetime
-import uuid
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -54,14 +52,9 @@ class Item(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.String(36), unique=True, nullable=False, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
-    order_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # Order date
-
-    user = db.relationship('User', backref='orders')
-    item = db.relationship('Item', backref='orders')
 
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,7 +64,7 @@ class Basket(db.Model):
 
     user = db.relationship('User', backref='baskets')
     item = db.relationship('Item', backref='baskets')
-    # item = db.relationship('Item', backref='orders')
+    item = db.relationship('Item', backref='orders')
 
 # Routes
 @app.route('/')
@@ -393,73 +386,45 @@ def remove_from_basket(item_id):
 def checkout():
     if 'user_id' not in session:
         flash('You must be logged in to complete the checkout process', 'danger')
-        return redirect(url_for('login'))
-
+        return redirect(url_for('login'))    
     user = User.query.get(session['user_id'])
-
     if request.method == 'POST':
         address_id = request.form.get('address_id')
         payment_option = request.form.get('payment_option')
-
-        # Validate address selection
+        # Check if an address was selected
         if not address_id:
             flash('Please select a delivery address', 'danger')
             return redirect(url_for('checkout'))
-        
         address = Address.query.get(address_id)
+        # Ensure the address exists and belongs to the current user
         if not address or address.user_id != user.id:
             flash('Invalid address selected', 'danger')
             return redirect(url_for('checkout'))
-
-        # Validate payment option selection
-        if not payment_option:
-            flash('Please select a payment method', 'danger')
-            return redirect(url_for('checkout'))
-
+        # Process the order, create order entries for items in the basket, etc.
         basket_items = Basket.query.filter_by(user_id=user.id).all()
-        if not basket_items:
-            flash('Your basket is empty. Please add items to proceed.', 'danger')
-            return redirect(url_for('items'))
-
-        # Generate a unique order ID
-        order_id = str(uuid.uuid4())
-        total_price = sum(float(item.item.price) * float(item.quantity) for item in basket_items)
-
-        # Save the order
+        total_price = sum(item.item.price * item.quantity for item in basket_items)
+        # Example of creating an order from the basket
         for basket_item in basket_items:
             order = Order(
                 user_id=user.id,
                 item_id=basket_item.item_id,
-                quantity=basket_item.quantity,
-                order_id=order_id,
-                address_id=address_id,
-                payment_method=payment_option
+                quantity=basket_item.quantity
             )
             db.session.add(order)
-        
-        # Clear the basket
-        Basket.query.filter_by(user_id=user.id).delete()
+        db.session.query(Basket).filter_by(user_id=user.id).delete()
+        # Commit the transaction
         db.session.commit()
-
-        flash(f'Thanks for your order! Your order ID is {order_id}. Find your orders in "My Orders".', 'success')
-        return redirect(url_for('orders'))
-
-    # Fetch user addresses
+        flash('Order placed successfully!', 'success')
+        return redirect(url_for('profile'))
+    # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
+    # Clear flash messages on GET request
+    if request.method == 'GET':
+        session.pop('_flashes', None)
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
-
-    # Fetch basket items for order summary
-    basket_items = Basket.query.filter_by(user_id=user.id).all()
-    total_price = sum(float(item.item.price) * float(item.quantity) for item in basket_items)
-
-    return render_template(
-        'checkout.html',
-        addresses=addresses,
-        basket_items=basket_items,
-        total_price=total_price
-    )
+    return render_template('checkout.html', addresses=addresses)
 
 @app.route('/get_basket_items')
 def get_basket_items():
@@ -482,6 +447,46 @@ def get_basket_items():
         items.append(item_data)
         total_price += item_price * item_quantity  # Perform multiplication after conversion    
     return jsonify({'success': True, 'items': items, 'total_price': total_price})
+
+@app.route('/complete_order', methods=['POST'])
+def complete_order():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'User not logged in'}), 401
+    
+    user = User.query.get(session['user_id'])
+    data = request.get_json()
+    address_id = data.get('address_id')
+    payment_option = data.get('payment_option')
+
+    # Validate Address
+    address = Address.query.filter_by(id=address_id, user_id=user.id).first()
+    if not address:
+        return jsonify({'success': False, 'message': 'Invalid address selected.'}), 400
+
+    # Fetch Basket Items
+    basket_items = Basket.query.filter_by(user_id=user.id).all()
+    if not basket_items:
+        return jsonify({'success': False, 'message': 'No items in the basket.'}), 400
+
+    # Create Orders
+    total_price = 0.0
+    for basket_item in basket_items:
+        total_price += basket_item.item.price * basket_item.quantity
+        order = Order(
+            user_id=user.id,
+            item_id=basket_item.item_id,
+            quantity=basket_item.quantity,
+            address_id=address.id
+        )
+        db.session.add(order)
+
+    # Clear Basket
+    Basket.query.filter_by(user_id=user.id).delete()
+
+    # Commit Changes
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'Order placed successfully!', 'total_price': total_price})
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
@@ -705,40 +710,6 @@ def edit_profile():
     # Pass 'enumerate' explicitly to the template context
     return render_template('edit_profile.html', user=user, enumerate=enumerate)
 
-@app.route('/place_order', methods=['POST'])
-def place_order():
-    try:
-        # Fetch user information
-        user = User.query.get(session['user_id'])
-        if not user:
-            return "User not found", 404
-
-        # Process the order (assumes basket and address_id from request)
-        basket_items = get_basket_items(user.id)  # Example function
-        address_id = request.form.get('address_id')
-        address = Address.query.get(address_id)
-
-        if not basket_items or not address:
-            return "Invalid basket or address", 400
-
-        # Place the order (example logic)
-        for item in basket_items:
-            order = Order(
-                user_id=user.id,
-                item_id=item['id'],
-                quantity=item['quantity'],
-                delivery_address=address.address,
-                order_date=datetime.now()
-            )
-            db.session.add(order)
-        
-        db.session.commit()
-        return redirect(url_for('orders'))
-
-    except Exception as e:
-        db.session.rollback()
-        app.logger.error(f"Error placing order: {e}")
-        return "Something went wrong. Please try again.", 500
 
 # @app.route('/delete_address/<int:address_id>', methods=['POST'])
 # def delete_address(address_id):

@@ -1,41 +1,40 @@
-{% extends "base.html" %}
-
 {% block content %}
 <h1>Checkout</h1>
 
 <!-- Address Section -->
 <div id="delivery-address-section" class="address-box">
   <h2>Delivery Address</h2>
+
   {% if addresses %}
-    <form action="{{ url_for('checkout') }}" method="POST" id="address-selection-form">
-      <div class="address-cards-container">
-        {% for address in addresses %}
-          <div class="address-card">
-            <input 
-              type="radio" 
-              name="address_id" 
-              value="{{ address.id }}" 
-              {% if address.is_default %} checked {% endif %}
-              id="address-{{ address.id }}"
-              class="address-radio"
-            >
-            <label for="address-{{ address.id }}" class="address-label">
-              <div class="address-info">
-                <p class="address-type">{{ address.address_type }}</p>
-                <p class="address-text">{{ address.address }}</p>
-              </div>
-              {% if address.is_default %}
-                <span class="default-address">Default</span>
-              {% endif %}
-            </label>
-          </div>
-        {% endfor %}
-      </div>
-      <div class="address-buttons">
-        <button type="submit" class="btn btn-primary">Confirm Address</button>
-        <a href="{{ url_for('profile') }}" class="btn btn-secondary">+ Add New Address</a>
-      </div>
+    <div class="address-cards-container">
+      {% for address in addresses %}
+        <div class="address-card">
+          <input 
+            type="radio" 
+            name="address_id" 
+            value="{{ address.id }}" 
+            {% if address.is_default %} checked {% endif %}
+            id="address-{{ address.id }}"
+            class="address-radio"
+          >
+          <label for="address-{{ address.id }}" class="address-label">
+            <div class="address-info">
+              <p class="address-type">{{ address.address_type }}</p>
+              <p class="address-text">{{ address.address }}</p>
+            </div>
+            {% if address.is_default %}
+              <span class="default-address">Default</span>
+            {% endif %}
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="address-buttons">
+      <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
+      <form action="{{ url_for('profile') }}" method="get">
+        <button type="submit" class="btn-secondary mt-3">+ Add New Address</button>
     </form>
+    </div>
   {% else %}
     <p>No addresses found. Please add an address to proceed.</p>
     <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
@@ -45,23 +44,24 @@
 <!-- Order Summary Section -->
 <div id="order-summary-section" class="summary-box hidden">
   <h2>Order Summary</h2>
+
   <div id="items-summary">
     {% for basket_item in basket_items %}
-      <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p>
+      <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price * basket_item.quantity }}</p>
     {% endfor %}
   </div>
+
   <div id="total-price">
     <p><strong>Total: ₹{{ total_price }}</strong></p>
   </div>
-  <form action="/place_order" method="POST">
-    <input type="hidden" name="address_id" value="{{ selected_address_id }}">
-    <button type="submit" class="btn btn-primary">Place Order</button>
-  </form>
+
+  <button id="place-order-button" class="btn btn-primary">Place Order</button>
 </div>
 
 <!-- Payment Options Section (hidden initially) -->
 <div id="payment-options-section" class="summary-box hidden">
   <h2>Payment</h2>
+
   <div id="payment-methods">
     <label>
       <input type="radio" name="payment_option" value="cash_on_delivery"> Cash on Delivery
@@ -70,9 +70,11 @@
       <input type="radio" name="payment_option" value="upi"> UPI
     </label>
   </div>
+
   <div id="payable-amount">
     <p><strong>Payable Amount: ₹<span id="payable-amount-value"></span></strong></p>
   </div>
+
   <button id="confirm-payment-button" class="btn btn-primary">Confirm Payment</button>
 </div>
 
@@ -81,25 +83,29 @@
     background-color: #e6b514;
     color: white;
     border: none;
-  }
+    }
   .address-box .btn-secondary:hover {
     background-color: #c5840b; 
-  }
+   }
+   
   .address-box, .summary-box {
     border: 1px solid #ccc;
     padding: 20px;
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }  
+  }
+  
   .address-box h2, .summary-box h2 {
     margin-bottom: 20px;
   }
+
   .address-cards-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
+
   .address-card {
     display: flex;
     align-items: center;
@@ -110,6 +116,7 @@
     transition: 0.3s;
     background-color: white;
   }
+
   .address-card:hover {
     background-color: #f9f9f9;
   }
@@ -117,6 +124,7 @@
     background-color: #d4edda; /* Light green background for selected address */
     border-color: #28a745; /* Green border */
   }
+
   .address-radio:checked + .address-label .address-card {
     border-color: #007bff; /* Ensure blue border for checked radio button */
   }
@@ -129,16 +137,20 @@
     width: 100%;
     align-items: center;
   }
+
   .address-info {
     flex: 1;
   }
+
   .address-type {
     font-weight: bold;
   }
+
   .address-text {
     color: #555;
     font-size: 0.9em;
   }
+
   .default-address {
     background-color: #28a745;
     color: white;
@@ -146,6 +158,7 @@
     border-radius: 5px;
     font-size: 0.8em;
   }
+
   .hidden {
     display: none;
   }
@@ -154,18 +167,132 @@
   display: flex;
   gap: 10px;
 }
+
 </style>
 
 <script>
+  // Manage address selection, order summary, and payment options
+  document.getElementById('confirm-address-button')?.addEventListener('click', () => {
+    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+    if (!selectedAddress) {
+      alert('Please select a delivery address.');
+      return;
+    }
+    
+    const addressId = selectedAddress.value;
+    
+    // Fetch basket items and calculate total price via AJAX
+    fetch(`/get_basket_items?address_id=${addressId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const itemsSummaryDiv = document.getElementById('items-summary');
+          const totalPriceDiv = document.getElementById('total-price');
+          
+          itemsSummaryDiv.innerHTML = '';
+          let totalPrice = 0;
+
+          data.items.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            totalPrice += itemTotal;
+            itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)} /${item.unit}</p>`;
+          });
+
+          totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
+          
+          // Display the order summary section
+          document.getElementById('order-summary-section').classList.remove('hidden');
+          window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
+          
+          // Store total price for payment options
+          document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
+        } else {
+          alert('Error fetching order summary.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong. Please try again.');
+      });
+  });
+
+  document.getElementById('place-order-button')?.addEventListener('click', () => {
+    // Reveal the Payment Options section
+    document.getElementById('payment-options-section').classList.remove('hidden');
+    window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
+  });
+
   document.querySelectorAll('.address-radio').forEach(radio => {
     radio.addEventListener('change', () => {
+      // Remove 'selected' class from all address cards
       document.querySelectorAll('.address-card').forEach(card => {
         card.classList.remove('selected');
       });
+
+      // Add 'selected' class to the currently checked radio button's parent
       const selectedCard = radio.closest('.address-card');
       selectedCard.classList.add('selected');
     });
   });
+  // Function to update selected class for the currently checked address
+  const updateSelectedAddress = () => {
+    document.querySelectorAll('.address-card').forEach(card => {
+      card.classList.remove('selected'); // Remove the 'selected' class from all cards
+    });
+
+    const selectedRadio = document.querySelector('input[name="address_id"]:checked'); // Find the checked radio
+    if (selectedRadio) {
+      const selectedCard = selectedRadio.closest('.address-card'); // Find the corresponding card
+      selectedCard.classList.add('selected'); // Add the 'selected' class
+    }
+  };
+
+  // Add event listeners to handle address selection changes
+  document.querySelectorAll('.address-radio').forEach(radio => {
+    radio.addEventListener('change', updateSelectedAddress);
+  });
+
+  // Run the logic once on page load for the default selection
+  document.addEventListener('DOMContentLoaded', () => {
+    updateSelectedAddress();
+  });
+
+  document.getElementById('confirm-payment-button')?.addEventListener('click', () => {
+    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+    const selectedPaymentOption = document.querySelector('input[name="payment_option"]:checked');
+
+    if (!selectedAddress || !selectedPaymentOption) {
+        alert('Please select both a delivery address and payment option.');
+        return;
+    }
+
+    const requestData = {
+        address_id: selectedAddress.value,
+        payment_option: selectedPaymentOption.value
+    };
+
+    fetch('/complete_order', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.href = '/orders';
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while completing your order. Please try again.');
+    });
+});
+
 </script>
 
 {% endblock %}
