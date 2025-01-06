@@ -402,7 +402,7 @@ def checkout():
             return redirect(url_for('checkout'))
         # Process the order, create order entries for items in the basket, etc.
         basket_items = Basket.query.filter_by(user_id=user.id).all()
-        total_price = sum(item.item.price * item.quantity for item in basket_items)
+        total_price = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
         # Example of creating an order from the basket
         for basket_item in basket_items:
             order = Order(
