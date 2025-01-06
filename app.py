@@ -445,6 +445,7 @@ def get_basket_items():
             'unit': basket_item.item.unit
         }
         items.append(item_data)
+        total_price = Decimal(total_price)
         total_price += Decimal(basket_item.item.price) * basket_item.quantity  # Perform multiplication after conversion    
     return jsonify({'success': True, 'items': items, 'total_price': total_price})
 
@@ -471,6 +472,7 @@ def complete_order():
     # Create Orders
     total_price = 0.0
     for basket_item in basket_items:
+        total_price = Decimal(total_price)
         total_price += Decimal(basket_item.item.price) * basket_item.quantity
         order = Order(
             user_id=user.id,
