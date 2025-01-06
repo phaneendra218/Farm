@@ -47,7 +47,7 @@
   <h2>Order Summary</h2>
   <div id="items-summary">
     {% for basket_item in basket_items %}
-      <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price * basket_item.quantity }}</p>
+      <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p>
     {% endfor %}
   </div>
   <div id="total-price">
