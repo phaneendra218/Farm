@@ -7,27 +7,25 @@
     <table class="table table-bordered">
         <thead>
             <tr>
+                <th>Order ID</th>
                 <th>Item</th>
                 <th>Quantity</th>
                 <th>Price</th>
                 <th>Total</th>
+                <th>Order Date</th>
                 <th>Delivery Address</th>
             </tr>
         </thead>
         <tbody>
             {% for order in orders %}
             <tr>
+                <td>{{ order.id }}</td>
                 <td>{{ order.item.name }}</td>
                 <td>{{ order.quantity }}</td>
-                <td>${{ order.item.price }}</td>
-                <td>${{ order.item.price * order.quantity }}</td>
-                <td>
-                    {% for address in user.addresses %}
-                        {% if address.is_default %}
-                            {{ address.address }}
-                        {% endif %}
-                    {% endfor %}
-                </td>
+                <td>₹{{ "{:.2f}".format(order.item.price) }}</td>
+                <td>₹{{ "{:.2f}".format(order.item.price * order.quantity) }}</td>
+                <td>{{ order.order_date.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+                <td>{{ order.delivery_address }}</td>
             </tr>
             {% endfor %}
         </tbody>

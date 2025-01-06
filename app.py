@@ -7,6 +7,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.types import Numeric
 from decimal import Decimal
 from datetime import datetime
+import uuid
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -42,7 +43,6 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
     phone_number = db.Column(db.String(15), nullable=False)
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
-    orders = db.relationship('Order', back_populates='user', cascade='all, delete-orphan')  # New relationship
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,18 +51,17 @@ class Item(db.Model):
     image_path = db.Column(db.String(255), nullable=True)
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
-    orders = db.relationship('Order', back_populates='item', cascade='all, delete-orphan')  # New relationship
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(36), unique=True, nullable=False, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
-    order_date = db.Column(db.DateTime, default=datetime.utcnow)  # Store the order creation timestamp
-    payment_method = db.Column(db.String(50), nullable=False)  # Store payment option (COD, UPI, etc.)
+    order_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # Order date
 
-    user = db.relationship('User', back_populates='orders')
-    item = db.relationship('Item', back_populates='orders')
+    user = db.relationship('User', backref='orders')
+    item = db.relationship('Item', backref='orders')
 
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -395,19 +394,13 @@ def checkout():
     if 'user_id' not in session:
         flash('You must be logged in to complete the checkout process', 'danger')
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     
     if request.method == 'POST':
         address_id = request.form.get('address_id')
         payment_option = request.form.get('payment_option')
 
-        # Validate the payment option
-        if not payment_option:
-            flash('Please select a payment method', 'danger')
-            return redirect(url_for('checkout'))
-
-        # Check if an address was selected
         if not address_id:
             flash('Please select a delivery address', 'danger')
             return redirect(url_for('checkout'))
@@ -417,35 +410,38 @@ def checkout():
             flash('Invalid address selected', 'danger')
             return redirect(url_for('checkout'))
 
-        # Process the order, create order entries for items in the basket
         basket_items = Basket.query.filter_by(user_id=user.id).all()
-        total_price = sum(item.item.price * item.quantity for item in basket_items)
-        
-        # Create orders for each basket item
+        if not basket_items:
+            flash('Your basket is empty. Please add items to proceed.', 'danger')
+            return redirect(url_for('items'))
+
+        # Generate a unique order ID
+        order_id = str(uuid.uuid4())
+        total_price = sum(float(item.item.price) * float(item.quantity) for item in basket_items)
+
+        # Save the order
         for basket_item in basket_items:
             order = Order(
                 user_id=user.id,
                 item_id=basket_item.item_id,
                 quantity=basket_item.quantity,
-                payment_method=payment_option  # Store the selected payment option
+                order_id=order_id
             )
             db.session.add(order)
         
-        # Clear the basket after order is placed
-        db.session.query(Basket).filter_by(user_id=user.id).delete()
+        # Clear the basket
+        Basket.query.filter_by(user_id=user.id).delete()
         db.session.commit()
 
-        flash('Order placed successfully!', 'success')
-        return redirect(url_for('profile'))
+        flash(f'Thanks for your order! Your order ID is {order_id}. Find your orders in "My Orders".', 'success')
+        return redirect(url_for('orders'))
 
-    # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
     
     return render_template('checkout.html', addresses=addresses)
-
 
 @app.route('/get_basket_items')
 def get_basket_items():
@@ -729,49 +725,6 @@ def orders():
     orders = Order.query.filter_by(user_id=user.id).all()
 
     return render_template('orders.html', user=user, orders=orders)
-
-from flask import request, jsonify
-
-@app.route('/place_order', methods=['POST'])
-def place_order():
-    data = request.get_json()
-    
-    # Extract payment method and total amount from the request
-    payment_method = data.get('payment_method')
-    total_amount = data.get('total_amount')
-
-    # You may also extract the selected address_id or basket items here
-    # address_id = data.get('address_id')
-    # basket_items = get_basket_items_for_user(current_user.id)  # Example function to get items
-
-    # Process the payment (here you can add logic for actual payment processing)
-    # You can integrate with payment gateways or just mock the payment confirmation
-
-    # After successful payment, place the order in the database
-    try:
-        # Place the order in the database (You need to update the order table or create a new order record)
-        new_order = Order(
-            user_id=current_user.id,  # The user who is placing the order
-            payment_method=payment_method,
-            total_amount=total_amount,
-            # Add more fields as needed (address_id, basket_items, etc.)
-        )
-        db.session.add(new_order)
-        db.session.commit()
-
-        # Update the basket items as part of the order
-        # You might need to create a new entry in an order_items table to track items ordered
-        # Example: OrderItem(order_id=new_order.id, item_id=item.id, quantity=item.quantity)
-
-        # Mark the basket as empty after order placement
-        # Basket.query.filter_by(user_id=current_user.id).delete()  # Clear the basket after placing the order
-
-        return jsonify({"success": True, "message": "Order placed successfully!"})
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error placing order: {e}")
-        return jsonify({"success": False, "message": "Error placing the order."})
 
 if __name__ == '__main__':
     with app.app_context():
