@@ -50,24 +50,20 @@ class Item(db.Model):
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
 
+from datetime import datetime  # Add this import
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
-    quantity = db.Column(Numeric(10, 2), nullable=False)
-    address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)  # Address relationship
-    order_date = db.Column(db.DateTime, default=datetime.utcnow)
+    quantity = db.Column(db.Integer, nullable=False)
+    address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)
+    order_date = db.Column(db.DateTime, default=datetime.utcnow)  # Now works because datetime is imported
 
-    item = db.relationship('Item', backref='orders')
+    # Define relationships if needed
     user = db.relationship('User', backref='orders')
+    item = db.relationship('Item', backref='orders')
     address = db.relationship('Address', backref='orders')
-    def __init__(self, item_id, quantity, user_id, address_id, order_date=None):
-        self.item_id = item_id
-        self.quantity = quantity
-        self.user_id = user_id
-        self.address_id = address_id
-        if order_date:
-            self.order_date = order_date
 
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
