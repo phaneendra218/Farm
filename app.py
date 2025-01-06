@@ -44,6 +44,7 @@ class User(db.Model):
     phone_number = db.Column(db.String(15), nullable=False)
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
     baskets = db.relationship('Basket', back_populates='user')
+    orders = db.relationship('Order', back_populates='user')  # Add this line
 
 # Item Model
 class Item(db.Model):
