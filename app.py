@@ -6,6 +6,7 @@ from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.types import Numeric
 from decimal import Decimal
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -56,6 +57,8 @@ class Order(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=True)
+    total_price = db.Column(db.Numeric(10, 2), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
