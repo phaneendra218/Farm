@@ -56,7 +56,7 @@ class Order(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=True)
-    
+
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -479,7 +479,7 @@ def complete_order():
             user_id=user.id,
             item_id=basket_item.item_id,
             quantity=basket_item.quantity,
-            address_id=address.id
+            # address_id=address.id
         )
         db.session.add(order)
 
