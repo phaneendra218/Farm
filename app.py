@@ -53,7 +53,7 @@ class Item(db.Model):
     image_path = db.Column(db.String(255), nullable=True)
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
-    orders = db.relationship('Order', backref='ordered_item', lazy=True)  # Renamed backref to 'ordered_item'
+    orders = db.relationship('Order', backref='item', lazy=True)  # Renamed backref to 'ordered_item'
     basket_items = db.relationship('Basket', backref='item_in_basket', lazy=True)  # Unique backref for Basket
 
 # Order Model
@@ -67,7 +67,7 @@ class Order(db.Model):
 
     # Define relationships if needed
     user = db.relationship('User', backref='orders')
-    item = db.relationship('Item', backref='item_orders')  # Ensure 'item_orders' is unique here
+    item = db.relationship('Item', backref='orders')  # Ensure 'item_orders' is unique here
     address = db.relationship('Address', backref='orders')
 
 # Basket Model
