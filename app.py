@@ -455,7 +455,12 @@ def complete_order():
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'User not logged in'}), 401
     
-    user = User.query.get(session['user_id'])
+    # Get user using Session.get()
+    user_id = session['user_id']
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found.'}), 404
+
     data = request.get_json()
     address_id = data.get('address_id')
     payment_option = data.get('payment_option')
@@ -470,18 +475,23 @@ def complete_order():
     if not basket_items:
         return jsonify({'success': False, 'message': 'No items in the basket.'}), 400
 
-    # Create Orders
-    total_price = 0.0
+    # Calculate Total Price and Create Orders
+    total_price = Decimal(0.0)
     for basket_item in basket_items:
-        total_price = Decimal(total_price)
-        total_price += Decimal(basket_item.item.price) * basket_item.quantity
-        order_total = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
+        item = basket_item.item  # Access the related Item object via the relationship
+        if not item:
+            return jsonify({'success': False, 'message': f'Item not found for basket item ID {basket_item.id}.'}), 400
+
+        item_total = Decimal(item.price) * Decimal(basket_item.quantity)
+        total_price += item_total
+
+        # Create and add an Order
         order = Order(
             user_id=user.id,
             item_id=basket_item.item_id,
             quantity=basket_item.quantity,
             address_id=address.id,
-            total_price=order_total
+            total_price=item_total
         )
         db.session.add(order)
 
@@ -491,7 +501,7 @@ def complete_order():
     # Commit Changes
     db.session.commit()
 
-    return jsonify({'success': True, 'message': 'Order placed successfully!', 'total_price': total_price})
+    return jsonify({'success': True, 'message': 'Order placed successfully!', 'total_price': str(total_price)})
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
