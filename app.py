@@ -468,8 +468,10 @@ def complete_order():
     data = request.get_json()
     address_id = data.get('address_id')
     payment_option = data.get('payment_option')
-    delivery_address = data.get('delivery_address')
-
+    # delivery_address = data.get('delivery_address')
+    # delivery_address = data.get('address_id')
+    # address_id = data.get('address_id')
+    delivery_address = Address.query.get(address_id)
     # Validate Address
     address = Address.query.filter_by(id=address_id, user_id=user.id).first()
     if not address:
