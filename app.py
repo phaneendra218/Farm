@@ -46,16 +46,15 @@ class User(db.Model):
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
 
 # Item Model
+# Item Model
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_path = db.Column(db.String(255), nullable=True)
-    unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column for unit (e.g., Kg, lb)
-    is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility (hidden or not)
-    
-    # Relationships
-    orders = db.relationship('Order', backref='item', lazy=True)  # Renamed backref to 'item'
+    unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
+    is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
+    orders = db.relationship('Order', backref='ordered_item', lazy=True)  # Updated backref name to 'ordered_item'
     basket_items = db.relationship('Basket', backref='item_in_basket', lazy=True)  # Unique backref for Basket
 
 # Order Model
