@@ -6,7 +6,6 @@ from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.types import Numeric
 from decimal import Decimal
-from datetime import datetime  # Add this import
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -26,7 +25,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 db = SQLAlchemy(app)
 
-# Address Model
+# Models
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)  # Ensure cascading delete
@@ -35,7 +34,6 @@ class Address(db.Model):
     is_default = db.Column(db.Boolean, default=False)
     user = db.relationship('User', back_populates='addresses')
 
-# User Model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -43,10 +41,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
     phone_number = db.Column(db.String(15), nullable=False)
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
-    baskets = db.relationship('Basket', back_populates='user')
-    orders = db.relationship('Order', back_populates='user')  # Add this line
 
-# Item Model
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
@@ -54,32 +49,22 @@ class Item(db.Model):
     image_path = db.Column(db.String(255), nullable=True)
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
-    orders = db.relationship('Order', back_populates='item')
-    basket_items = db.relationship('Basket', back_populates='item')
 
-# Order Model
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)
-    order_date = db.Column(db.DateTime, default=datetime.utcnow)  # Date when the order was placed
+    quantity = db.Column(Numeric(10, 2), nullable=False)
 
-    # Relationships
-    user = db.relationship('User', back_populates='orders')
-    item = db.relationship('Item', back_populates='orders')
-    address = db.relationship('Address', back_populates='orders')
-
-# Basket Model
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
 
-    user = db.relationship('User', back_populates='baskets')
-    item = db.relationship('Item', back_populates='basket_items')
+    user = db.relationship('User', backref='baskets')
+    item = db.relationship('Item', backref='baskets')
+    item = db.relationship('Item', backref='orders')
 
 # Routes
 @app.route('/')
@@ -485,18 +470,15 @@ def complete_order():
         return jsonify({'success': False, 'message': 'No items in the basket.'}), 400
 
     # Create Orders
-    total_price = Decimal('0.00')  # Initialize total_price as a Decimal
+    total_price = 0.0
     for basket_item in basket_items:
-        # Ensure the price is treated as Decimal for proper multiplication
-        item_price = Decimal(str(basket_item.item.price))
-        total_price += item_price * basket_item.quantity
-
-        # Create the order for each item
+        total_price = Decimal(total_price)
+        total_price += Decimal(basket_item.item.price) * basket_item.quantity
         order = Order(
             user_id=user.id,
             item_id=basket_item.item_id,
             quantity=basket_item.quantity,
-            address_id=address.id  # Correctly associate the address with the order
+            address_id=address.id
         )
         db.session.add(order)
 
