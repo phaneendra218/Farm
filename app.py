@@ -51,9 +51,11 @@ class Item(db.Model):
     name = db.Column(db.String(120), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_path = db.Column(db.String(255), nullable=True)
-    unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
-    is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
-    orders = db.relationship('Order', backref='item', lazy=True)  # Renamed backref to 'ordered_item'
+    unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column for unit (e.g., Kg, lb)
+    is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility (hidden or not)
+    
+    # Relationships
+    orders = db.relationship('Order', backref='item', lazy=True)  # Renamed backref to 'item'
     basket_items = db.relationship('Basket', backref='item_in_basket', lazy=True)  # Unique backref for Basket
 
 # Order Model
@@ -63,11 +65,11 @@ class Order(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)
-    order_date = db.Column(db.DateTime, default=datetime.utcnow)  # Now works because datetime is imported
+    order_date = db.Column(db.DateTime, default=datetime.utcnow)  # Date when the order was placed
 
-    # Define relationships if needed
+    # Relationships
     user = db.relationship('User', backref='orders')
-    item = db.relationship('Item', backref='orders')  # Ensure 'item_orders' is unique here
+    item = db.relationship('Item', backref='orders')  # Relationship to Item (renamed backref is 'orders')
     address = db.relationship('Address', backref='orders')
 
 # Basket Model
@@ -78,7 +80,7 @@ class Basket(db.Model):
     quantity = db.Column(Numeric(10, 2), nullable=False)
 
     user = db.relationship('User', backref='baskets')
-    item = db.relationship('Item', backref='basket_items', lazy=True)  # Unique backref here
+    item_in_basket = db.relationship('Item', backref='basket_items', lazy=True)  # Unique backref here
 
 # Routes
 @app.route('/')
