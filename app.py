@@ -55,6 +55,19 @@ class Order(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
+    address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)  # Address relationship
+    order_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    item = db.relationship('Item', backref='orders')
+    user = db.relationship('User', backref='orders')
+    address = db.relationship('Address', backref='orders')
+    def __init__(self, item_id, quantity, user_id, address_id, order_date=None):
+        self.item_id = item_id
+        self.quantity = quantity
+        self.user_id = user_id
+        self.address_id = address_id
+        if order_date:
+            self.order_date = order_date
 
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -470,15 +483,18 @@ def complete_order():
         return jsonify({'success': False, 'message': 'No items in the basket.'}), 400
 
     # Create Orders
-    total_price = 0.0
+    total_price = Decimal('0.00')  # Initialize total_price as a Decimal
     for basket_item in basket_items:
-        total_price = Decimal(total_price)
-        total_price += Decimal(basket_item.item.price) * basket_item.quantity
+        # Ensure the price is treated as Decimal for proper multiplication
+        item_price = Decimal(str(basket_item.item.price))
+        total_price += item_price * basket_item.quantity
+
+        # Create the order for each item
         order = Order(
             user_id=user.id,
             item_id=basket_item.item_id,
             quantity=basket_item.quantity,
-            address_id=address.id
+            address_id=address.id  # Correctly associate the address with the order
         )
         db.session.add(order)
 
