@@ -46,7 +46,6 @@ class User(db.Model):
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
 
 # Item Model
-# Item Model
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
@@ -55,7 +54,7 @@ class Item(db.Model):
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
     orders = db.relationship('Order', backref='ordered_item', lazy=True)  # Updated backref name to 'ordered_item'
-    basket_items = db.relationship('Basket', backref='item_in_basket', lazy=True)  # Unique backref for Basket
+    basket_items = db.relationship('Basket', backref='item_in_basket_relationship', lazy=True)  # Updated backref to 'item_in_basket_relationship'
 
 # Order Model
 class Order(db.Model):
@@ -79,7 +78,7 @@ class Basket(db.Model):
     quantity = db.Column(Numeric(10, 2), nullable=False)
 
     user = db.relationship('User', backref='baskets')
-    item_in_basket = db.relationship('Item', backref='basket_items', lazy=True)  # Unique backref here
+    items = db.relationship('Item', backref='item_in_basket_relationship', lazy=True)
 
 # Routes
 @app.route('/')
