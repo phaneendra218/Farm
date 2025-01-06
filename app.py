@@ -6,6 +6,7 @@ from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.types import Numeric
 from decimal import Decimal
+from datetime import datetime  # Add this import
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -49,8 +50,7 @@ class Item(db.Model):
     image_path = db.Column(db.String(255), nullable=True)
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
-
-from datetime import datetime  # Add this import
+    orders = db.relationship('Order', backref='item', lazy=True)
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -74,6 +74,7 @@ class Basket(db.Model):
     user = db.relationship('User', backref='baskets')
     item = db.relationship('Item', backref='baskets')
     item = db.relationship('Item', backref='orders')
+    item = db.relationship('Item', backref='basket_items')
 
 # Routes
 @app.route('/')
