@@ -67,7 +67,7 @@ class Order(db.Model):
 
     # Define relationships if needed
     user = db.relationship('User', backref='orders')
-    item = db.relationship('Item', backref='orders')  # Ensure 'orders' is unique here
+    item = db.relationship('Item', backref='item_orders')  # Ensure 'item_orders' is unique here
     address = db.relationship('Address', backref='orders')
 
 # Basket Model
