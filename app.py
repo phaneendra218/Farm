@@ -396,11 +396,12 @@ def checkout():
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
-    
+
     if request.method == 'POST':
         address_id = request.form.get('address_id')
         payment_option = request.form.get('payment_option')
 
+        # Validate address selection
         if not address_id:
             flash('Please select a delivery address', 'danger')
             return redirect(url_for('checkout'))
@@ -408,6 +409,11 @@ def checkout():
         address = Address.query.get(address_id)
         if not address or address.user_id != user.id:
             flash('Invalid address selected', 'danger')
+            return redirect(url_for('checkout'))
+
+        # Validate payment option selection
+        if not payment_option:
+            flash('Please select a payment method', 'danger')
             return redirect(url_for('checkout'))
 
         basket_items = Basket.query.filter_by(user_id=user.id).all()
@@ -425,7 +431,9 @@ def checkout():
                 user_id=user.id,
                 item_id=basket_item.item_id,
                 quantity=basket_item.quantity,
-                order_id=order_id
+                order_id=order_id,
+                address_id=address_id,
+                payment_method=payment_option
             )
             db.session.add(order)
         
@@ -436,12 +444,22 @@ def checkout():
         flash(f'Thanks for your order! Your order ID is {order_id}. Find your orders in "My Orders".', 'success')
         return redirect(url_for('orders'))
 
+    # Fetch user addresses
     addresses = Address.query.filter_by(user_id=user.id).all()
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
-    
-    return render_template('checkout.html', addresses=addresses)
+
+    # Fetch basket items for order summary
+    basket_items = Basket.query.filter_by(user_id=user.id).all()
+    total_price = sum(float(item.item.price) * float(item.quantity) for item in basket_items)
+
+    return render_template(
+        'checkout.html',
+        addresses=addresses,
+        basket_items=basket_items,
+        total_price=total_price
+    )
 
 @app.route('/get_basket_items')
 def get_basket_items():
@@ -687,6 +705,40 @@ def edit_profile():
     # Pass 'enumerate' explicitly to the template context
     return render_template('edit_profile.html', user=user, enumerate=enumerate)
 
+@app.route('/place_order', methods=['POST'])
+def place_order():
+    try:
+        # Fetch user information
+        user = User.query.get(session['user_id'])
+        if not user:
+            return "User not found", 404
+
+        # Process the order (assumes basket and address_id from request)
+        basket_items = get_basket_items(user.id)  # Example function
+        address_id = request.form.get('address_id')
+        address = Address.query.get(address_id)
+
+        if not basket_items or not address:
+            return "Invalid basket or address", 400
+
+        # Place the order (example logic)
+        for item in basket_items:
+            order = Order(
+                user_id=user.id,
+                item_id=item['id'],
+                quantity=item['quantity'],
+                delivery_address=address.address,
+                order_date=datetime.now()
+            )
+            db.session.add(order)
+        
+        db.session.commit()
+        return redirect(url_for('orders'))
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error placing order: {e}")
+        return "Something went wrong. Please try again.", 500
 
 # @app.route('/delete_address/<int:address_id>', methods=['POST'])
 # def delete_address(address_id):

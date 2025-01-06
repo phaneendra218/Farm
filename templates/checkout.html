@@ -7,35 +7,35 @@
 <div id="delivery-address-section" class="address-box">
   <h2>Delivery Address</h2>
   {% if addresses %}
-    <div class="address-cards-container">
-      {% for address in addresses %}
-        <div class="address-card">
-          <input 
-            type="radio" 
-            name="address_id" 
-            value="{{ address.id }}" 
-            {% if address.is_default %} checked {% endif %}
-            id="address-{{ address.id }}"
-            class="address-radio"
-          >
-          <label for="address-{{ address.id }}" class="address-label">
-            <div class="address-info">
-              <p class="address-type">{{ address.address_type }}</p>
-              <p class="address-text">{{ address.address }}</p>
-            </div>
-            {% if address.is_default %}
-              <span class="default-address">Default</span>
-            {% endif %}
-          </label>
-        </div>
-      {% endfor %}
-    </div>
-    <div class="address-buttons">
-      <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
-      <form action="{{ url_for('profile') }}" method="get">
-        <button type="submit" class="btn-secondary mt-3">+ Add New Address</button>
+    <form action="{{ url_for('checkout') }}" method="POST" id="address-selection-form">
+      <div class="address-cards-container">
+        {% for address in addresses %}
+          <div class="address-card">
+            <input 
+              type="radio" 
+              name="address_id" 
+              value="{{ address.id }}" 
+              {% if address.is_default %} checked {% endif %}
+              id="address-{{ address.id }}"
+              class="address-radio"
+            >
+            <label for="address-{{ address.id }}" class="address-label">
+              <div class="address-info">
+                <p class="address-type">{{ address.address_type }}</p>
+                <p class="address-text">{{ address.address }}</p>
+              </div>
+              {% if address.is_default %}
+                <span class="default-address">Default</span>
+              {% endif %}
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="address-buttons">
+        <button type="submit" class="btn btn-primary">Confirm Address</button>
+        <a href="{{ url_for('profile') }}" class="btn btn-secondary">+ Add New Address</a>
+      </div>
     </form>
-    </div>
   {% else %}
     <p>No addresses found. Please add an address to proceed.</p>
     <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
@@ -53,7 +53,10 @@
   <div id="total-price">
     <p><strong>Total: ₹{{ total_price }}</strong></p>
   </div>
-  <button id="place-order-button" class="btn btn-primary">Place Order</button>
+  <form action="/place_order" method="POST">
+    <input type="hidden" name="address_id" value="{{ selected_address_id }}">
+    <button type="submit" class="btn btn-primary">Place Order</button>
+  </form>
 </div>
 
 <!-- Payment Options Section (hidden initially) -->
@@ -78,10 +81,10 @@
     background-color: #e6b514;
     color: white;
     border: none;
-    }
+  }
   .address-box .btn-secondary:hover {
     background-color: #c5840b; 
-   }
+  }
   .address-box, .summary-box {
     border: 1px solid #ccc;
     padding: 20px;
@@ -154,119 +157,15 @@
 </style>
 
 <script>
-  // Manage address selection, order summary, and payment options
-  document.getElementById('confirm-address-button')?.addEventListener('click', () => {
-    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
-    if (!selectedAddress) {
-      alert('Please select a delivery address.');
-      return;
-    }    
-    const addressId = selectedAddress.value;    
-    // Fetch basket items and calculate total price via AJAX
-    fetch(`/get_basket_items?address_id=${addressId}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const itemsSummaryDiv = document.getElementById('items-summary');
-          const totalPriceDiv = document.getElementById('total-price');          
-          itemsSummaryDiv.innerHTML = '';
-          let totalPrice = 0;
-          data.items.forEach(item => {
-            const itemTotal = item.price * item.quantity;
-            totalPrice += itemTotal;
-            itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)} /${item.unit}</p>`;
-          });
-          totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;          
-          // Display the order summary section
-          document.getElementById('order-summary-section').classList.remove('hidden');
-          window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
-          
-          // Store total price for payment options
-          document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
-        } else {
-          alert('Error fetching order summary.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Something went wrong. Please try again.');
-      });
-  });
-  document.getElementById('place-order-button')?.addEventListener('click', () => {
-    // Reveal the Payment Options section
-    document.getElementById('payment-options-section').classList.remove('hidden');
-    window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
-  });
   document.querySelectorAll('.address-radio').forEach(radio => {
     radio.addEventListener('change', () => {
-      // Remove 'selected' class from all address cards
       document.querySelectorAll('.address-card').forEach(card => {
         card.classList.remove('selected');
       });
-      // Add 'selected' class to the currently checked radio button's parent
       const selectedCard = radio.closest('.address-card');
       selectedCard.classList.add('selected');
     });
   });
-  // Function to update selected class for the currently checked address
-  const updateSelectedAddress = () => {
-    document.querySelectorAll('.address-card').forEach(card => {
-      card.classList.remove('selected'); // Remove the 'selected' class from all cards
-    });
-    const selectedRadio = document.querySelector('input[name="address_id"]:checked'); // Find the checked radio
-    if (selectedRadio) {
-      const selectedCard = selectedRadio.closest('.address-card'); // Find the corresponding card
-      selectedCard.classList.add('selected'); // Add the 'selected' class
-    }
-  };
-  // Add event listeners to handle address selection changes
-  document.querySelectorAll('.address-radio').forEach(radio => {
-    radio.addEventListener('change', updateSelectedAddress);
-  });
-  // Run the logic once on page load for the default selection
-  document.addEventListener('DOMContentLoaded', () => {
-    updateSelectedAddress();
-  });
-  document.getElementById('confirm-payment-button')?.addEventListener('click', () => {
-    const paymentOption = document.querySelector('input[name="payment_option"]:checked');
-    if (!paymentOption) {
-        alert('Please select a payment option.');
-        return;
-    }
-    
-    const paymentMethod = paymentOption.value;
-    const payableAmount = document.getElementById('payable-amount-value').textContent;
-
-    // You can add more data to send if required (like address_id, basket items, etc.)
-
-    // Make an AJAX request to place the order
-    fetch('/place_order', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            payment_method: paymentMethod,
-            total_amount: payableAmount,
-            // If you need the selected address or basket items, include them here
-            // address_id: selectedAddressId,
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Order placed successfully!');
-            window.location.href = '/orders';  // Redirect to the orders page or any other page after order success
-        } else {
-            alert('Error placing the order. Please try again.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Something went wrong. Please try again.');
-    });
-});
-
 </script>
 
 {% endblock %}
