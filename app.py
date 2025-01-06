@@ -56,7 +56,7 @@ class Order(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=True)
-
+    
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -475,11 +475,13 @@ def complete_order():
     for basket_item in basket_items:
         total_price = Decimal(total_price)
         total_price += Decimal(basket_item.item.price) * basket_item.quantity
+        order_total = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
         order = Order(
             user_id=user.id,
             item_id=basket_item.item_id,
             quantity=basket_item.quantity,
-            # address_id=address.id
+            address_id=address.id,
+            total_price=order_total
         )
         db.session.add(order)
 
