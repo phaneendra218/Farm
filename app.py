@@ -467,6 +467,7 @@ def complete_order():
     data = request.get_json()
     address_id = data.get('address_id')
     payment_option = data.get('payment_option')
+    delivery_address = data.get('delivery_address')
 
     # Validate Address
     address = Address.query.filter_by(id=address_id, user_id=user.id).first()
@@ -494,6 +495,7 @@ def complete_order():
             item_id=basket_item.item_id,
             quantity=basket_item.quantity,
             address_id=address.id,
+            delivery_address=delivery_address,
             total_price=item_total
         )
         db.session.add(order)
