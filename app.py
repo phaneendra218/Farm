@@ -26,7 +26,6 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 db = SQLAlchemy(app)
 
-# Models
 # Address Model
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,6 +43,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False, server_default='false')  # Default for admin flag
     phone_number = db.Column(db.String(15), nullable=False)
     addresses = db.relationship('Address', back_populates='user', cascade='all, delete-orphan')
+    baskets = db.relationship('Basket', back_populates='user')
 
 # Item Model
 class Item(db.Model):
@@ -53,8 +53,8 @@ class Item(db.Model):
     image_path = db.Column(db.String(255), nullable=True)
     unit = db.Column(db.String(50), nullable=False, default="Kg")  # New column
     is_hidden = db.Column(db.Boolean, default=False)  # New column to track visibility
-    orders = db.relationship('Order', backref='ordered_item', lazy=True)  # Updated backref name to 'ordered_item'
-    basket_items = db.relationship('Basket', backref='item_in_basket_relationship', lazy=True)  # Updated backref to 'item_in_basket_relationship'
+    orders = db.relationship('Order', back_populates='item')
+    basket_items = db.relationship('Basket', back_populates='item')
 
 # Order Model
 class Order(db.Model):
@@ -66,9 +66,9 @@ class Order(db.Model):
     order_date = db.Column(db.DateTime, default=datetime.utcnow)  # Date when the order was placed
 
     # Relationships
-    user = db.relationship('User', backref='orders')
-    item = db.relationship('Item', backref='order_items')
-    address = db.relationship('Address', backref='orders')
+    user = db.relationship('User', back_populates='orders')
+    item = db.relationship('Item', back_populates='orders')
+    address = db.relationship('Address', back_populates='orders')
 
 # Basket Model
 class Basket(db.Model):
@@ -77,8 +77,8 @@ class Basket(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
 
-    user = db.relationship('User', backref='baskets')
-    items = db.relationship('Item', backref='item_in_basket_relationship', lazy=True)
+    user = db.relationship('User', back_populates='baskets')
+    item = db.relationship('Item', back_populates='basket_items')
 
 # Routes
 @app.route('/')
