@@ -420,7 +420,7 @@ button:hover {
 }
 
 .order-summary:hover {
-    background-color: #f8f9fa; /* Highlight the summary when hovered */
+    background-color: #eedb73; /* Highlight the summary when hovered */
     border-radius: 8px;
 }
 
@@ -428,7 +428,7 @@ button:hover {
 .order-details {
     transition: all 0.3s ease-in-out;
     padding: 10px;
-    background-color: #f8f9fa;
+    background-color: #dbbe17;
     border-radius: 8px;
 }
 
