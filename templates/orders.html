@@ -1,24 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>My Orders</h1>
+<h1 class="text-center my-4">My Orders</h1>
 
 {% if orders %}
-    <div class="row">
+    <div class="orders-container">
         {% for order in orders %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-success text-white">
-                        <h5>Order ID: {{ order.id }}</h5>
-                    </div>
-                    <div class="card-body">
+            <div class="order-card">
+                <div class="order-card-header">
+                    <h5>Order ID: {{ order.id }}</h5>
+                    <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
+                </div>
+                <div class="order-card-body">
+                    <div class="order-item">
                         <p><strong>Item:</strong> {{ order.item_name }}</p>
                         <p><strong>Quantity:</strong> {{ order.quantity }}</p>
-                        <p><strong>Price (₹):</strong> ₹{{ order.item_price | round(2) }}</p>
-                        <p><strong>Total (₹):</strong> ₹{{ order.total_price | round(2) }}</p>
-                        <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+                        <p><strong>Price (₹):</strong> ₹{{ order.item.price | round(2) }}</p>
+                        <p><strong>Total (₹):</strong> ₹{{ (order.item.price * order.quantity) | round(2) }}</p>
+                    </div>
+                    <div class="order-address">
                         <p><strong>Delivery Address:</strong></p>
                         <p>{{ order.delivery_address }}</p>
+                    </div>
+                    <div class="order-payment">
                         <p><strong>Payment Method:</strong> {{ order.payment_method | capitalize }}</p>
                     </div>
                 </div>
@@ -26,7 +30,103 @@
         {% endfor %}
     </div>
 {% else %}
-    <p>No orders found. Start shopping now!</p>
-    <a href="{{ url_for('items') }}" class="btn btn-primary">View Items</a>
+    <p class="text-center">No orders found. Start shopping now!</p>
+    <div class="text-center">
+        <a href="{{ url_for('items') }}" class="btn btn-primary">View Items</a>
+    </div>
 {% endif %}
+
 {% endblock %}
+
+<style>
+    /* General Styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        color: #333;
+        text-align: center;
+    }
+
+    .orders-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .order-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .order-card-header {
+        background-color: #28a745;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .order-card-body {
+        padding: 10px;
+    }
+
+    .order-item, .order-address, .order-payment {
+        margin-bottom: 15px;
+    }
+
+    .order-item p, .order-address p, .order-payment p {
+        margin: 5px 0;
+        color: #555;
+    }
+
+    .order-item p strong, .order-address p strong, .order-payment p strong {
+        color: #333;
+    }
+
+    .order-item p {
+        font-weight: bold;
+    }
+
+    .order-address p {
+        font-style: italic;
+        color: #777;
+    }
+
+    .order-payment p {
+        color: #333;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .orders-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .order-card {
+            max-width: 90%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .order-card {
+            max-width: 100%;
+        }
+    }
+</style>
