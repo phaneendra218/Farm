@@ -793,7 +793,7 @@ def orders():
             "item_name": order.item.name,  # Access item relationship
             "quantity": order.quantity,
             "price": order.item.price,    # Fetching price for better UI display
-            "total_price": round(order.item.price * order.quantity, 2),  # Calculating total dynamically
+            "total_price": round(float(order.item.price) * float(order.quantity), 2),  # Calculating total dynamically
             "delivery_address": order.delivery_address,
             "payment_method": order.payment_method  # Include payment method for better UX
         }
