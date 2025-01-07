@@ -1,31 +1,41 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container my-4">
-    <h1 class="mb-4 text-center">My Orders</h1>
+<div class="container my-5">
+    <h1 class="mb-4 text-center text-primary font-weight-bold">My Orders</h1>
 
     {% if orders %}
         <div class="row">
             {% for order in orders %}
                 <div class="col-lg-6 col-md-12 mb-4">
-                    <!-- Card container that will expand -->
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <div class="card shadow-lg rounded-lg border-0">
+                        <div class="card-header bg-gradient text-white d-flex justify-content-between align-items-center">
                             <strong>Order ID: {{ order.order_id }}</strong>
-                            <span class="badge bg-light text-primary"> (₹{{ order.total_price | round(2) }})</span>
+                            <span class="badge bg-light text-primary">₹{{ order.total_price | round(2) }}</span>
                         </div>
                         <div class="card-body">
-                            <div class="order-summary" onclick="toggleDetails('{{ order.order_id }}')">
-                                <p><strong>Item:</strong> {{ order.item_name }}</p>
-                                <p><strong>Price (₹):</strong> {{ order.item_price | round(2) }}</p>
+                            <!-- Order summary that will trigger the details toggle -->
+                            <div class="order-summary p-3" style="cursor: pointer;" onclick="toggleDetails('{{ order.order_id }}')">
+                                <h5 class="text-dark mb-2">{{ order.item_name }}</h5>
+                                <p class="text-muted"><strong>Price:</strong> ₹{{ order.item_price | round(2) }}</p>
+                                <i class="bi bi-chevron-down text-primary"></i> <span class="text-primary">Click to view details</span>
                             </div>
+
                             <!-- Hidden details section -->
                             <div id="details-{{ order.order_id }}" class="order-details" style="display: none;">
-                                <p><strong>Quantity:</strong> {{ order.quantity }}</p>
-                                <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
-                                <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
-                                <p><strong>Payment Method:</strong> {{ order.payment_method | capitalize }}</p>
+                                <div class="details-content p-3 mt-3">
+                                    <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+                                    <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
+                                    <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
+                                    <p><strong>Payment Method:</strong> {{ order.payment_method | capitalize }}</p>
+                                </div>
                             </div>
+                        </div>
+                        <!-- Action button -->
+                        <div class="card-footer text-center">
+                            <a href="{{ url_for('order_details', order_id=order.order_id) }}" class="btn btn-primary btn-sm">
+                                View Full Details
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -37,7 +47,7 @@
                 <h2 class="mb-3">
                     <i class="bi bi-cart-x"></i> Oops! No Orders Found!
                 </h2>
-                <p class="mb-4">We are exciting for your first order. Please order your favorite items now. Happy shopping!</p>
+                <p class="mb-4">We're excited for your first order! Start shopping now and place your first order.</p>
                 <form action="{{ url_for('items') }}" method="get">
                     <button type="submit" class="btn btn-secondary mt-3">Add Items</button>
                 </form>
@@ -50,9 +60,10 @@
 <script>
     function toggleDetails(orderId) {
         var details = document.getElementById('details-' + orderId);
-        // Toggle visibility of the details section
+        // Toggle visibility of the details section with a smooth transition
         if (details.style.display === 'none') {
             details.style.display = 'block';
+            details.classList.add('animated', 'fadeIn');
         } else {
             details.style.display = 'none';
         }
