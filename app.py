@@ -468,6 +468,7 @@ def complete_order():
     data = request.get_json()
     address_id = data.get('address_id')
     payment_option = data.get('payment_option')
+    payment_method = data.get('payment_method')
     # delivery_address = data.get('delivery_address')
     # delivery_address = data.get('address_id')
     # address_id = data.get('address_id')
