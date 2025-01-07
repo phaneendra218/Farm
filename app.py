@@ -60,7 +60,7 @@ class Order(db.Model):
     total_price = db.Column(db.Numeric(10, 2), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     delivery_address = db.Column(db.String(255), nullable=False)
-    payment_option = db.Column(db.String(50), nullable=False)
+    payment_method = db.Column(db.String(50), nullable=False)
 
     
 class Basket(db.Model):
@@ -462,8 +462,9 @@ def complete_order():
         return jsonify({'success': False, 'message': 'User not logged in'}), 401
     
     # Get user using Session.get()
-    user_id = session['user_id']
-    user = db.session.get(User, user_id)
+    # user_id = session['user_id']
+    # user = db.session.get(User, user_id)
+    user = db.session.get(User, session['user_id'])
     if not user:
         return jsonify({'success': False, 'message': 'User not found.'}), 404
 
@@ -474,7 +475,8 @@ def complete_order():
     # delivery_address = data.get('delivery_address')
     # delivery_address = data.get('address_id')
     # address_id = data.get('address_id')
-    delivery_address = Address.query.get(address_id)
+    # delivery_address = Address.query.get(address_id) working
+    delivery_address = db.session.get(Address, address_id)
     # Validate Address
     address = Address.query.filter_by(id=address_id, user_id=user.id).first()
     if not address:
