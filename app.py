@@ -564,6 +564,36 @@ def complete_order():
 
     return jsonify({'success': True, 'message': 'Order placed successfully!', 'total_price': str(total_price)})
 
+@app.route('/orders', methods=['GET'])
+def orders():
+    if 'user_id' not in session:
+        flash('Please login to view your orders', 'danger')
+        return redirect(url_for('login'))
+    
+    user = User.query.filter_by(id=session['user_id']).first()
+    if not user:
+        return {"error": "User not found"}, 404
+
+    # Use class-bound attributes with joinedload
+    user_orders = Order.query.options(joinedload(Order.item)).filter_by(user_id=user.id).all()
+
+    # Process orders for the response
+    orders_list = [
+        {
+            "order_id": order.id,
+            "item_name": order.item.name,  # Access item relationship
+            "quantity": order.quantity,
+            "item_price": float(order.item.price),
+            "total_price": round(float(order.item.price) * float(order.quantity), 2),
+            "delivery_address": order.delivery_address,
+            "payment_method": order.payment_method,
+            "created_at": order.created_at
+        }
+        for order in user_orders
+    ]
+
+    return render_template('orders.html', orders=orders_list)
+
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
     if 'user_id' not in session or not session.get('is_admin'):
@@ -813,36 +843,6 @@ def delete_address_by_id():
         return jsonify({'message': 'Address deleted successfully!'}), 200
 
     return jsonify({'message': 'Address not found or unauthorized'}), 404
-
-@app.route('/orders', methods=['GET'])
-def orders():
-    if 'user_id' not in session:
-        flash('Please login to view your orders', 'danger')
-        return redirect(url_for('login'))
-    
-    user = User.query.filter_by(id=session['user_id']).first()
-    if not user:
-        return {"error": "User not found"}, 404
-
-    # Use class-bound attributes with joinedload
-    user_orders = Order.query.options(joinedload(Order.item)).filter_by(user_id=user.id).all()
-
-    # Process orders for the response
-    orders_list = [
-        {
-            "order_id": order.id,
-            "item_name": order.item.name,  # Access item relationship
-            "quantity": order.quantity,
-            "item_price": float(order.item.price),
-            "total_price": round(float(order.item.price) * float(order.quantity), 2),
-            "delivery_address": order.delivery_address,
-            "payment_method": order.payment_method,
-            "created_at": order.created_at
-        }
-        for order in user_orders
-    ]
-
-    return render_template('orders.html', orders=orders_list)
 
 if __name__ == '__main__':
     with app.app_context():
