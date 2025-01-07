@@ -405,55 +405,70 @@ button:hover {
     }
 }
 
-/* Enhancements for Order Card */
+/* Order Card Styles */
 .card {
-    transition: margin-bottom 0.3s ease; /* Smooth transition for margin adjustment */
+    border: 1px solid #ddd; /* Light border around each order card */
+    border-radius: 10px; /* Rounded corners for the card */
+    margin-bottom: 20px; /* Space between each order card */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+    background-color: #ffffff;
 }
 
+/* Hover Effect for Order Card */
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+    border-color: #007bff; /* Change border color to blue */
+}
+
+/* Card Body */
 .card-body {
-    padding: 15px;
+    padding: 20px;
 }
 
+/* Order Summary Section */
 .order-summary {
     cursor: pointer;
     transition: background-color 0.3s ease;
+    border-radius: 8px;
 }
 
 .order-summary:hover {
-    background-color: #eedb73; /* Highlight the summary when hovered */
-    border-radius: 8px;
+    background-color: #f1f1f1; /* Subtle hover effect for summary */
 }
 
-/* Smooth transitions for order details */
+/* Order Details Section */
 .order-details {
-    transition: all 0.3s ease-in-out;
+    display: none; /* Hidden by default */
     padding: 10px;
-    background-color: #dbbe17;
+    background-color: #f8f9fa;
     border-radius: 8px;
+    margin-top: 10px;
+    transition: all 0.3s ease;
 }
 
-/* Add animation class to smoothly show details */
-.animated {
-    animation-duration: 0.5s;
+/* Card Header */
+.card-header {
+    background-color: #007bff; /* Blue background for the header */
+    color: white;
+    font-weight: bold;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
-/* Media Queries for Responsive Design */
+/* Spacing Between Order Containers */
+.card {
+    margin-bottom: 30px; /* Ensure there’s space between the order cards */
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
     .card-body {
-        padding: 10px;
-    }
-
-    .order-summary {
-        padding: 10px;
+        padding: 15px;
     }
 }
 
 @media (max-width: 480px) {
     .card-body {
-        padding: 8px;
-    }
-
-    .order-summary {
-        padding: 8px;
+        padding: 12px;
     }
 }
