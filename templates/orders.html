@@ -8,23 +8,23 @@
         <div class="row">
             {% for order in orders %}
                 <div class="col-lg-6 col-md-12 mb-4">
+                    <!-- Card container that will expand -->
                     <div class="card shadow-sm">
                         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <strong>Order ID: {{ order.order_id }}</strong>
                             <span class="badge bg-light text-primary"> (₹{{ order.total_price | round(2) }})</span>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Item:</strong> {{ order.item_name }}</p>
-                                    <p><strong>Quantity:</strong> {{ order.quantity }}</p>
-                                    <p><strong>Price (₹):</strong> {{ order.item_price | round(2) }}</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
-                                    <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
-                                    <p><strong>Payment Method:</strong> {{ order.payment_method | capitalize }}</p>
-                                </div>
+                            <div class="order-summary" onclick="toggleDetails('{{ order.order_id }}')">
+                                <p><strong>Item:</strong> {{ order.item_name }}</p>
+                                <p><strong>Price (₹):</strong> {{ order.item_price | round(2) }}</p>
+                            </div>
+                            <!-- Hidden details section -->
+                            <div id="details-{{ order.order_id }}" class="order-details" style="display: none;">
+                                <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+                                <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
+                                <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
+                                <p><strong>Payment Method:</strong> {{ order.payment_method | capitalize }}</p>
                             </div>
                         </div>
                     </div>
@@ -45,4 +45,17 @@
         </div>
     {% endif %}
 </div>
+
+<!-- JavaScript to handle the toggle effect -->
+<script>
+    function toggleDetails(orderId) {
+        var details = document.getElementById('details-' + orderId);
+        // Toggle visibility of the details section
+        if (details.style.display === 'none') {
+            details.style.display = 'block';
+        } else {
+            details.style.display = 'none';
+        }
+    }
+</script>
 {% endblock %}
