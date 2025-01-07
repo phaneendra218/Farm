@@ -64,6 +64,7 @@ class Order(db.Model):
     
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    basket_id = db.Column(db.String(100), nullable=False, index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
@@ -301,18 +302,25 @@ def add_to_basket(item_id):
         except Exception:
             flash('Invalid quantity entered.', 'danger')
             return redirect(url_for('items'))
+
+    # Get the basket_id for the user or create a new one
+    basket_id = session.get('basket_id')
+    if not basket_id:
+        basket_id = str(uuid.uuid4())  # Generate a unique basket_id
+        session['basket_id'] = basket_id
+
     # Check if the item already exists in the basket
-    basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
+    basket_item = Basket.query.filter_by(basket_id=basket_id, item_id=item_id).first()
     if basket_item:
         basket_item.quantity += quantity  # Update quantity if item already exists
     else:
-        basket_item = Basket(user_id=user_id, item_id=item_id, quantity=quantity)
+        basket_item = Basket(basket_id=basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
         db.session.add(basket_item)
 
     db.session.commit()
 
     # Update the basket count in session
-    basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
+    basket_count = db.session.query(Basket).filter_by(basket_id=basket_id).count()
     session['basket_count'] = basket_count
 
     flash('Item added to basket successfully!', 'success')
@@ -359,13 +367,20 @@ def basket():
         flash('Please login to view your basket', 'danger')
         return redirect(url_for('login'))
 
-    user_id = session['user_id']
-    basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.user_id == user_id).all()
+    basket_id = session.get('basket_id')
+    if not basket_id:
+        flash('Your basket is empty.', 'warning')
+        return redirect(url_for('items'))
+
+    basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.basket_id == basket_id).all()
+
     # Calculate the total price (convert Decimal to float)
     total_price = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
+    
     # Update the basket count
     basket_count = len(basket_items)
     session['basket_count'] = basket_count
+    
     return render_template('basket.html', basket_items=basket_items, total_price=total_price)
 
 @app.route('/remove_from_basket/<int:item_id>', methods=['POST'])
@@ -374,18 +389,26 @@ def remove_from_basket(item_id):
         flash('Please login to remove items from your basket', 'danger')
         return redirect(url_for('login'))
 
-    user_id = session['user_id']
-    basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
+    # Get the basket_id from session
+    basket_id = session.get('basket_id')
+    if not basket_id:
+        flash('Your basket is empty', 'warning')
+        return redirect(url_for('items'))
+
+    # Find the basket item for this basket_id and item_id
+    basket_item = Basket.query.filter_by(basket_id=basket_id, item_id=item_id).first()
 
     if basket_item:
         db.session.delete(basket_item)
         db.session.commit()
 
         # Update the basket count
-        basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
+        basket_count = db.session.query(Basket).filter_by(basket_id=basket_id).count()
         session['basket_count'] = basket_count
 
         flash('Item removed from basket', 'info')
+    else:
+        flash('Item not found in basket', 'danger')
 
     return redirect(url_for('basket'))
 
@@ -462,7 +485,6 @@ def complete_order():
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'User not logged in'}), 401
     
-    # Get user using Session.get()
     # user_id = session['user_id'] Working
     # user = db.session.get(User, user_id) Working
     user = db.session.get(User, session['user_id'])
@@ -471,9 +493,7 @@ def complete_order():
 
     data = request.get_json()
     address_id = data.get('address_id')
-    # payment_option = data.get('payment_option')
     payment_method = data.get('payment_method')
-    # delivery_address = Address.query.get(address_id) working
     delivery_address = db.session.get(Address, address_id)
     # Validate Address
     address = Address.query.filter_by(id=address_id, user_id=user.id).first()
