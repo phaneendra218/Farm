@@ -574,10 +574,16 @@ def orders():
     if not user:
         return {"error": "User not found"}, 404
 
-    # Use class-bound attributes with joinedload and order by creation date descending
-    user_orders = Order.query.options(joinedload(Order.item))\
-        .filter_by(user_id=user.id)\
-        .order_by(Order.created_at.desc())  # Orders by newest first
+    # Check if the user is an admin
+    if user.is_admin:
+        # If the user is admin, get all orders in the database, ordered by the most recent
+        user_orders = Order.query.options(joinedload(Order.item))\
+            .order_by(Order.created_at.desc())  # Orders by newest first
+    else:
+        # If the user is not admin, get only the orders belonging to the logged-in user
+        user_orders = Order.query.options(joinedload(Order.item))\
+            .filter_by(user_id=user.id)\
+            .order_by(Order.created_at.desc())  # Orders by newest first
     
     # Process orders for the response
     orders_list = [
