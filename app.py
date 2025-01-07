@@ -468,7 +468,6 @@ def get_basket_items():
         total_price += Decimal(basket_item.item.price) * basket_item.quantity  # Perform multiplication after conversion    
     return jsonify({'success': True, 'items': items, 'total_price': total_price})
 
-from flask import request, jsonify
 from sqlalchemy.exc import IntegrityError
 
 @app.route('/complete_order', methods=['POST'])
@@ -477,13 +476,28 @@ def complete_order():
         # Get data from the request
         order_data = request.get_json()
 
-        # Get the user, address, and other details
+        # Check if all necessary data is present in the request
+        required_fields = ['user_id', 'address_id', 'total_price', 'delivery_address', 'payment_method', 'items']
+        for field in required_fields:
+            if field not in order_data:
+                return jsonify({"error": f"Missing {field} in the request"}), 400
+
         user_id = order_data['user_id']
         address_id = order_data['address_id']
         total_price = order_data['total_price']
         delivery_address = order_data['delivery_address']
         payment_method = order_data['payment_method']
         items = order_data['items']  # List of items to be added
+
+        # Check if the user exists (you can customize this as per your logic)
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Validate Address
+        address = Address.query.filter_by(id=address_id, user_id=user_id).first()
+        if not address:
+            return jsonify({"error": "Invalid address selected"}), 400
 
         # Create new order
         new_order = Order(
@@ -501,6 +515,9 @@ def complete_order():
 
         # Create OrderItems for each item in the order
         for item in items:
+            if 'item_id' not in item or 'quantity' not in item or 'price' not in item:
+                return jsonify({"error": "Each item must have item_id, quantity, and price"}), 400
+
             order_item = OrderItem(
                 order_id=new_order.id,
                 item_id=item['item_id'],
