@@ -397,7 +397,8 @@ def checkout():
     user = User.query.get(session['user_id'])
     if request.method == 'POST':
         address_id = request.form.get('address_id')
-        payment_option = request.form.get('payment_option')
+        # payment_option = request.form.get('payment_option')
+        payment_method = request.form.get('payment_method')
         # Check if an address was selected
         if not address_id:
             flash('Please select a delivery address', 'danger')
@@ -462,15 +463,15 @@ def complete_order():
         return jsonify({'success': False, 'message': 'User not logged in'}), 401
     
     # Get user using Session.get()
-    # user_id = session['user_id']
-    # user = db.session.get(User, user_id)
+    # user_id = session['user_id'] Working
+    # user = db.session.get(User, user_id) Working
     user = db.session.get(User, session['user_id'])
     if not user:
         return jsonify({'success': False, 'message': 'User not found.'}), 404
 
     data = request.get_json()
     address_id = data.get('address_id')
-    payment_option = data.get('payment_option')
+    # payment_option = data.get('payment_option')
     payment_method = data.get('payment_method')
     # delivery_address = data.get('delivery_address')
     # delivery_address = data.get('address_id')

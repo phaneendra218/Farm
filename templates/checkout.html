@@ -259,8 +259,9 @@
 
   document.getElementById('confirm-payment-button')?.addEventListener('click', () => {
     const selectedAddress = document.querySelector('input[name="address_id"]:checked');
-    const selectedPaymentOption = document.querySelector('input[name="payment_option"]:checked');
-
+    // const selectedPaymentOption = document.querySelector('input[name="payment_option"]:checked');
+    const selectedPaymentOption = document.querySelector('input[name="payment_method"]:checked');
+    
     if (!selectedAddress || !selectedPaymentOption) {
         alert('Please select both a delivery address and payment option.');
         return;
@@ -268,7 +269,8 @@
 
     const requestData = {
         address_id: selectedAddress.value,
-        payment_option: selectedPaymentOption.value
+        // payment_option: selectedPaymentOption.value
+        payment_method: selectedPaymentOption.value
     };
 
     fetch('/complete_order', {
