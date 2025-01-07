@@ -451,8 +451,8 @@ button:hover {
     background-color: #007bff; /* Blue background for the header */
     color: white;
     font-weight: bold;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
 }
 
 /* Spacing Between Order Containers */
