@@ -7,6 +7,11 @@ from sqlalchemy.orm import sessionmaker, Session, joinedload
 from sqlalchemy.types import Numeric
 from decimal import Decimal
 from datetime import datetime
+import random
+import string
+
+def generate_basket_id():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -64,6 +69,7 @@ class Order(db.Model):
     
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    basket_id = db.Column(db.String(6), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
@@ -287,6 +293,12 @@ def add_to_basket(item_id):
     user_id = session['user_id']
     quantity = request.form.get('quantity')
 
+    # Generate or retrieve the basket_id
+    if 'basket_id' not in session or not session['basket_id']:
+        session['basket_id'] = generate_basket_id()
+
+    basket_id = session['basket_id']
+
     # Handle custom quantity
     if quantity == 'custom':
         try:
@@ -301,18 +313,19 @@ def add_to_basket(item_id):
         except Exception:
             flash('Invalid quantity entered.', 'danger')
             return redirect(url_for('items'))
+
     # Check if the item already exists in the basket
-    basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
+    basket_item = Basket.query.filter_by(basket_id=basket_id, item_id=item_id).first()
     if basket_item:
         basket_item.quantity += quantity  # Update quantity if item already exists
     else:
-        basket_item = Basket(user_id=user_id, item_id=item_id, quantity=quantity)
+        basket_item = Basket(basket_id=basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
         db.session.add(basket_item)
 
     db.session.commit()
 
     # Update the basket count in session
-    basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
+    basket_count = db.session.query(Basket).filter_by(basket_id=basket_id).count()
     session['basket_count'] = basket_count
 
     flash('Item added to basket successfully!', 'success')
@@ -359,13 +372,17 @@ def basket():
         flash('Please login to view your basket', 'danger')
         return redirect(url_for('login'))
 
-    user_id = session['user_id']
-    basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.user_id == user_id).all()
-    # Calculate the total price (convert Decimal to float)
+    if 'basket_id' not in session or not session['basket_id']:
+        flash('Your basket is empty.', 'info')
+        return redirect(url_for('items'))
+
+    basket_id = session['basket_id']
+    basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.basket_id == basket_id).all()
     total_price = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
-    # Update the basket count
+
     basket_count = len(basket_items)
     session['basket_count'] = basket_count
+
     return render_template('basket.html', basket_items=basket_items, total_price=total_price)
 
 @app.route('/remove_from_basket/<int:item_id>', methods=['POST'])
@@ -374,20 +391,42 @@ def remove_from_basket(item_id):
         flash('Please login to remove items from your basket', 'danger')
         return redirect(url_for('login'))
 
-    user_id = session['user_id']
-    basket_item = Basket.query.filter_by(user_id=user_id, item_id=item_id).first()
+    if 'basket_id' not in session or not session['basket_id']:
+        flash('Your basket is empty.', 'info')
+        return redirect(url_for('basket'))
+
+    basket_id = session['basket_id']
+    basket_item = Basket.query.filter_by(basket_id=basket_id, item_id=item_id).first()
 
     if basket_item:
         db.session.delete(basket_item)
         db.session.commit()
 
-        # Update the basket count
-        basket_count = db.session.query(Basket).filter_by(user_id=user_id).count()
+        basket_count = db.session.query(Basket).filter_by(basket_id=basket_id).count()
         session['basket_count'] = basket_count
+
+        if basket_count == 0:
+            session.pop('basket_id', None)
 
         flash('Item removed from basket', 'info')
 
     return redirect(url_for('basket'))
+
+@app.route('/clear_basket', methods=['POST'])
+def clear_basket():
+    if 'user_id' not in session or 'basket_id' not in session:
+        flash('Your basket is already empty.', 'info')
+        return redirect(url_for('items'))
+
+    basket_id = session['basket_id']
+    Basket.query.filter_by(basket_id=basket_id).delete()
+    db.session.commit()
+
+    session.pop('basket_id', None)
+    session['basket_count'] = 0
+
+    flash('Basket cleared successfully!', 'info')
+    return redirect(url_for('items'))
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
