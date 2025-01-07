@@ -430,8 +430,8 @@ button:hover {
     cursor: pointer;
     padding: 10px;
     transition: background-color 0.3s ease;
-    margin-top: 2px;
-    border-radius: 5px;
+    margin-top: 0px;
+    border-radius: 0px;
 }
 
 .order-summary:hover {
@@ -456,6 +456,8 @@ button:hover {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     padding-left: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .order-id {
