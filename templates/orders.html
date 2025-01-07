@@ -10,10 +10,11 @@
                 <th>Order ID</th>
                 <th>Item</th>
                 <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
+                <th>Price (₹)</th>
+                <th>Total (₹)</th>
                 <th>Order Date</th>
                 <th>Delivery Address</th>
+                <th>Payment Method</th>
             </tr>
         </thead>
         <tbody>
@@ -22,10 +23,11 @@
                 <td>{{ order.id }}</td>
                 <td>{{ order.item.name }}</td>
                 <td>{{ order.quantity }}</td>
-                <td>₹{{ order.item.price | round(2) }}</td>
-                <td>₹{{ (order.item.price * order.quantity) | round(2) }}</td>
-                <td>{{ order.order_date.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+                <td>{{ order.item.price | round(2) }}</td>
+                <td>{{ (order.item.price * order.quantity) | round(2) }}</td>
+                <td>{{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</td>
                 <td>{{ order.delivery_address }}</td>
+                <td>{{ order.payment_method | capitalize }}</td>
             </tr>
             {% endfor %}
         </tbody>

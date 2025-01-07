@@ -775,8 +775,15 @@ def orders():
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
-    # Use joinedload to eagerly load the `item` relationship
-    orders = Order.query.filter_by(user_id=user.id).options(joinedload(Order.item)).all()
+    # Use joinedload to eagerly load related data
+    orders = (
+        db.session.query(Order)
+        .filter_by(user_id=user.id)
+        .options(joinedload(Order.item))
+        .options(joinedload(Order.address))
+        .order_by(Order.created_at.desc())
+        .all()
+    )
 
     return render_template('orders.html', user=user, orders=orders)
 
