@@ -428,7 +428,7 @@ button:hover {
 /* Order Summary Section */
 .order-summary {
     cursor: pointer;
-    padding: 2px;
+    padding: 1px;
     transition: background-color 0.3s ease;
     margin-top: 0px;
     border-radius: 0px;

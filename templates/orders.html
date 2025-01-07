@@ -24,7 +24,7 @@
                             <!-- Hidden details section -->
                             <div id="details-{{ order.order_id }}" class="order-details" style="display: none;">
                                 <div class="details-content p-3 mt-3">
-                                    <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+                                    <p><strong>Quantity:</strong> {{ order.quantity | int }}</p>
                                     <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
                                     <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
                                     <p><strong>Payment Method:</strong> {{ order.payment_method | capitalize }}</p>
