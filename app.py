@@ -789,7 +789,8 @@ def orders():
             "order_id": order.id,
             "item_name": order.item.name,  # Access item relationship
             "quantity": order.quantity,
-            "total_price": order.total_price
+            "total_price": order.total_price,
+            "delivery_address": order.delivery_address
         }
         for order in user_orders
     ]
