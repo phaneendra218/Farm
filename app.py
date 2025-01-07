@@ -574,9 +574,11 @@ def orders():
     if not user:
         return {"error": "User not found"}, 404
 
-    # Use class-bound attributes with joinedload
-    user_orders = Order.query.options(joinedload(Order.item)).filter_by(user_id=user.id).all()
-
+    # Use class-bound attributes with joinedload and order by creation date descending
+    user_orders = Order.query.options(joinedload(Order.item))\
+        .filter_by(user_id=user.id)\
+        .order_by(Order.created_at.desc())  # Orders by newest first
+    
     # Process orders for the response
     orders_list = [
         {
