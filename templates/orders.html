@@ -8,17 +8,20 @@
         <div class="row">
             {% for order in orders %}
                 <div class="col-12 mb-4">
+                    <!-- Outer Card for each order -->
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header clickable-header" data-target="#order-details-{{ order.order_id }}">
+                            <!-- Display Order ID, Item Name, and Total Price -->
                             <strong>Order ID: {{ order.order_id }} | Item: {{ order.item_name }} | Total: ₹{{ order.total_price | round(2) }}</strong>
                         </div>
-                        <div class="card-body" id="order-details-{{ order.order_id }}" style="display: none;">
+                        <!-- Order Details (Initially hidden) -->
+                        <div class="card-body order-details" id="order-details-{{ order.order_id }}" style="display: none;">
                             <div class="row">
                                 <div class="col-md-6">
                                     <p><strong>Item:</strong> {{ order.item_name }}</p>
                                     <p><strong>Quantity:</strong> {{ order.quantity }}</p>
-                                    <p><strong>Price (₹):</strong> {{ order.item_price | round(2) }}</p>
-                                    <p><strong>Total (₹):</strong> {{ order.total_price | round(2) }}</p> 
+                                    <p><strong>Price (₹):</strong> ₹{{ order.item_price | round(2) }}</p>
+                                    <p><strong>Total (₹):</strong> ₹{{ order.total_price | round(2) }}</p> 
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
@@ -39,15 +42,20 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Include Bootstrap CSS and JS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 <script>
-    // jQuery to toggle visibility of order details
     $(document).ready(function() {
-        $(".card-header").click(function() {
-            var orderId = $(this).parent().find(".card-body");
-            var orderDetailsId = orderId.attr('id');
+        // Toggle the order details when the header is clicked
+        $(".clickable-header").click(function() {
+            // Find the corresponding order details div using the data-target attribute
+            var targetId = $(this).data("target");
             
-            // Toggle the display of the order details (expand or collapse)
-            $("#" + orderDetailsId).toggle();
+            // Toggle the visibility of the order details
+            $(targetId).toggle();
         });
     });
 </script>
