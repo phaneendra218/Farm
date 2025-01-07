@@ -468,68 +468,58 @@ def get_basket_items():
         total_price += Decimal(basket_item.item.price) * basket_item.quantity  # Perform multiplication after conversion    
     return jsonify({'success': True, 'items': items, 'total_price': total_price})
 
+from flask import request, jsonify
+from sqlalchemy.exc import IntegrityError
+
 @app.route('/complete_order', methods=['POST'])
 def complete_order():
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'User not logged in'}), 401
-    
-    # Get user
-    user = db.session.get(User, session['user_id'])
-    if not user:
-        return jsonify({'success': False, 'message': 'User not found.'}), 404
+    try:
+        # Get data from the request
+        order_data = request.get_json()
 
-    data = request.get_json()
-    address_id = data.get('address_id')
-    payment_method = data.get('payment_method')
+        # Get the user, address, and other details
+        user_id = order_data['user_id']
+        address_id = order_data['address_id']
+        total_price = order_data['total_price']
+        delivery_address = order_data['delivery_address']
+        payment_method = order_data['payment_method']
+        items = order_data['items']  # List of items to be added
 
-    # Validate Address
-    address = Address.query.filter_by(id=address_id, user_id=user.id).first()
-    if not address:
-        return jsonify({'success': False, 'message': 'Invalid address selected.'}), 400
-
-    # Fetch Basket Items
-    basket_items = Basket.query.filter_by(user_id=user.id).all()
-    if not basket_items:
-        return jsonify({'success': False, 'message': 'No items in the basket.'}), 400
-
-    # Calculate Total Price
-    total_price = Decimal(0.0)
-    for basket_item in basket_items:
-        item = basket_item.item  # Access related Item object
-        if not item:
-            return jsonify({'success': False, 'message': f'Item not found for basket item ID {basket_item.id}.'}), 400
-        total_price += Decimal(item.price) * Decimal(basket_item.quantity)
-
-    # Create Transaction Order
-    order = Order(
-        user_id=user.id,
-        address_id=address.id,
-        delivery_address=address.address,
-        total_price=total_price,
-        payment_method=payment_method,
-        created_at=datetime.utcnow()
-    )
-    db.session.add(order)
-    db.session.flush()  # Flush to get `order.id`
-
-    # Add Items to OrderItem Table
-    for basket_item in basket_items:
-        item = basket_item.item
-        order_item = OrderItem(
-            order_id=order.id,
-            item_id=basket_item.item_id,
-            quantity=basket_item.quantity,
-            price=Decimal(item.price)
+        # Create new order
+        new_order = Order(
+            user_id=user_id,
+            address_id=address_id,
+            total_price=total_price,
+            delivery_address=delivery_address,
+            payment_method=payment_method,
+            created_at=datetime.utcnow()
         )
-        db.session.add(order_item)
 
-    # Clear Basket
-    Basket.query.filter_by(user_id=user.id).delete()
+        # Add the new order to the session
+        db.session.add(new_order)
+        db.session.flush()  # This is important to get the order id for the order_items
 
-    # Commit Transaction
-    db.session.commit()
+        # Create OrderItems for each item in the order
+        for item in items:
+            order_item = OrderItem(
+                order_id=new_order.id,
+                item_id=item['item_id'],
+                quantity=item['quantity'],
+                price=item['price']
+            )
+            db.session.add(order_item)
 
-    return jsonify({'success': True, 'message': 'Order placed successfully!', 'total_price': str(total_price)})
+        # Commit the transaction
+        db.session.commit()
+
+        return jsonify({"message": "Order successfully completed!", "order_id": new_order.id}), 200
+
+    except IntegrityError as e:
+        db.session.rollback()
+        return jsonify({"error": "Database integrity error", "message": str(e)}), 500
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An error occurred", "message": str(e)}), 500
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
