@@ -2,7 +2,31 @@
 
 {% block content %}
 <h1>My Orders</h1>
-
+<style>
+    .card {
+        margin-bottom: 20px;
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    
+    .card-body {
+        background-color: #ffffff;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .col-md-6 {
+        flex: 1 1 50%;
+        padding: 10px;
+    }
+    </style>
+    
 {% if orders %}
     <div class="container">
         <div class="row">
