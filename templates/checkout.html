@@ -67,7 +67,7 @@
       <input type="radio" name="payment_method" value="cash_on_delivery"> Cash on Delivery
     </label><br>
     <label>
-      <input type="radio" name="payment_method" value="upi"> UPI
+      <input type="radio" name="payment_method" value="upi" disabled> UPI (Coming Soon)
     </label>
   </div>
 
@@ -294,7 +294,13 @@
         alert('An error occurred while completing your order. Please try again.');
     });
 });
-
+document.querySelectorAll('input[name="payment_method"]').forEach(input => {
+    input.addEventListener('change', (event) => {
+        if (event.target.value === 'UPI') {
+            alert('UPI payment is coming soon!');
+        }
+    });
+});
 </script>
 
 {% endblock %}

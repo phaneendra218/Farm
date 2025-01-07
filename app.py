@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.utils import secure_filename
 from sqlalchemy import Integer, String, Boolean, Float
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker, Session, joinedload
 from sqlalchemy.types import Numeric
 from decimal import Decimal
 from datetime import datetime
@@ -61,6 +61,7 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     delivery_address = db.Column(db.String(255), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
+    item = db.relationship('Item', backref='orders')
 
     
 class Basket(db.Model):
@@ -775,7 +776,8 @@ def orders():
         return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
-    orders = Order.query.filter_by(user_id=user.id).all()
+    # Use joinedload to eagerly load the `item` relationship
+    orders = Order.query.filter_by(user_id=user.id).options(joinedload(Order.item)).all()
 
     return render_template('orders.html', user=user, orders=orders)
 
