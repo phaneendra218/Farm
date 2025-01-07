@@ -408,7 +408,7 @@ button:hover {
 /* Order Card Styles */
 .card {
     border: 1px solid #ddd; /* Light border around each order card */
-    border-radius: 10px; /* Rounded corners for the card */
+    border-radius: 0px; /* Rounded corners for the card */
     margin-bottom: 20px; /* Space between each order card */
     transition: all 0.3s ease; /* Smooth transition for hover effect */
     background-color: #ffffff;
@@ -453,6 +453,11 @@ button:hover {
     font-weight: bold;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
+    padding-left: 20px;
+}
+
+.order-id {
+    margin-left: 15px; /* Move the Order ID slightly to the right */
 }
 
 /* Spacing Between Order Containers */
