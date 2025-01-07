@@ -499,7 +499,7 @@ def complete_order():
             quantity=basket_item.quantity,
             address_id=address.id,
             delivery_address=delivery_address.address,
-            total_price=item_total
+            total_price=item_total,
             payment_method=payment_method
         )
         db.session.add(order)
