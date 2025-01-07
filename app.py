@@ -61,17 +61,6 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     delivery_address = db.Column(db.String(255), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
-
-class OrderItem(db.Model):
-    __tablename__ = 'order_item'
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Numeric(10, 2), nullable=False)
-
-    def __repr__(self):
-        return f'<OrderItem {self.id}>'
     
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -468,75 +457,63 @@ def get_basket_items():
         total_price += Decimal(basket_item.item.price) * basket_item.quantity  # Perform multiplication after conversion    
     return jsonify({'success': True, 'items': items, 'total_price': total_price})
 
-from sqlalchemy.exc import IntegrityError
-
 @app.route('/complete_order', methods=['POST'])
 def complete_order():
-    try:
-        # Get data from the request
-        order_data = request.get_json()
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'User not logged in'}), 401
+    
+    # Get user using Session.get()
+    # user_id = session['user_id'] Working
+    # user = db.session.get(User, user_id) Working
+    user = db.session.get(User, session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found.'}), 404
 
-        # Check if all necessary data is present in the request
-        required_fields = ['user_id', 'address_id', 'total_price', 'delivery_address', 'payment_method', 'items']
-        for field in required_fields:
-            if field not in order_data:
-                return jsonify({"error": f"Missing {field} in the request"}), 400
+    data = request.get_json()
+    address_id = data.get('address_id')
+    # payment_option = data.get('payment_option')
+    payment_method = data.get('payment_method')
+    # delivery_address = Address.query.get(address_id) working
+    delivery_address = db.session.get(Address, address_id)
+    # Validate Address
+    address = Address.query.filter_by(id=address_id, user_id=user.id).first()
+    if not address:
+        return jsonify({'success': False, 'message': 'Invalid address selected.'}), 400
 
-        user_id = order_data['user_id']
-        address_id = order_data['address_id']
-        total_price = order_data['total_price']
-        delivery_address = order_data['delivery_address']
-        payment_method = order_data['payment_method']
-        items = order_data['items']  # List of items to be added
+    # Fetch Basket Items
+    basket_items = Basket.query.filter_by(user_id=user.id).all()
+    if not basket_items:
+        return jsonify({'success': False, 'message': 'No items in the basket.'}), 400
 
-        # Check if the user exists (you can customize this as per your logic)
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({"error": "User not found"}), 404
+    # Calculate Total Price and Create Orders
+    total_price = Decimal(0.0)
+    for basket_item in basket_items:
+        item = basket_item.item  # Access the related Item object via the relationship
+        if not item:
+            return jsonify({'success': False, 'message': f'Item not found for basket item ID {basket_item.id}.'}), 400
 
-        # Validate Address
-        address = Address.query.filter_by(id=address_id, user_id=user_id).first()
-        if not address:
-            return jsonify({"error": "Invalid address selected"}), 400
+        item_total = Decimal(item.price) * Decimal(basket_item.quantity)
+        total_price += item_total
 
-        # Create new order
-        new_order = Order(
-            user_id=user_id,
-            address_id=address_id,
-            total_price=total_price,
-            delivery_address=delivery_address,
-            payment_method=payment_method,
-            created_at=datetime.utcnow()
+        # Create and add an Order
+        order = Order(
+            user_id=user.id,
+            item_id=basket_item.item_id,
+            quantity=basket_item.quantity,
+            address_id=address.id,
+            delivery_address=delivery_address.address,
+            total_price=item_total,
+            payment_method=payment_method
         )
+        db.session.add(order)
 
-        # Add the new order to the session
-        db.session.add(new_order)
-        db.session.flush()  # This is important to get the order id for the order_items
+    # Clear Basket
+    Basket.query.filter_by(user_id=user.id).delete()
 
-        # Create OrderItems for each item in the order
-        for item in items:
-            if 'item_id' not in item or 'quantity' not in item or 'price' not in item:
-                return jsonify({"error": "Each item must have item_id, quantity, and price"}), 400
+    # Commit Changes
+    db.session.commit()
 
-            order_item = OrderItem(
-                order_id=new_order.id,
-                item_id=item['item_id'],
-                quantity=item['quantity'],
-                price=item['price']
-            )
-            db.session.add(order_item)
-
-        # Commit the transaction
-        db.session.commit()
-
-        return jsonify({"message": "Order successfully completed!", "order_id": new_order.id}), 200
-
-    except IntegrityError as e:
-        db.session.rollback()
-        return jsonify({"error": "Database integrity error", "message": str(e)}), 500
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": "An error occurred", "message": str(e)}), 500
+    return jsonify({'success': True, 'message': 'Order placed successfully!', 'total_price': str(total_price)})
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
