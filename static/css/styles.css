@@ -186,28 +186,6 @@ button {
 button:hover {
     background-color: #45a049;
 }
-.card {
-    margin-bottom: 20px;
-}
-
-.card-header {
-    background-color: #f8f9fa;
-    font-weight: bold;
-}
-
-.card-body {
-    background-color: #ffffff;
-}
-
-.row {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.col-md-6 {
-    flex: 1 1 50%;
-    padding: 10px;
-}
 
 /* Media Queries for Responsive Design */
 /* For screens smaller than 768px (Tablets, small screens) */
@@ -424,5 +402,58 @@ button:hover {
     .basket-item-card img {
         width: 100px;
         height: 70px;
+    }
+}
+
+/* Enhancements for Order Card */
+.card {
+    transition: margin-bottom 0.3s ease; /* Smooth transition for margin adjustment */
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.order-summary {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.order-summary:hover {
+    background-color: #f8f9fa; /* Highlight the summary when hovered */
+    border-radius: 8px;
+}
+
+/* Smooth transitions for order details */
+.order-details {
+    transition: all 0.3s ease-in-out;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Add animation class to smoothly show details */
+.animated {
+    animation-duration: 0.5s;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 10px;
+    }
+
+    .order-summary {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-body {
+        padding: 8px;
+    }
+
+    .order-summary {
+        padding: 8px;
     }
 }
