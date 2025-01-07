@@ -61,6 +61,17 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     delivery_address = db.Column(db.String(255), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
+
+class OrderItem(db.Model):
+    __tablename__ = 'order_item'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
+
+    def __repr__(self):
+        return f'<OrderItem {self.id}>'
     
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -462,7 +473,7 @@ def complete_order():
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'User not logged in'}), 401
     
-    # Get user using Session.get()
+    # Get user
     user = db.session.get(User, session['user_id'])
     if not user:
         return jsonify({'success': False, 'message': 'User not found.'}), 404
@@ -470,7 +481,6 @@ def complete_order():
     data = request.get_json()
     address_id = data.get('address_id')
     payment_method = data.get('payment_method')
-    delivery_address = db.session.get(Address, address_id)
 
     # Validate Address
     address = Address.query.filter_by(id=address_id, user_id=user.id).first()
@@ -485,45 +495,38 @@ def complete_order():
     # Calculate Total Price
     total_price = Decimal(0.0)
     for basket_item in basket_items:
-        item = basket_item.item  # Access the related Item object via the relationship
+        item = basket_item.item  # Access related Item object
         if not item:
             return jsonify({'success': False, 'message': f'Item not found for basket item ID {basket_item.id}.'}), 400
         total_price += Decimal(item.price) * Decimal(basket_item.quantity)
 
-    # Create a single Order for the transaction
+    # Create Transaction Order
     order = Order(
         user_id=user.id,
         address_id=address.id,
-        delivery_address=delivery_address.address,
+        delivery_address=address.address,
         total_price=total_price,
         payment_method=payment_method,
         created_at=datetime.utcnow()
     )
     db.session.add(order)
-    db.session.flush()  # Flush to get the `order.id`
+    db.session.flush()  # Flush to get `order.id`
 
-    # Create individual order entries for each basket item
+    # Add Items to OrderItem Table
     for basket_item in basket_items:
         item = basket_item.item
-        item_total = Decimal(item.price) * Decimal(basket_item.quantity)
-
-        order_item = Order(
-            user_id=user.id,
+        order_item = OrderItem(
+            order_id=order.id,
             item_id=basket_item.item_id,
             quantity=basket_item.quantity,
-            address_id=address.id,
-            delivery_address=delivery_address.address,
-            total_price=item_total,
-            payment_method=payment_method,
-            created_at=datetime.utcnow(),
-            order_id=order.id  # Assign the same order ID to all items
+            price=Decimal(item.price)
         )
         db.session.add(order_item)
 
     # Clear Basket
     Basket.query.filter_by(user_id=user.id).delete()
 
-    # Commit Changes
+    # Commit Transaction
     db.session.commit()
 
     return jsonify({'success': True, 'message': 'Order placed successfully!', 'total_price': str(total_price)})
