@@ -490,7 +490,7 @@ def complete_order():
             return jsonify({'success': False, 'message': f'Item not found for basket item ID {basket_item.id}.'}), 400
         total_price += Decimal(item.price) * Decimal(basket_item.quantity)
 
-    # Create a single Order
+    # Create a single Order for the transaction
     order = Order(
         user_id=user.id,
         address_id=address.id,
@@ -500,9 +500,9 @@ def complete_order():
         created_at=datetime.utcnow()
     )
     db.session.add(order)
-    db.session.flush()  # Flush to get the `order.id` before committing
+    db.session.flush()  # Flush to get the `order.id`
 
-    # Update Orders for Basket Items with the same `order_id`
+    # Create individual order entries for each basket item
     for basket_item in basket_items:
         item = basket_item.item
         item_total = Decimal(item.price) * Decimal(basket_item.quantity)
@@ -515,9 +515,9 @@ def complete_order():
             delivery_address=delivery_address.address,
             total_price=item_total,
             payment_method=payment_method,
-            created_at=datetime.utcnow()
+            created_at=datetime.utcnow(),
+            order_id=order.id  # Assign the same order ID to all items
         )
-        order.id = order_item.id
         db.session.add(order_item)
 
     # Clear Basket
