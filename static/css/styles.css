@@ -428,7 +428,7 @@ button:hover {
 /* Order Summary Section */
 .order-summary {
     cursor: pointer;
-    padding: 10px;
+    padding: 0px;
     transition: background-color 0.3s ease;
     margin-top: 0px;
     border-radius: 0px;
@@ -456,8 +456,8 @@ button:hover {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     padding-left: 20px;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .order-id {
