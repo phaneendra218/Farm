@@ -72,7 +72,7 @@ class Basket(db.Model):
     user = db.relationship('User', backref='baskets')
     item = db.relationship('Item', backref='baskets')
     item = db.relationship('Item', backref='orders')
-    Order.item = db.relationship('Item', backref='orders')
+    Order.item = db.relationship('Item', backref='order_items')
 
 # Routes
 @app.route('/')
