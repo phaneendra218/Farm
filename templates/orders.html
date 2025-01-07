@@ -43,10 +43,10 @@
                 <h2 class="mb-3">
                     <i class="bi bi-cart-x"></i> No Orders Found!
                 </h2>
-                <p class="mb-4">Looks like you haven’t placed any orders yet. Start shopping now and fill your cart with exciting items!</p>
-                <a href="{{ url_for('items') }}" class="btn btn-primary btn-lg">
-                    <i class="bi bi-bag-plus"></i> View Items
-                </a>
+                <p class="mb-4">We are exited for your first order. Please order your faverote items now. Happy shopping!</p>
+                <form action="{{ url_for('items') }}" method="get">
+                    <button type="submit" class="btn btn-secondary mt-3">Add Items</button>
+                </form>
             </div>
         </div>
     {% endif %}
