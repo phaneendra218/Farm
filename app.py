@@ -61,7 +61,7 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     delivery_address = db.Column(db.String(255), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
-    Order.item = db.relationship('Item', backref='orders')
+    # Order.item = db.relationship('Item', backref='orders')
 
     
 class Basket(db.Model):
@@ -773,7 +773,7 @@ def delete_address_by_id():
 def orders():
     user = User.query.filter_by(id=session.get('user_id')).first()
     if not user:
-        return {"error": "User not found"}, 404
+        return jsonify({"error": "User not found"}), 404
 
     # Load orders with their items
     user_orders = Order.query.options(joinedload('item')).filter_by(user_id=user.id).all()
@@ -789,7 +789,7 @@ def orders():
         for order in user_orders
     ]
 
-    return {"orders": orders_list}, 200
+    return jsonify({"orders": orders_list}), 200
 
 if __name__ == '__main__':
     with app.app_context():
