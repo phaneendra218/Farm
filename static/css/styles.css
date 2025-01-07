@@ -186,6 +186,28 @@ button {
 button:hover {
     background-color: #45a049;
 }
+.card {
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.card-body {
+    background-color: #ffffff;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col-md-6 {
+    flex: 1 1 50%;
+    padding: 10px;
+}
 
 /* Media Queries for Responsive Design */
 /* For screens smaller than 768px (Tablets, small screens) */
