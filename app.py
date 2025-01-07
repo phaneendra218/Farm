@@ -7,6 +7,7 @@ from sqlalchemy.orm import sessionmaker, Session, joinedload
 from sqlalchemy.types import Numeric
 from decimal import Decimal
 from datetime import datetime
+import uuid
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
