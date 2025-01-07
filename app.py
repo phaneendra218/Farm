@@ -414,21 +414,32 @@ def remove_from_basket(item_id):
 
     return redirect(url_for('basket'))
 
-# @app.route('/clear_basket', methods=['POST'])
-# def clear_basket():
-#     if 'user_id' not in session or 'basket_id' not in session:
-#         flash('Your basket is already empty.', 'info')
-#         return redirect(url_for('items'))
+@app.route('/clear_basket', methods=['POST'])
+def clear_basket():
+    if 'user_id' not in session:
+        flash('Please log in to manage your basket.', 'danger')
+        return redirect(url_for('login'))
 
-#     basket_id = session['basket_id']
-#     Basket.query.filter_by(basket_id=basket_id).delete()
-#     db.session.commit()
+    user_id = session['user_id']
 
-#     session.pop('basket_id', None)
-#     session['basket_count'] = 0
+    # Fetch the current basket_id
+    basket = Basket.query.filter_by(user_id=user_id).first()
+    if not basket:
+        flash('Your basket is already empty.', 'info')
+        return redirect(url_for('items'))
 
-#     flash('Basket cleared successfully!', 'info')
-#     return redirect(url_for('items'))
+    basket_id = basket.basket_id
+
+    # Clear all items in the basket
+    Basket.query.filter_by(basket_id=basket_id).delete()
+    db.session.commit()
+
+    # Clear the basket_id and basket_count from session
+    session.pop('basket_id', None)
+    session['basket_count'] = 0
+
+    flash('Basket cleared successfully!', 'info')
+    return redirect(url_for('items'))
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
