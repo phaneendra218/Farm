@@ -5,6 +5,7 @@
 
 {% if orders %}
     <div class="container">
+        <table class="table table-bordered">
         <div class="row">
             {% for order in orders %}
                 <div class="col-12 mb-4">
@@ -31,6 +32,7 @@
                 </div>
             {% endfor %}
         </div>
+       </table>
     </div>
 {% else %}
     <p>No orders found. Start shopping now!</p>
