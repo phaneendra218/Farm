@@ -61,7 +61,6 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     delivery_address = db.Column(db.String(255), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
-
     
 class Basket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,8 +71,7 @@ class Basket(db.Model):
     user = db.relationship('User', backref='baskets')
     item = db.relationship('Item', backref='baskets')
     item = db.relationship('Item', backref='orders')
-    Order.item = db.relationship('Item', backref='order_items')
-    
+    Order.item = db.relationship('Item', backref='order_items')    
 
 # Routes
 @app.route('/')
@@ -465,21 +463,15 @@ def complete_order():
         return jsonify({'success': False, 'message': 'User not logged in'}), 401
     
     # Get user using Session.get()
-    # user_id = session['user_id'] Working
-    # user = db.session.get(User, user_id) Working
     user = db.session.get(User, session['user_id'])
     if not user:
         return jsonify({'success': False, 'message': 'User not found.'}), 404
 
     data = request.get_json()
     address_id = data.get('address_id')
-    # payment_option = data.get('payment_option')
     payment_method = data.get('payment_method')
-    # delivery_address = data.get('delivery_address')
-    # delivery_address = data.get('address_id')
-    # address_id = data.get('address_id')
-    # delivery_address = Address.query.get(address_id) working
     delivery_address = db.session.get(Address, address_id)
+
     # Validate Address
     address = Address.query.filter_by(id=address_id, user_id=user.id).first()
     if not address:
@@ -490,27 +482,43 @@ def complete_order():
     if not basket_items:
         return jsonify({'success': False, 'message': 'No items in the basket.'}), 400
 
-    # Calculate Total Price and Create Orders
+    # Calculate Total Price
     total_price = Decimal(0.0)
     for basket_item in basket_items:
         item = basket_item.item  # Access the related Item object via the relationship
         if not item:
             return jsonify({'success': False, 'message': f'Item not found for basket item ID {basket_item.id}.'}), 400
+        total_price += Decimal(item.price) * Decimal(basket_item.quantity)
 
+    # Create a single Order
+    order = Order(
+        user_id=user.id,
+        address_id=address.id,
+        delivery_address=delivery_address.address,
+        total_price=total_price,
+        payment_method=payment_method,
+        created_at=datetime.utcnow()
+    )
+    db.session.add(order)
+    db.session.flush()  # Flush to get the `order.id` before committing
+
+    # Update Orders for Basket Items with the same `order_id`
+    for basket_item in basket_items:
+        item = basket_item.item
         item_total = Decimal(item.price) * Decimal(basket_item.quantity)
-        total_price += item_total
 
-        # Create and add an Order
-        order = Order(
+        order_item = Order(
             user_id=user.id,
             item_id=basket_item.item_id,
             quantity=basket_item.quantity,
             address_id=address.id,
             delivery_address=delivery_address.address,
             total_price=item_total,
-            payment_method=payment_method
+            payment_method=payment_method,
+            created_at=datetime.utcnow()
         )
-        db.session.add(order)
+        order.id = order_item.id
+        db.session.add(order_item)
 
     # Clear Basket
     Basket.query.filter_by(user_id=user.id).delete()
