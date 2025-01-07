@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify, get_object_or_404
+from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.utils import secure_filename
@@ -9,7 +9,6 @@ from decimal import Decimal
 from datetime import datetime
 import random
 import string
-from .models import Order
 
 def generate_basket_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
@@ -844,11 +843,6 @@ def orders():
     ]
 
     return render_template('orders.html', orders=orders_list)
-
-@app.route('/order/<int:order_id>')
-def order_details(order_id):
-    order = get_object_or_404(Order, order_id=order_id)  # Fetch the order from the database
-    return render_template('order_details.html', order=order)
 
 if __name__ == '__main__':
     with app.app_context():
