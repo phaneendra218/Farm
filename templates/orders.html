@@ -4,35 +4,26 @@
 <h1>My Orders</h1>
 
 {% if orders %}
-    <div class="container">
-        <table class="table table-bordered">
-        <div class="row">
-            {% for order in orders %}
-                <div class="col-12 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <strong>Order ID: {{ order.order_id }}</strong>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Item:</strong> {{ order.item_name }}</p>
-                                    <p><strong>Quantity:</strong> {{ order.quantity }}</p>
-                                    <p><strong>Price (₹):</strong> {{ order.item_price | round(2) }}</p>
-                                    <p><strong>Total (₹):</strong> {{ order.total_price | round(2) }}</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
-                                    <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
-                                    <p><strong>Payment Method:</strong> {{ order.payment_method | capitalize }}</p>
-                                </div>
-                            </div>
-                        </div>
+    <div class="row">
+        {% for order in orders %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5>Order ID: {{ order.id }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Item:</strong> {{ order.item_name }}</p>
+                        <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+                        <p><strong>Price (₹):</strong> ₹{{ order.item_price | round(2) }}</p>
+                        <p><strong>Total (₹):</strong> ₹{{ order.total_price | round(2) }}</p>
+                        <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+                        <p><strong>Delivery Address:</strong></p>
+                        <p>{{ order.delivery_address }}</p>
+                        <p><strong>Payment Method:</strong> {{ order.payment_method | capitalize }}</p>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
-       </table>
+            </div>
+        {% endfor %}
     </div>
 {% else %}
     <p>No orders found. Start shopping now!</p>
