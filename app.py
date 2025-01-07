@@ -780,22 +780,27 @@ def orders():
     if not user:
         return {"error": "User not found"}, 404
 
-    # Use class-bound attributes with joinedload
+    # Retrieve user orders with related item data and payment method
     user_orders = Order.query.options(joinedload(Order.item)).filter_by(user_id=user.id).all()
 
+    if not user_orders:
+        flash("No orders found.", "info")
+    
     # Process orders for the response
     orders_list = [
         {
             "order_id": order.id,
             "item_name": order.item.name,  # Access item relationship
             "quantity": order.quantity,
-            "total_price": order.total_price,
-            "delivery_address": order.delivery_address
+            "price": order.item.price,    # Fetching price for better UI display
+            "total_price": round(order.item.price * order.quantity, 2),  # Calculating total dynamically
+            "delivery_address": order.delivery_address,
+            "payment_method": order.payment_method  # Include payment method for better UX
         }
         for order in user_orders
     ]
 
-    return {"orders": orders_list}, 200
+    return render_template('orders.html', orders=orders_list)
 
 if __name__ == '__main__':
     with app.app_context():
