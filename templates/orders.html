@@ -5,23 +5,21 @@
 
 {% if orders %}
     <div class="container">
+        <table class="table table-bordered">
         <div class="row">
             {% for order in orders %}
                 <div class="col-12 mb-4">
-                    <!-- Outer Card for each order -->
                     <div class="card">
-                        <div class="card-header clickable-header" data-target="#order-details-{{ order.order_id }}" style="cursor: pointer;">
-                            <!-- Display Order ID, Item Name, and Total Price -->
-                            <strong>Order ID: {{ order.order_id }} | Item: {{ order.item_name }} | Total: ₹{{ order.total_price | round(2) }}</strong>
+                        <div class="card-header">
+                            <strong>Order ID: {{ order.order_id }}</strong>
                         </div>
-                        <!-- Order Details (Initially hidden) -->
-                        <div class="card-body order-details" id="order-details-{{ order.order_id }}" style="display: none;">
+                        <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <p><strong>Item:</strong> {{ order.item_name }}</p>
                                     <p><strong>Quantity:</strong> {{ order.quantity }}</p>
-                                    <p><strong>Price (₹):</strong> ₹{{ order.item_price | round(2) }}</p>
-                                    <p><strong>Total (₹):</strong> ₹{{ order.total_price | round(2) }}</p> 
+                                    <p><strong>Price (₹):</strong> {{ order.item_price | round(2) }}</p>
+                                    <p><strong>Total (₹):</strong> {{ order.total_price | round(2) }}</p>
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
@@ -34,79 +32,10 @@
                 </div>
             {% endfor %}
         </div>
+       </table>
     </div>
 {% else %}
     <p>No orders found. Start shopping now!</p>
     <a href="{{ url_for('items') }}" class="btn btn-primary">View Items</a>
 {% endif %}
-{% endblock %}
-
-{% block scripts %}
-<!-- Include Bootstrap CSS and JS -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-<script>
-    $(document).ready(function() {
-        // Toggle the order details when the header is clicked
-        $(".clickable-header").click(function() {
-            // Find the corresponding order details div using the data-target attribute
-            var targetId = $(this).data("target");
-            
-            // Toggle the visibility of the order details
-            $("#" + targetId).toggle();
-        });
-    });
-</script>
-{% endblock %}
-
-{% block styles %}
-<style>
-    .card {
-        margin-bottom: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-header {
-        background-color: #f8f9fa;
-        font-weight: bold;
-        cursor: pointer;
-        padding: 15px;
-        text-align: left;
-        border-radius: 10px 10px 0 0;
-    }
-
-    .card-body {
-        background-color: #ffffff;
-        padding: 20px;
-    }
-
-    .order-details {
-        display: none;
-        padding-top: 20px;
-        background-color: #f9f9f9;
-        border-top: 1px solid #e0e0e0;
-    }
-
-    .row {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .col-md-6 {
-        flex: 1 1 50%;
-        padding: 10px;
-    }
-
-    .col-md-12 {
-        padding-top: 15px;
-        padding-bottom: 15px;
-    }
-
-    .clickable-header:hover {
-        background-color: #e9ecef;
-    }
-</style>
 {% endblock %}

@@ -7,7 +7,6 @@ from sqlalchemy.orm import sessionmaker, Session, joinedload
 from sqlalchemy.types import Numeric
 from decimal import Decimal
 from datetime import datetime
-import uuid
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -406,6 +405,10 @@ def remove_from_basket(item_id):
         # Update the basket count
         basket_count = db.session.query(Basket).filter_by(basket_id=basket_id).count()
         session['basket_count'] = basket_count
+
+        # If the basket is empty, remove basket_id from session
+        if basket_count == 0:
+            session.pop('basket_id', None)
 
         flash('Item removed from basket', 'info')
     else:
