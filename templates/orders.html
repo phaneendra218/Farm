@@ -5,21 +5,20 @@
 
 {% if orders %}
     <div class="container">
-        <table class="table table-bordered">
         <div class="row">
             {% for order in orders %}
                 <div class="col-12 mb-4">
                     <div class="card">
                         <div class="card-header">
-                            <strong>Order ID: {{ order.order_id }}</strong>
+                            <strong>Order ID: {{ order.order_id }} | Item: {{ order.item_name }} | Total: ₹{{ order.total_price | round(2) }}</strong>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" id="order-details-{{ order.order_id }}" style="display: none;">
                             <div class="row">
                                 <div class="col-md-6">
                                     <p><strong>Item:</strong> {{ order.item_name }}</p>
                                     <p><strong>Quantity:</strong> {{ order.quantity }}</p>
                                     <p><strong>Price (₹):</strong> {{ order.item_price | round(2) }}</p>
-                                    <p><strong>Total (₹):</strong> {{ order.total_price | round(2) }}</p>
+                                    <p><strong>Total (₹):</strong> {{ order.total_price | round(2) }}</p> 
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
@@ -32,10 +31,24 @@
                 </div>
             {% endfor %}
         </div>
-       </table>
     </div>
 {% else %}
     <p>No orders found. Start shopping now!</p>
     <a href="{{ url_for('items') }}" class="btn btn-primary">View Items</a>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // jQuery to toggle visibility of order details
+    $(document).ready(function() {
+        $(".card-header").click(function() {
+            var orderId = $(this).parent().find(".card-body");
+            var orderDetailsId = orderId.attr('id');
+            
+            // Toggle the display of the order details (expand or collapse)
+            $("#" + orderDetailsId).toggle();
+        });
+    });
+</script>
 {% endblock %}
