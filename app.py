@@ -73,6 +73,7 @@ class Basket(db.Model):
     item = db.relationship('Item', backref='baskets')
     item = db.relationship('Item', backref='orders')
     Order.item = db.relationship('Item', backref='order_items')
+    
 
 # Routes
 @app.route('/')
@@ -771,12 +772,16 @@ def delete_address_by_id():
 
 @app.route('/orders', methods=['GET'])
 def orders():
-    user = User.query.filter_by(id=session.get('user_id')).first()
+    if 'user_id' not in session:
+        flash('Please login to view your orders', 'danger')
+        return redirect(url_for('login'))
+    
+    user = User.query.filter_by(id=session['user_id']).first()
     if not user:
-        return jsonify({"error": "User not found"}), 404
+        return {"error": "User not found"}, 404
 
-    # Load orders with their items
-    user_orders = Order.query.options(joinedload('item')).filter_by(user_id=user.id).all()
+    # Use class-bound attributes with joinedload
+    user_orders = Order.query.options(joinedload(Order.item)).filter_by(user_id=user.id).all()
 
     # Process orders for the response
     orders_list = [
@@ -789,7 +794,7 @@ def orders():
         for order in user_orders
     ]
 
-    return jsonify({"orders": orders_list}), 200
+    return {"orders": orders_list}, 200
 
 if __name__ == '__main__':
     with app.app_context():
