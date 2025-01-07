@@ -795,7 +795,8 @@ def orders():
             "price": order.item.price,    # Fetching price for better UI display
             "total_price": round(float(order.item.price) * float(order.quantity), 2),  # Calculating total dynamically
             "delivery_address": order.delivery_address,
-            "payment_method": order.payment_method  # Include payment method for better UX
+            "payment_method": order.payment_method,  # Include payment method for better UX
+            "created_at": order.created_at
         }
         for order in user_orders
     ]
