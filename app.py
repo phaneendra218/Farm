@@ -61,6 +61,7 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     delivery_address = db.Column(db.String(255), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
+    Order.item = db.relationship('Item', backref='orders')
 
     
 class Basket(db.Model):
@@ -770,22 +771,25 @@ def delete_address_by_id():
 
 @app.route('/orders', methods=['GET'])
 def orders():
-    if 'user_id' not in session:
-        flash('Please login to view your orders', 'danger')
-        return redirect(url_for('login'))
-    
-    user = User.query.get(session['user_id'])
-    # Use joinedload to eagerly load related data
-    orders = (
-        db.session.query(Order)
-        .filter_by(user_id=user.id)
-        .options(joinedload(Order.item))
-        .options(joinedload(Order.address))
-        .order_by(Order.created_at.desc())
-        .all()
-    )
+    user = User.query.filter_by(id=session.get('user_id')).first()
+    if not user:
+        return {"error": "User not found"}, 404
 
-    return render_template('orders.html', user=user, orders=orders)
+    # Load orders with their items
+    user_orders = Order.query.options(joinedload('item')).filter_by(user_id=user.id).all()
+
+    # Process orders for the response
+    orders_list = [
+        {
+            "order_id": order.id,
+            "item_name": order.item.name,  # Access item relationship
+            "quantity": order.quantity,
+            "total_price": order.total_price
+        }
+        for order in user_orders
+    ]
+
+    return {"orders": orders_list}, 200
 
 if __name__ == '__main__':
     with app.app_context():
