@@ -13,6 +13,17 @@ import string
 def generate_basket_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
+def get_or_create_basket_id(user_id):
+    # Check if the user already has an existing basket_id
+    basket = Basket.query.filter_by(user_id=user_id).first()
+
+    if basket:
+        return basket.basket_id
+
+    # Generate a new basket_id if none exists
+    new_basket_id = generate_basket_id()
+    return new_basket_id
+
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
@@ -291,15 +302,9 @@ def add_to_basket(item_id):
         return redirect(url_for('login'))
 
     user_id = session['user_id']
+    basket_id = get_or_create_basket_id(user_id)
+
     quantity = request.form.get('quantity')
-
-    # Generate or retrieve the basket_id
-    if 'basket_id' not in session or not session['basket_id']:
-        session['basket_id'] = generate_basket_id()
-
-    basket_id = session['basket_id']
-
-    # Handle custom quantity
     if quantity == 'custom':
         try:
             custom_quantity = request.form.get('custom_quantity', '1')
@@ -324,8 +329,8 @@ def add_to_basket(item_id):
 
     db.session.commit()
 
-    # Update the basket count in session
-    basket_count = db.session.query(Basket).filter_by(basket_id=basket_id).count()
+    # Update basket count
+    basket_count = Basket.query.filter_by(basket_id=basket_id).count()
     session['basket_count'] = basket_count
 
     flash('Item added to basket successfully!', 'success')
@@ -372,11 +377,9 @@ def basket():
         flash('Please login to view your basket', 'danger')
         return redirect(url_for('login'))
 
-    if 'basket_id' not in session or not session['basket_id']:
-        flash('Your basket is empty.', 'info')
-        return redirect(url_for('items'))
+    user_id = session['user_id']
+    basket_id = get_or_create_basket_id(user_id)
 
-    basket_id = session['basket_id']
     basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.basket_id == basket_id).all()
     total_price = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
 
@@ -391,42 +394,41 @@ def remove_from_basket(item_id):
         flash('Please login to remove items from your basket', 'danger')
         return redirect(url_for('login'))
 
-    if 'basket_id' not in session or not session['basket_id']:
-        flash('Your basket is empty.', 'info')
-        return redirect(url_for('basket'))
+    user_id = session['user_id']
+    basket_id = get_or_create_basket_id(user_id)
 
-    basket_id = session['basket_id']
     basket_item = Basket.query.filter_by(basket_id=basket_id, item_id=item_id).first()
-
     if basket_item:
         db.session.delete(basket_item)
         db.session.commit()
 
-        basket_count = db.session.query(Basket).filter_by(basket_id=basket_id).count()
+        basket_count = Basket.query.filter_by(basket_id=basket_id).count()
         session['basket_count'] = basket_count
 
+        # Optionally, remove the basket_id from the database if empty
         if basket_count == 0:
-            session.pop('basket_id', None)
+            Basket.query.filter_by(basket_id=basket_id).delete()
+            db.session.commit()
 
         flash('Item removed from basket', 'info')
 
     return redirect(url_for('basket'))
 
-@app.route('/clear_basket', methods=['POST'])
-def clear_basket():
-    if 'user_id' not in session or 'basket_id' not in session:
-        flash('Your basket is already empty.', 'info')
-        return redirect(url_for('items'))
+# @app.route('/clear_basket', methods=['POST'])
+# def clear_basket():
+#     if 'user_id' not in session or 'basket_id' not in session:
+#         flash('Your basket is already empty.', 'info')
+#         return redirect(url_for('items'))
 
-    basket_id = session['basket_id']
-    Basket.query.filter_by(basket_id=basket_id).delete()
-    db.session.commit()
+#     basket_id = session['basket_id']
+#     Basket.query.filter_by(basket_id=basket_id).delete()
+#     db.session.commit()
 
-    session.pop('basket_id', None)
-    session['basket_count'] = 0
+#     session.pop('basket_id', None)
+#     session['basket_count'] = 0
 
-    flash('Basket cleared successfully!', 'info')
-    return redirect(url_for('items'))
+#     flash('Basket cleared successfully!', 'info')
+#     return redirect(url_for('items'))
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
