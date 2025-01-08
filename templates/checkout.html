@@ -334,14 +334,14 @@ function activateSection(activeSectionId) {
     // Get all sections
     const sections = document.querySelectorAll('.section');
     sections.forEach(section => {
-      // If it's the active section, highlight it; otherwise, blackout
-      if (section.id === activeSectionId) {
-        section.classList.add('active');
-        section.classList.remove('blackout');
-      } else {
-        section.classList.add('blackout');
-        section.classList.remove('active');
-      }
+        // If it's the active section, highlight it; otherwise, blackout
+        if (section.id === activeSectionId) {
+            section.classList.add('active');
+            section.classList.remove('blackout', 'hidden');
+        } else {
+            section.classList.add('blackout');
+            section.classList.remove('active');
+        }
     });
   }
 
@@ -382,6 +382,39 @@ function activateSection(activeSectionId) {
   document.addEventListener('DOMContentLoaded', () => {
     activateSection('delivery-address-section');
   });
+
+  document.getElementById('confirm-address-button')?.addEventListener('click', () => {
+    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+    if (!selectedAddress) {
+        alert('Please select a delivery address.');
+        return;
+    }
+
+    // Show a summary of the selected address in the "Delivery Address" section
+    const addressCard = selectedAddress.closest('.address-card').cloneNode(true);
+    const deliverySection = document.getElementById('delivery-address-section');
+    deliverySection.innerHTML = `
+        <h2>Delivery Address</h2>
+        <div class="summary-view">
+            <p><strong>Selected Address:</strong></p>
+        </div>
+    `;
+    deliverySection.querySelector('.summary-view').appendChild(addressCard);
+
+    // Add a "Change Address" button
+    const changeAddressButton = document.createElement('button');
+    changeAddressButton.textContent = 'Change Address';
+    changeAddressButton.className = 'btn btn-secondary';
+    changeAddressButton.addEventListener('click', () => {
+        // Reactivate the "Delivery Address" section
+        activateSection('delivery-address-section');
+    });
+    deliverySection.appendChild(changeAddressButton);
+
+    // Activate the "Order Summary" section
+    activateSection('order-summary-section');
+});
+
 </script>
 
 {% endblock %}
