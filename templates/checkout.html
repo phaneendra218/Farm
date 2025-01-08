@@ -179,12 +179,6 @@
   display: flex;
   gap: 10px;
 }
-.confirmed-address {
-  padding: 10px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  border-radius: 5px;
-}
 
 </style>
 
@@ -335,60 +329,64 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
 
   // Handle confirm address button click
   document.getElementById('confirm-address-button')?.addEventListener('click', () => {
-    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
-    if (!selectedAddress) {
-      alert('Please select a delivery address.');
-      return;
-    }
+  const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+  if (!selectedAddress) {
+    alert('Please select a delivery address.');
+    return;
+  }
 
-    // Lock the Delivery Address section and display only the confirmed address
-    const deliveryAddressSection = document.getElementById('delivery-address-section');
-    const selectedCard = selectedAddress.closest('.address-card');
-    const addressContainer = document.getElementById('address-container');
+  // Lock the Delivery Address section and display only the confirmed address
+  const deliveryAddressSection = document.getElementById('delivery-address-section');
+  const selectedCard = selectedAddress.closest('.address-card');
+  const addressContainer = document.getElementById('address-container');
 
-    // Replace the container content with the confirmed address details
-    addressContainer.innerHTML = `
-      <div class="confirmed-address">
-        <p><strong>Selected Address:</strong></p>
-        <p>${selectedCard.querySelector('.address-type').textContent}</p>
-        <p>${selectedCard.querySelector('.address-text').textContent}</p>
-      </div>
-    `;
+  // Replace the container content with the confirmed address details
+  addressContainer.innerHTML = `
+    <div class="confirmed-address">
+      <h3>Selected Address:</h3>
+      <p><strong>${selectedCard.querySelector('.address-type').textContent}</strong></p>
+      <p>${selectedCard.querySelector('.address-text').textContent}</p>
+    </div>
+  `;
 
-    // Lock the delivery address section visually
-    deliveryAddressSection.classList.add('locked');
+  // Hide all remaining address cards and buttons
+  document.querySelector('.address-cards-container').style.display = 'none';
+  document.querySelector('.address-buttons').style.display = 'none';
 
-    // Fetch basket items and show Order Summary section (existing logic)
-    fetch(`/get_basket_items?address_id=${selectedAddress.value}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const itemsSummaryDiv = document.getElementById('items-summary');
-          const totalPriceDiv = document.getElementById('total-price');
-          let totalPrice = 0;
+  // Lock the delivery address section visually
+  deliveryAddressSection.classList.add('locked');
 
-          itemsSummaryDiv.innerHTML = '';
-          data.items.forEach(item => {
-            const itemTotal = item.price * item.quantity;
-            totalPrice += itemTotal;
-            itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>`;
-          });
+  // Fetch basket items and show Order Summary section (existing logic)
+  fetch(`/get_basket_items?address_id=${selectedAddress.value}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const itemsSummaryDiv = document.getElementById('items-summary');
+        const totalPriceDiv = document.getElementById('total-price');
+        let totalPrice = 0;
 
-          totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
-          document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
+        itemsSummaryDiv.innerHTML = '';
+        data.items.forEach(item => {
+          const itemTotal = item.price * item.quantity;
+          totalPrice += itemTotal;
+          itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>`;
+        });
 
-          // Unlock and expand Order Summary section
-          document.getElementById('order-summary-section').classList.remove('blackout');
-          document.getElementById('order-summary-details').classList.remove('hidden');
-        } else {
-          alert('Error fetching order summary.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Something went wrong. Please try again.');
-      });
-  });
+        totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
+        document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
+
+        // Unlock and expand Order Summary section
+        document.getElementById('order-summary-section').classList.remove('blackout');
+        document.getElementById('order-summary-details').classList.remove('hidden');
+      } else {
+        alert('Error fetching order summary.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Something went wrong. Please try again.');
+    });
+});
 
   // Handle place order button click
   document.getElementById('place-order-button')?.addEventListener('click', () => {
