@@ -405,3 +405,97 @@ button:hover {
     }
 }
 
+/* Order Card Styles */
+.card {
+    border: 1px solid #ddd; /* Light border around each order card */
+    border-radius: 0px; /* Rounded corners for the card */
+    margin-bottom: 20px; /* Space between each order card */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover Effect for Order Card */
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+    border-color: #007bff; /* Change border color to blue */
+}
+
+/* Card Body */
+.card-body {
+    padding: 20px;
+}
+
+/* Order Summary Section */
+.order-summary {
+    cursor: pointer;
+    padding: 0px;
+    transition: background-color 0.3s ease;
+    margin-top: 0px;
+    border-radius: 8px;
+}
+
+.order-summary:hover {
+    background-color: white; /* Subtle hover effect for summary */
+}
+
+/* Order Details Section */
+.order-details {
+    display: none; /* Hidden by default */
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 5px;
+    transition: all 0.3s ease;
+}
+.order-details:hover {
+    background-color: #f1f1f1;
+}
+
+/* Card Header */
+.card-header {
+    background: linear-gradient(to bottom, #f4e3b4 0%, #dbc078 50%, #b59133 100%);
+    color: white;
+    font-weight: bold;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.order-id {
+    margin-left: 15px; /* Move the Order ID slightly to the right */
+}
+
+/* Spacing Between Order Containers */
+.card {
+    margin-bottom: 30px; /* Ensure there’s space between the order cards */
+}
+
+  /* Click to view details Text Styling */
+  .click-to-view-details {
+    font-weight: bold;
+    color: #007bff; /* Vibrant blue color */
+    text-decoration: underline; /* Underline to highlight the text */
+    transition: color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Hover Effect on "Click to view details" Text */
+.click-to-view-details:hover {
+    color: #0056b3; /* Darker blue on hover */
+    text-decoration: none; /* Remove underline on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-body {
+        padding: 12px;
+    }
+}

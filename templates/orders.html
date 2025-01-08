@@ -1,119 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    /* General styling for the page */
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f4f7fc;
-        margin: 0;
-        padding: 0;
-    }
+<div class="container my-5">
+    <h1 class="mb-4 text-center text-primary font-weight-bold">My Orders</h1>
 
-    .orders-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        padding-top: 30px;
-        padding-bottom: 30px;
-        min-height: 70vh;
-    }
-
-    .order-box {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 800px;
-        box-sizing: border-box;
-    }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-        color: #333;
-        font-size: 24px;
-    }
-
-    .card {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        transition: all 0.3s ease;
-        background-color: #ffffff;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        border-color: #4CAF50;
-    }
-
-    .card-header {
-        background: linear-gradient(to bottom, #f4e3b4 0%, #dbc078 50%, #b59133 100%);
-        color: white;
-        font-weight: bold;
-        padding: 10px 20px;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-    }
-
-    .card-body {
-        padding: 20px;
-    }
-
-    .order-summary {
-        cursor: pointer;
-        padding: 10px;
-        transition: background-color 0.3s ease;
-        border-radius: 8px;
-    }
-
-    .order-summary:hover {
-        background-color: #f4f7fc;
-    }
-
-    .order-details {
-        display: none;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        margin-top: 10px;
-    }
-
-    .empty-orders-message {
-        text-align: center;
-        padding: 40px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-</style>
-
-<div class="orders-container">
-    <div class="order-box">
-        <h1 class="text-primary font-weight-bold">My Orders</h1>
-
-        {% if orders %}
-            <div class="row">
-                {% for order in orders %}
-                    <div class="col-md-12 mb-4">
-                        <div class="card" id="order-card-{{ order.order_id }}">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <strong>Order ID: {{ order.order_id }}</strong>
+    {% if orders %}
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-lg-6 col-md-12 mb-4">
+                    <div class="card shadow-lg rounded-lg border-0" id="order-card-{{ order.order_id }}">
+                        <div class="card-header bg-gradient text-white d-flex justify-content-between align-items-center">
+                            <strong>Order ID: {{ order.order_id }}</strong>
+                            <!-- <span class="badge bg-light text-primary">₹{{ order.total_price | round(2) }}</span> -->
+                        </div>
+                        <div class="card-body">
+                            <!-- Order summary that will trigger the details toggle -->
+                            <div class="order-summary p-3" style="cursor: pointer;" onclick="toggleDetails('{{ order.order_id }}')">
+                                <h5 class="text-dark mb-2">{{ order.item_name }}</h5>
+                                <p class="text-muted"><strong>Price:</strong> ₹{{ order.item_price | round(2) }}</p>
+                                <i class="bi bi-chevron-down text-primary"></i> <span class="click-to-view-details">Click to view details</span>
                             </div>
-                            <div class="card-body">
-                                <!-- Order summary that will trigger the details toggle -->
-                                <div class="order-summary" onclick="toggleDetails('{{ order.order_id }}')">
-                                    <h5 class="text-dark mb-2">{{ order.item_name }}</h5>
-                                    <p class="text-muted"><strong>Price:</strong> ₹{{ order.item_price | round(2) }}</p>
-                                    <span class="click-to-view-details">Click to view details</span>
-                                </div>
 
-                                <!-- Hidden details section -->
-                                <div id="details-{{ order.order_id }}" class="order-details">
+                            <!-- Hidden details section -->
+                            <div id="details-{{ order.order_id }}" class="order-details" style="display: none;">
+                                <div class="details-content p-3 mt-3">
                                     <p><strong>Quantity:</strong> {{ order.quantity | int }}</p>
                                     <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
                                     <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
@@ -122,34 +32,41 @@
                             </div>
                         </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-orders-message">
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center mt-5">
+            <div class="alert alert-info py-4">
                 <h2 class="mb-3">
                     <i class="bi bi-cart-x"></i> Oops! No Orders Found!
                 </h2>
-                <p>We're excited for your first order! Start shopping now and place your first order.</p>
+                <p class="mb-4">We're excited for your first order! Start shopping now and place your first order.</p>
                 <form action="{{ url_for('items') }}" method="get">
                     <button type="submit" class="btn btn-secondary mt-3">Add Items</button>
                 </form>
             </div>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 </div>
 
+<!-- JavaScript to handle the toggle effect -->
 <script>
     // Function to toggle details of the orders
     function toggleDetails(orderId) {
         var details = document.getElementById('details-' + orderId);
         var card = document.getElementById('order-card-' + orderId);
         
-        if (details.style.display === 'none' || details.style.display === '') {
+        // Check if the order details are already expanded or collapsed
+        if (details.style.display === 'none') {
+            // Show the details and add an animation class
             details.style.display = 'block';
-            card.style.marginBottom = '20px';
+            details.classList.add('animated', 'fadeIn');
+            card.style.marginBottom = '20px';  // Add space for the expanded details
         } else {
+            // Hide the details and remove animation
             details.style.display = 'none';
-            card.style.marginBottom = '0px';
+            card.style.marginBottom = '0px';  // Remove extra space
         }
     }
 </script>
