@@ -47,10 +47,27 @@
                         <button type="submit">Add to Basket</button>
                     </form>                    
                     <!-- Order item button -->
-                    <form method="POST" action="{{ url_for('clear_and_add_to_basket') }}" id="order-form-{{ item.id }}" style="margin-top:10px;">
-                        <input type="hidden" name="item_id" value="{{ item.id }}"> <!-- Pass item_id -->
-                        <button type="submit" id="order-button-{{ item.id }}">Order</button>
-                    </form>                                       
+                    <!-- Quantity input for adding to basket -->
+                    <form method="POST" action="{{ url_for('clear_and_add_to_basket') }}" style="margin-top:10px; position:relative;">
+                        <input type="hidden" name="item_id" value="{{ item.id }}"> <!-- Ensure item_id is passed -->
+                    
+                        <!-- Show the custom input or select based on the condition -->
+                        <label for="quantity_{{ item.id }}">Quantity:</label>
+                        <div id="quantity-container-{{ item.id }}">
+                            <select name="quantity" id="quantity_{{ item.id }}" onchange="toggleCustomInput(this, '{{ item.id }}')" required>
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                    
+                        <!-- Custom quantity input field (hidden by default) -->
+                        <input type="number" name="custom_quantity" id="custom_quantity_{{ item.id }}" min="1" max="50" step="1" style="display:none; margin-top:10px; width:100%;" placeholder="Enter custom quantity">
+                    
+                        <button type="submit">Add to Basket</button>
+                    </form>                                     
                 {% endif %}
 
                 <!-- Admin actions -->

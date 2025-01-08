@@ -306,14 +306,25 @@ def clear_and_add_to_basket():
     Basket.query.filter_by(user_id=user_id).delete()
     db.session.commit()
 
-    # Get the item_id from the form data
+    # Get the item_id and quantity from the form data
     item_id = request.form.get('item_id')
+    quantity = request.form.get('quantity')
     
     if not item_id:
         return jsonify({'success': False, 'message': 'Item ID is missing.'}), 400
 
+    # Fetch the item to check if it exists in the database
+    item = db.session.get(Item, item_id)
+    if not item:
+        return jsonify({'success': False, 'message': 'Item not found.'}), 404
+
+    # Determine the actual quantity
+    if quantity == 'custom':
+        custom_quantity = int(request.form.get('custom_quantity', 1))
+        quantity = custom_quantity
+    
     # Add the selected item to the basket
-    basket_item = Basket(user_id=user_id, item_id=item_id, quantity=1)
+    basket_item = Basket(user_id=user_id, item_id=item_id, quantity=int(quantity))
     db.session.add(basket_item)
     db.session.commit()
 
