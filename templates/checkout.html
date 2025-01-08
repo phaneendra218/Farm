@@ -4,71 +4,64 @@
 <h1>Checkout</h1>
 
 <!-- Address Section -->
-<div id="delivery-address-section" class="address-box">
+<div id="delivery-address-section" class="address-box active" data-state="delivery">
   <h2>Delivery Address</h2>
 
-  <div id="address-details">
-    {% if addresses %}
-      <div class="address-cards-container">
-        {% for address in addresses %}
-          <div class="address-card">
-            <input 
-              type="radio" 
-              name="address_id" 
-              value="{{ address.id }}" 
-              {% if address.is_default %} checked {% endif %}
-              id="address-{{ address.id }}"
-              class="address-radio"
-            >
-            <label for="address-{{ address.id }}" class="address-label">
-              <div class="address-info">
-                <p class="address-type">{{ address.address_type }}</p>
-                <p class="address-text">{{ address.address }}</p>
-              </div>
-              {% if address.is_default %}
-                <span class="default-address">Default</span>
-              {% endif %}
-            </label>
-          </div>
-        {% endfor %}
-      </div>
-      <div class="address-buttons">
-        <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
-        <form action="{{ url_for('profile') }}" method="get">
-          <button type="submit" class="btn-secondary mt-3">+ Add New Address</button>
-        </form>
-      </div>
-    {% else %}
-      <p>No addresses found. Please add an address to proceed.</p>
-      <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
-    {% endif %}
-  </div>
-
-  <!-- Summary View for Collapsed State -->
-  <div id="address-summary" class="hidden">
-    <p><strong>Selected Address:</strong> <span id="selected-address"></span></p>
-    <button id="edit-address-button" class="btn btn-secondary">Edit Address</button>
-  </div>
+  {% if addresses %}
+    <div class="address-cards-container">
+      {% for address in addresses %}
+        <div class="address-card">
+          <input 
+            type="radio" 
+            name="address_id" 
+            value="{{ address.id }}" 
+            {% if address.is_default %} checked {% endif %}
+            id="address-{{ address.id }}"
+            class="address-radio"
+          >
+          <label for="address-{{ address.id }}" class="address-label">
+            <div class="address-info">
+              <p class="address-type">{{ address.address_type }}</p>
+              <p class="address-text">{{ address.address }}</p>
+            </div>
+            {% if address.is_default %}
+              <span class="default-address">Default</span>
+            {% endif %}
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="address-buttons">
+      <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
+      <form action="{{ url_for('profile') }}" method="get">
+        <button type="submit" class="btn-secondary mt-3">+ Add New Address</button>
+      </form>
+    </div>
+  {% else %}
+    <p>No addresses found. Please add an address to proceed.</p>
+    <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
+  {% endif %}
 </div>
 
 <!-- Order Summary Section -->
-<div id="order-summary-section" class="summary-box blackout">
+<div id="order-summary-section" class="summary-box hidden" data-state="order-summary">
   <h2>Order Summary</h2>
 
-  <div id="items-summary"></div>
-  <div id="total-price"></div>
-
-  <!-- Summary View for Collapsed State -->
-  <div id="order-summary-collapsed" class="hidden">
-    <p><strong>Items:</strong> <span id="summary-item-count"></span></p>
-    <p><strong>Total:</strong> ₹<span id="summary-total-price"></span></p>
+  <div id="items-summary">
+    {% for basket_item in basket_items %}
+      <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p>
+    {% endfor %}
   </div>
 
-  <button id="place-order-button" class="btn btn-primary hidden">Place Order</button>
+  <div id="total-price">
+    <p><strong>Total: ₹{{ total_price }}</strong></p>
+  </div>
+
+  <button id="place-order-button" class="btn btn-primary">Place Order</button>
 </div>
 
 <!-- Payment Options Section -->
-<div id="payment-options-section" class="summary-box blackout">
+<div id="payment-options-section" class="summary-box hidden" data-state="payment">
   <h2>Payment</h2>
 
   <div id="payment-methods">
@@ -84,7 +77,7 @@
     <p><strong>Payable Amount: ₹<span id="payable-amount-value"></span></strong></p>
   </div>
 
-  <button id="confirm-payment-button" class="btn btn-primary hidden">Confirm Payment</button>
+  <button id="confirm-payment-button" class="btn btn-primary">Confirm Payment</button>
 </div>
 
 <style>
@@ -94,68 +87,157 @@
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+  }
+  
+  .address-box h2, .summary-box h2 {
+    margin-bottom: 20px;
+  }
+
+  .address-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .address-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
     background-color: white;
   }
 
-  .blackout {
-    background-color: rgba(0,0,0,0.05);
-    pointer-events: none;
+  .address-card:hover {
+    background-color: #f9f9f9;
+  }
+  .address-card.selected {
+    background-color: #d4edda; /* Light green background for selected address */
+    border-color: #28a745; /* Green border */
+  }
+
+  .address-radio:checked + .address-label .address-card {
+    border-color: #007bff; /* Ensure blue border for checked radio button */
+  }
+  .address-radio {
+    margin-right: 15px;
+  }
+  .address-label {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+
+  .address-info {
+    flex: 1;
+  }
+
+  .address-type {
+    font-weight: bold;
+  }
+
+  .address-text {
+    color: #555;
+    font-size: 0.9em;
+  }
+
+  .default-address {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8em;
   }
 
   .hidden {
     display: none;
   }
 
-  #selected-address {
-    font-size: 0.9em;
-    color: #333;
+  .address-buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
   }
 
-  .address-buttons, #edit-address-button {
-    margin-top: 10px;
+  .summary-box.blackout {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .summary-box.active {
+    opacity: 1;
+  }
+
+  .summary-box h2 {
+    font-size: 1.5rem;
   }
 </style>
 
 <script>
-  document.getElementById('confirm-address-button')?.addEventListener('click', () => {
-    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
-    if (!selectedAddress) {
-      alert('Please select a delivery address.');
-      return;
-    }
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initial state: Only Delivery Address is active
+    let currentState = 'delivery';
 
-    const selectedLabel = selectedAddress.closest('.address-card').querySelector('.address-info').textContent;
-    document.getElementById('selected-address').textContent = selectedLabel;
+    const sections = document.querySelectorAll('.summary-box, .address-box');
+    const deliverySection = document.getElementById('delivery-address-section');
+    const orderSummarySection = document.getElementById('order-summary-section');
+    const paymentSection = document.getElementById('payment-options-section');
 
-    document.getElementById('delivery-address-section').classList.add('blackout');
-    document.getElementById('address-details').classList.add('hidden');
-    document.getElementById('address-summary').classList.remove('hidden');
+    const confirmAddressBtn = document.getElementById('confirm-address-button');
+    const placeOrderBtn = document.getElementById('place-order-button');
 
-    document.getElementById('order-summary-section').classList.remove('blackout');
-    document.getElementById('place-order-button').classList.remove('hidden');
+    // Function to handle state transitions
+    const handleStateTransition = (newState) => {
+      // Deactivate current section
+      if (currentState === 'delivery') {
+        deliverySection.classList.add('blackout');
+      } else if (currentState === 'order-summary') {
+        orderSummarySection.classList.add('blackout');
+      }
+
+      // Activate new section
+      if (newState === 'order-summary') {
+        orderSummarySection.classList.remove('blackout');
+      } else if (newState === 'payment') {
+        paymentSection.classList.remove('blackout');
+      }
+
+      currentState = newState;
+    };
+
+    // Confirm Address Button Clicked
+    confirmAddressBtn.addEventListener('click', () => {
+      handleStateTransition('order-summary');
+      deliverySection.classList.remove('active');
+    });
+
+    // Place Order Button Clicked
+    placeOrderBtn.addEventListener('click', () => {
+      handleStateTransition('payment');
+      orderSummarySection.classList.remove('active');
+    });
   });
 
-  document.getElementById('place-order-button')?.addEventListener('click', () => {
-    const itemCount = document.querySelectorAll('#items-summary p').length;
-    const totalPrice = document.querySelector('#total-price').textContent.split('₹')[1];
+  // Manage address selection
+  document.querySelectorAll('.address-radio').forEach(radio => {
+    radio.addEventListener('change', (event) => {
+      document.querySelectorAll('.address-card').forEach(card => {
+        card.classList.remove('selected');
+      });
 
-    document.getElementById('summary-item-count').textContent = itemCount;
-    document.getElementById('summary-total-price').textContent = totalPrice;
-
-    document.getElementById('order-summary-section').classList.add('blackout');
-    document.getElementById('order-summary-collapsed').classList.remove('hidden');
-
-    document.getElementById('payment-options-section').classList.remove('blackout');
-    document.getElementById('confirm-payment-button').classList.remove('hidden');
+      const selectedCard = radio.closest('.address-card');
+      selectedCard.classList.add('selected');
+    });
   });
 
-  document.getElementById('edit-address-button')?.addEventListener('click', () => {
+  // Change Address Button functionality
+  document.getElementById('change-address-button')?.addEventListener('click', () => {
     document.getElementById('delivery-address-section').classList.remove('blackout');
-    document.getElementById('address-details').classList.remove('hidden');
-    document.getElementById('address-summary').classList.add('hidden');
-
-    document.getElementById('order-summary-section').classList.add('blackout');
-    document.getElementById('place-order-button').classList.add('hidden');
+    document.getElementById('delivery-address-section').classList.add('active');
   });
 </script>
 
