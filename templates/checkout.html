@@ -313,41 +313,53 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
         }
     });
 });
-  // Manage address selection, order summary, and payment options
+
+  // Initialize the page state
+  const initializeCheckoutPage = () => {
+    const orderSummarySection = document.getElementById('order-summary-section');
+    const paymentSection = document.getElementById('payment-options-section');
+
+    // Lock Order Summary and Payment sections initially
+    orderSummarySection.classList.add('blackout');
+    paymentSection.classList.add('blackout');
+
+    // Update the selected address on page load
+    updateSelectedAddress();
+  };
+
+  // Handle confirm address button click
   document.getElementById('confirm-address-button')?.addEventListener('click', () => {
     const selectedAddress = document.querySelector('input[name="address_id"]:checked');
     if (!selectedAddress) {
       alert('Please select a delivery address.');
       return;
     }
-    
-    const addressId = selectedAddress.value;
-    
-    // Fetch basket items and calculate total price via AJAX
-    fetch(`/get_basket_items?address_id=${addressId}`)
+
+    // Lock the Delivery Address section
+    document.getElementById('delivery-address-section').classList.add('locked');
+
+    // Fetch basket items and show Order Summary section (existing logic)
+    fetch(`/get_basket_items?address_id=${selectedAddress.value}`)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
           const itemsSummaryDiv = document.getElementById('items-summary');
           const totalPriceDiv = document.getElementById('total-price');
-          
-          itemsSummaryDiv.innerHTML = '';
           let totalPrice = 0;
 
+          itemsSummaryDiv.innerHTML = '';
           data.items.forEach(item => {
             const itemTotal = item.price * item.quantity;
             totalPrice += itemTotal;
-            itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)} /${item.unit}</p>`;
+            itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>`;
           });
 
           totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
-          
-          // Display the order summary section
-          document.getElementById('order-summary-section').classList.remove('hidden');
-          window.scrollTo(0, document.getElementById('order-summary-section').offsetTop);
-          
-          // Store total price for payment options
           document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
+
+          // Unlock and expand Order Summary section
+          document.getElementById('order-summary-section').classList.remove('blackout');
+          document.getElementById('order-summary-details').classList.remove('hidden');
         } else {
           alert('Error fetching order summary.');
         }
@@ -358,77 +370,24 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
       });
   });
 
+  // Handle place order button click
   document.getElementById('place-order-button')?.addEventListener('click', () => {
-    // Reveal the Payment Options section
-    document.getElementById('payment-options-section').classList.remove('hidden');
-    window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
+    // Lock Order Summary section
+    document.getElementById('order-summary-section').classList.add('blackout');
+
+    // Unlock and expand Payment section
+    document.getElementById('payment-options-section').classList.remove('blackout');
+    document.getElementById('payment-details').classList.remove('hidden');
   });
 
+  // Add event listeners to handle address selection changes
   document.querySelectorAll('.address-radio').forEach(radio => {
-    radio.addEventListener('change', () => {
-      // Remove 'selected' class from all address cards
-      document.querySelectorAll('.address-card').forEach(card => {
-        card.classList.remove('selected');
-      });
-
-      // Add 'selected' class to the currently checked radio button's parent
-      const selectedCard = radio.closest('.address-card');
-      selectedCard.classList.add('selected');
-    });
+    radio.addEventListener('change', updateSelectedAddress);
   });
 
-  document.getElementById('confirm-payment-button')?.addEventListener('click', () => {
-    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
-    const selectedPaymentOption = document.querySelector('input[name="payment_method"]:checked');
-    
-    if (!selectedAddress || !selectedPaymentOption) {
-        alert('Please select both a delivery address and payment option.');
-        return;
-    }
+  // Initialize the page on load
+  document.addEventListener('DOMContentLoaded', initializeCheckoutPage);
 
-    const requestData = {
-        address_id: selectedAddress.value,
-        payment_method: selectedPaymentOption.value
-    };
-
-    fetch('/complete_order', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            window.location.href = '/orders';
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while completing your order. Please try again.');
-    });
-  });
-
-  document.querySelectorAll('input[name="payment_method"]').forEach(input => {
-    input.addEventListener('change', (event) => {
-        if (event.target.value === 'upi') {
-            alert('UPI payment is coming soon!');
-        }
-    });
-  });
-
-  // Run the logic once on page load for the default selection
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.address-radio').forEach(radio => {
-      if (radio.checked) {
-        radio.closest('.address-card').classList.add('selected');
-      }
-    });
-  });
 </script>
 
 {% endblock %}
