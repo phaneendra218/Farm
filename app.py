@@ -288,7 +288,7 @@ def order_item(item_id):
     user_id = session['user_id']
 
     # Create a temporary basket_id, unique for this order session
-    temp_basket_id = f'temp_{user_id}_{int(time())}'
+    temp_basket_id = f'temp_{user_id}_{int(time.time())}'
 
     quantity = Decimal(1)  # Default to 1 item
     basket_item = Basket(basket_id=temp_basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
