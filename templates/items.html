@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Items</h2>
+
+<!-- Check if there are any items to display -->
+{% if items %}
+    <div class="item-container">
+        {% for item in items %}
+            <div class="item-card" style="position:relative;">
+                <h4>{{ item.name }}</h4>
+                <p>Price: ₹{{ item.price }} /{{ item.unit }}</p>
+                
+                <!-- Display image if it exists -->
+                {% if item.image_path %}
+                    <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width:150px; height:100px;">
+                {% else %}
+                    <p>No image available</p>
+                {% endif %}
+
+                <!-- Check if item is hidden (Sold Out) -->
+                {% if item.is_hidden %}
+                    <!-- Sold Out Message -->
+                    <p class="text-danger sold-out-text" style="font-weight: bold;">Sold Out</p>
+                    <!-- Coming Soon Stamp -->
+                    <img src="{{ url_for('static', filename='coming_soon.png') }}" alt="Coming Soon" style="width:100px; height:100px; position:absolute; top:40%; right:10px; transform:translateY(-50%);">
+                {% else %}
+                    <!-- Quantity input for adding to basket -->
+                    <form method="POST" action="{{ url_for('add_to_basket', item_id=item.id) }}" style="margin-top:10px; position:relative;">
+                        <label for="quantity_{{ item.id }}">Quantity:</label>
+                        
+                        <!-- Show the custom input or select based on the condition -->
+                        <div id="quantity-container-{{ item.id }}">
+                            <select name="quantity" id="quantity_{{ item.id }}" onchange="toggleCustomInput(this, '{{ item.id }}')" required>
+                                <!-- <option value="0.5">1/2</option> -->
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Custom quantity input field (hidden by default) -->
+                        <input type="number" name="custom_quantity" id="custom_quantity_{{ item.id }}" min="1" max="50" step="1" style="display:none; margin-top:10px; width:100%;" placeholder="Enter custom quantity">
+
+                        <button type="submit">Add to Basket</button>
+                    </form>                    
+                    <!-- Order item button -->
+                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <button type="submit">Order</button>
+                    </form>
+                {% endif %}
+
+                <!-- Admin actions -->
+                {% if session.get('is_admin') %}
+                    <form action="{{ url_for('update_item', item_id=item.id) }}" method="get" style="display:inline;">
+                        <button type="submit" class="btn btn-primary" style="margin-top:10px;">Update</button>
+                    </form>                    
+                    <form method="POST" action="{{ url_for('delete_item', item_id=item.id) }}" style="margin-top:10px;">
+                        <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this item?');">Delete</button>
+                    </form>
+                    {% if item.is_hidden %}
+                        <form method="POST" action="{{ url_for('unhide_item', item_id=item.id) }}" style="margin-top:10px;">
+                            <button type="submit" class="btn btn-warning">Unhide</button>
+                        </form>
+                    {% else %}
+                        <form method="POST" action="{{ url_for('hide_item', item_id=item.id) }}" style="margin-top:10px;">
+                            <button type="submit" class="btn btn-danger">Hide</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No items available at the moment.</p>
+{% endif %}
+<script>
+    function toggleCustomInput(select, itemId) {
+        const customInput = document.getElementById(`custom_quantity_${itemId}`);
+        
+        // Show the custom input field only when 'Custom' is selected
+        if (select.value === 'custom') {
+            customInput.style.display = 'block';
+            customInput.required = true;
+        } else {
+            customInput.style.display = 'none';
+            customInput.required = false;
+        }
+    }
+</script>
+{% endblock %}

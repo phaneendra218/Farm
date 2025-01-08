@@ -1,0 +1,501 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+h2, h3 {
+    text-align: center;
+    color: #333;
+}
+header {
+    background-color: #4CAF50;
+    padding: 8px 30px;
+    color: white;
+    text-align: center;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+footer {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 0px 30px;
+    font-size: 10px;
+}
+.logo {
+    height: 80px;
+    width: auto;
+    margin-right: 20px;
+}
+nav a {
+    margin: 0 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+nav a:hover {
+    text-decoration: underline;
+}
+main {
+    padding: 20px;
+    flex-grow: 1;
+}
+/* Flash Messages */
+.flash-messages {
+    margin: 5px 0;
+}
+.flash-messages ul {
+    list-style-type: none;
+    padding: 0;
+}
+.flash-messages li {
+    padding: 10px;
+    background-color: #f8d7da;
+    color: #721c24;
+    margin-bottom: 10px;
+}
+.flash-messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+.flash-messages li.info {
+    background-color: #cce5ff;
+    color: #004085;
+}
+.flash-messages li.warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+/* User Info */
+.user-info {
+    text-align: right;
+}
+.user-info p {
+    display: inline-block;
+    margin-right: 15px;
+}
+.delete-button {
+    background-color: #e3342f;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.delete-button:hover {
+    background-color: #c82333;
+}
+.user-info button {
+    margin-top: 10px;
+    background-color: #e6bd38;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.user-info button:hover {
+    background-color: #c28c0d;
+}
+/* Basket Icon Style */
+#basket-icon {
+    position: relative;
+}
+#basket-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+/* Item and Basket Container Styles */
+.item-container, .basket-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.item-card, .basket-item-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    width: 200px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.item-card:hover, .basket-item-card:hover {
+    background-color: #f0f0f0;
+    transition: background-color 0.3s ease;
+}
+.item-card img, .basket-item-card img {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+/* Sold Out Text */
+.sold-out-text {
+    font-weight: bold;
+    color: red;
+}
+/* Coming Soon Image */
+.coming-soon-image {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top: 40%;
+    right: 10px;
+    transform: translateY(-50%);
+}
+/* Order Form */
+.order-form {
+    margin-top: 10px;
+}
+/* Order Button */
+.order-button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.order-button:hover {
+    background-color: #218838;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+button:hover {
+    background-color: #45a049;
+}
+
+/* Media Queries for Responsive Design */
+/* For screens smaller than 768px (Tablets, small screens) */
+@media (max-width: 768px) {
+    header {
+        padding: 12px 20px;
+    }
+    .logo {
+        height: 60px;
+    }
+    .item-card, .basket-item-card {
+        width: 45%;
+    }
+    footer {
+        font-size: 12px;
+        padding: 10px 20px;
+    }
+    .delete-button, .user-info button {
+        padding: 8px 12px;
+    }
+}
+
+/* For screens smaller than 480px (Mobile) */
+@media (max-width: 480px) {
+    header {
+        padding: 10px 15px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    nav a {
+        margin: 5px 0;
+    }
+    .logo {
+        height: 50px;
+        margin-right: 0;
+    }
+    .item-card, .basket-item-card {
+        width: 100%;
+    }
+    footer {
+        font-size: 12px;
+        padding: 10px 15px;
+    }
+    .delete-button, .user-info button {
+        padding: 8px 12px;
+    }
+    #basket-count {
+        font-size: 10px;
+        padding: 2px 5px;
+    }
+}
+
+/* For 360x640 screens */
+@media (max-width: 360px) {
+    .logo {
+        height: 40px;
+    }
+    .item-card, .basket-item-card {
+        width: 100%;
+    }
+    nav a {
+        font-size: 12px;
+    }
+    .delete-button, .user-info button {
+        padding: 6px 10px;
+    }
+    footer {
+        font-size: 10px;
+        padding: 10px 10px;
+    }
+}
+
+/* For 375x667 screens */
+@media (max-width: 375px) {
+    header {
+        padding: 10px 20px;
+    }
+    .logo {
+        height: 50px;
+    }
+    .item-card, .basket-item-card {
+        width: 100%;
+    }
+    footer {
+        font-size: 12px;
+        padding: 10px 20px;
+    }
+}
+/* Media Queries for Basket items*/
+.basket-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+    gap: 10px; 
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 1200px;
+    grid-auto-rows: minmax(100px, auto); 
+}
+
+.basket-item-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+    min-height: 250px; 
+}
+
+.basket-item-card h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.basket-item-card p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.basket-item-card img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.no-image {
+    color: #999;
+    font-size: 0.9em;
+}
+
+.basket-item-card input[type="number"] {
+    width: 70px;
+    padding: 5px;
+    text-align: center;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.total-price-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.total-price-container p {
+    font-size: 1.2em;
+    color: #333;
+}
+
+.basket-actions {
+    text-align: center;
+    margin-top: 20px;
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+}
+.basket-actions form {
+    display: inline-block; 
+    margin-right: 10px; 
+}
+.basket-actions .btn {
+    padding: 10px 20px; 
+}
+.empty-basket-message {
+    color: #777;
+    margin-top: 20px;
+}
+
+.empty-basket-message a {
+    color: #008fee;
+}
+.basket-item-card .btn-update {
+    background-color: #e6b940;
+    color: white;
+    border: none;
+}
+
+.basket-item-card .btn-update:hover {
+    background-color: #c28f04; 
+}
+.basket-item-card .btn-danger {
+    background-color: #cc2d22;
+    color: white;
+    border: none;
+}
+
+.basket-item-card .btn-danger:hover {
+    background-color: #920905; 
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .basket-container {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 8px; 
+    }
+
+    .basket-item-card img {
+        width: 120px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .basket-container {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 6px; 
+    }
+
+    .basket-item-card {
+        padding: 8px; 
+    }
+
+    .basket-item-card img {
+        width: 100px;
+        height: 70px;
+    }
+}
+
+/* Order Card Styles */
+.card {
+    border: 1px solid #ddd; /* Light border around each order card */
+    border-radius: 8px; /* Rounded corners for the card */
+    margin-bottom: 20px; /* Space between each order card */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover Effect for Order Card */
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+    border-color: #007bff; /* Change border color to blue */
+}
+
+/* Card Body */
+.card-body {
+    padding: 20px;
+}
+
+/* Order Summary Section */
+.order-summary {
+    cursor: pointer;
+    padding: 0px;
+    transition: background-color 0.3s ease;
+    margin-top: 0px;
+    border-radius: 8px;
+}
+
+.order-summary:hover {
+    background-color: white; /* Subtle hover effect for summary */
+}
+
+/* Order Details Section */
+.order-details {
+    display: none; /* Hidden by default */
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 5px;
+    transition: all 0.3s ease;
+}
+.order-details:hover {
+    background-color: #f1f1f1;
+}
+
+/* Card Header */
+.card-header {
+    background: linear-gradient(to bottom, #f4e3b4 0%, #dbc078 50%, #b59133 100%);
+    color: white;
+    font-weight: bold;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.order-id {
+    margin-left: 15px; /* Move the Order ID slightly to the right */
+}
+
+/* Spacing Between Order Containers */
+.card {
+    margin-bottom: 30px; /* Ensure there’s space between the order cards */
+}
+
+  /* Click to view details Text Styling */
+  .click-to-view-details {
+    font-weight: bold;
+    color: #007bff; /* Vibrant blue color */
+    text-decoration: underline; /* Underline to highlight the text */
+    transition: color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Hover Effect on "Click to view details" Text */
+.click-to-view-details:hover {
+    color: #0056b3; /* Darker blue on hover */
+    text-decoration: none; /* Remove underline on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-body {
+        padding: 12px;
+    }
+}

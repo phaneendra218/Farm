@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshlyFruited Farms</title>
+    <link rel="icon" href="{{ url_for('static', filename='tabcon.png') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <!-- Logo added here -->
+        <a href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Farming Logo" class="logo">
+        </a>
+        <h1>FreshlyFruited Farms</h1>
+        <nav>
+            <a href="/">Home</a>
+            {% if 'user_id' in session %}
+                <a href="/items">Items</a>
+                {% if session.get('is_admin') %}
+                    <a href="/add_item">Add Item</a>
+                {% endif %}
+                <a href="/contact">Contact Us</a>
+            {% else %}
+                <a href="/signup">Signup</a>
+                <a href="/login">Login</a>
+                <a href="/contact">Contact Us</a>
+            {% endif %}
+        </nav>
+
+        {% if 'user_id' in session %}
+        <!-- User info section positioned on the right side -->
+        <div class="user-info">
+            <p>Welcome, {{ session['username'] }}</p>
+            <a href="{{ url_for('profile') }}"><button>My Profile</button></a>
+            <a href="/orders"><button>My Orders</button></a>
+            <a href="/logout"><button>Logout</button></a>            
+        </div>
+        {% endif %}
+
+        <!-- Basket icon with count -->
+        <a href="/basket" id="basket-icon">
+            <img src="{{ url_for('static', filename='basket.png') }}" alt="Basket" style="width:36px; height:36px;">
+            <span id="basket-count">{{ session.get('basket_count', 0) }}</span>
+        </a>
+    </header>
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 FreshlyFruited Farms</p>
+    </footer>
+</body>
+</html>

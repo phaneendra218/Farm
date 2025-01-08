@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Update Item</h2>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="item_id" value="{{ item.id }}"> <!-- Hidden item ID -->
+    <div class="form-group">
+      <label for="name">Item Name</label><br>
+      <input type="text" class="form-control" id="name" name="name" value="{{ item.name }}" required><br>
+    </div>
+    <div class="form-group">
+      <label for="price">Price (₹)</label><br>
+      <input type="number" class="form-control" id="price" name="price" value="{{ item.price }}" step="0.01" required><br>
+    </div>
+    <div class="form-group">
+      <label for="unit">Unit</label><br>
+      <select class="form-control" id="unit" name="unit" required>
+        <option value="Kg" {% if item.unit == "Kg" %}selected{% endif %}>Kg</option>
+        <option value="Piece" {% if item.unit == "Piece" %}selected{% endif %}>Piece</option>
+        <option value="Litre" {% if item.unit == "Litre" %}selected{% endif %}>Litre</option>
+        <option value="Dozen" {% if item.unit == "Dozen" %}selected{% endif %}>Dozen</option>
+        <option value="Bag" {% if item.unit == "Bag" %}selected{% endif %}>Bag</option>
+      </select><br>
+    </div>
+    <div class="form-group">
+      <label for="image">Item Image (optional)</label><br>
+      <input type="file" class="form-control-file" id="image" name="image"><br>
+      {% if item.image_path %}
+        <p>Current Image:</p>
+        <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}" style="width:150px; height:100px;">
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to update this item?');">Update Item</button>
+  </form>
+  <form action="{{ url_for('items') }}" method="get" style="display:inline;">
+    <button type="submit" class="btn btn-secondary mt-3">Back to Items</button>
+  </form>
+{% endblock %}

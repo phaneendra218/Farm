@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .forget-user-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+        background-color: #f4f7fc;
+    }
+
+    .forget-user-box {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 350px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 5px;
+        display: block;
+        font-size: 14px;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+    }
+
+    button:active {
+        transform: translateY(1px);
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px 30px;
+        border: 1px solid #888;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+    }
+
+    /* Adjusting OK button size */
+    #okButton {
+        padding: 8px 20px;
+        font-size: 14px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        display: inline-block;
+        margin-top: 15px;
+    }
+
+    #okButton:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+    }
+
+    #okButton:active {
+        transform: translateY(1px);
+    }
+    .form-footer {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .form-footer a {
+        color: #4CAF50;
+        text-decoration: none;
+    }
+
+    .form-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="forget-user-container">
+    <div class="forget-user-box">
+        <h2>Forgot Username</h2>
+        <form method="POST" id="forgetUserForm">
+            <label for="phone_number">Phone Number<span class="mandatory">*</span></label>
+            <input type="text" id="phone_number" name="phone_number" required>
+            <button type="submit">Submit</button>
+        </form>
+        <div class="form-footer">
+            <p>Return to <a href="{{ url_for('login') }}">Login</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal structure -->
+<div id="usernameModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <p>Your username is: <strong id="usernameText"></strong></p>
+        <button id="okButton">OK</button>
+    </div>
+</div>
+
+<script>
+    // Check if username exists and show modal
+    {% if username %}
+    const usernameModal = document.getElementById("usernameModal");
+    const usernameText = document.getElementById("usernameText");
+    const closeModal = document.getElementById("closeModal");
+    const okButton = document.getElementById("okButton");
+
+    // Set username text and display modal
+    usernameText.textContent = "{{ username }}";
+    usernameModal.style.display = "block";
+
+    // Close modal and redirect to login page
+    closeModal.onclick = function () {
+        usernameModal.style.display = "none";
+        window.location.href = "{{ url_for('login') }}";
+    };
+
+    okButton.onclick = function () {
+        usernameModal.style.display = "none";
+        window.location.href = "{{ url_for('login') }}";
+    };
+
+    // Close modal if clicked outside of modal content
+    window.onclick = function (event) {
+        if (event.target === usernameModal) {
+            usernameModal.style.display = "none";
+            window.location.href = "{{ url_for('login') }}";
+        }
+    };
+    {% endif %}
+</script>
+{% endblock %}

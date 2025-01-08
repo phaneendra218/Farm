@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* General styling for the page */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fc;
+        margin: 0;
+        padding: 0;
+    }
+
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+        background-color: #f4f7fc;
+        padding-top: 50px;
+        padding-bottom: 0px;
+    }
+
+    .login-box {
+        background-color: #fff;
+        padding: 20px;  /* Adjusted from profile.html */
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 350px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;  /* Adjusted from profile.html */
+        color: #333;
+        font-size: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 5px;  /* Adjusted from profile.html */
+        display: block;
+        font-size: 14px;
+    }
+    .mandatory {
+        color: red;
+        font-size: 14px;
+        margin-left: 3px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;  /* Adjusted from profile.html */
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;  /* Adjusted from profile.html */
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 20px;  /* Adjusted from profile.html */
+        color: #888;
+        font-size: 14px;
+    }
+
+    .footer a {
+        color: #4CAF50;
+        text-decoration: none;
+    }
+
+    .footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-box">
+        <h2>Login</h2>
+        <form method="POST">
+            <label for="username">Username<span class="mandatory">*</span></label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password<span class="mandatory">*</span></label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+        <div class="footer">
+            <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a></p>
+            <p><a href="{{ url_for('forget_password') }}">Forgot Password?</a></p>
+            <p><a href="{{ url_for('forget_user') }}">Forgot Username?</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

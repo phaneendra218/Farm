@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Add New Item</h2>
+<form method="POST" enctype="multipart/form-data">
+    <label>Item Name</label><br>
+    <input type="text" name="name" required><br>
+    
+    <label>Item Price (₹)</label><br>
+    <input type="number" name="price" step="0.01" required><br>
+    
+    <!-- Add unit selection -->
+    <label>Unit</label><br>
+    <select name="unit" required>
+        <option value="Kg">Kg</option>
+        <option value="Piece">Piece</option>
+        <option value="Litre">Litre</option>
+        <option value="Dozen">Dozen</option>
+        <option value="Bag">Bag</option>
+    </select><br>
+
+    <label>Item Image</label><br>
+    <input type="file" name="image" accept="image/*" required><br>
+    
+    <button type="submit">Add Item</button>
+    <a href="{{ url_for('items') }}" class="btn btn-secondary"><button type="button">Cancel</button></a>
+</form>
+{% endblock %}
