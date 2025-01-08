@@ -9,6 +9,7 @@ from decimal import Decimal
 from datetime import datetime
 import random
 import string
+import time
 
 def generate_basket_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
