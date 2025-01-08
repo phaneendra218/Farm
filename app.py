@@ -292,30 +292,25 @@ def order_item(item_id):
     # Clear the existing basket items for the user
     Basket.query.filter_by(basket_id=basket_id, user_id=user_id).delete()
 
-    # Retrieve quantity from the form
-    quantity = request.form.get('quantity')
+    try:
+        # Retrieve the selected quantity from the form
+        quantity = request.form.get('quantity')
 
-    if quantity == 'custom':
-        try:
-            # Retrieve and validate custom quantity
-            custom_quantity = request.form.get('custom_quantity', '1').strip()
+        if not quantity:
+            raise ValueError("No quantity selected.")
+
+        if quantity == 'custom':
+            # Handle custom quantity
+            custom_quantity = request.form.get('custom_quantity', '0').strip()
             quantity = Decimal(custom_quantity)
             if quantity <= 0:
-                raise ValueError("Quantity must be greater than zero.")
-        except Exception:
-            flash('Invalid custom quantity entered. Please enter a positive number.', 'danger')
-            return redirect(url_for('items'))
-    else:
-        try:
-            # Convert predefined quantities to decimal
+                raise ValueError("Custom quantity must be greater than zero.")
+        else:
+            # Handle predefined quantity options
             quantity = Decimal(quantity)
-            if quantity not in [1, 2, 5, 10]:  # Ensure only valid predefined options
-                raise ValueError("Invalid quantity option selected.")
-        except Exception:
-            flash('Invalid quantity selected.', 'danger')
-            return redirect(url_for('items'))
+            if quantity not in [1, 2, 5, 10]:
+                raise ValueError("Invalid predefined quantity selected.")
 
-    try:
         # Add the selected item to the basket with the specified quantity
         basket_item = Basket(basket_id=basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
         db.session.add(basket_item)
@@ -326,12 +321,15 @@ def order_item(item_id):
         session['basket_count'] = basket_count
 
         flash('Item ordered successfully! Redirecting to checkout...', 'success')
+        return redirect(url_for('checkout'))
+
+    except ValueError as ve:
+        flash(str(ve), 'danger')
+        return redirect(url_for('items'))
     except Exception as e:
         db.session.rollback()
         flash(f'An error occurred: {e}', 'danger')
         return redirect(url_for('items'))
-
-    return redirect(url_for('checkout'))
 
 @app.route('/add_to_basket/<int:item_id>', methods=['POST'])
 def add_to_basket(item_id):
