@@ -453,7 +453,7 @@ button:hover {
 
 /* Card Header */
 .card-header {
-    background: linear-gradient(to bottom, #ddc36d 50%, #e6bd38 50%); /* Blue background for the header */
+    background: linear-gradient(to bottom, #f4e3b4 0%, #dbc078 50%, #b59133 100%);
     color: white;
     font-weight: bold;
     border-top-left-radius: 0px;
