@@ -48,7 +48,6 @@
                     </form>                    
                     <!-- Order item button -->
                     <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
-                        <input type="hidden" name="item_id" value="{{ item.id }}">
                         <button type="submit">Order</button>
                     </form>
                 {% endif %}

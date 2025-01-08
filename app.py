@@ -10,6 +10,8 @@ from datetime import datetime
 import random
 import string
 
+# old
+
 def generate_basket_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
@@ -281,19 +283,33 @@ def add_item():
 @app.route('/order_item/<int:item_id>', methods=['POST'])
 def order_item(item_id):
     if 'user_id' not in session:
-        flash('Please login to order items', 'danger')
+        flash('Please login to proceed.', 'danger')
         return redirect(url_for('login'))
-    
-    # Get the item and create an order (assuming quantity is 1 for simplicity)
-    item = Item.query.get_or_404(item_id)
-    order = Order(user_id=session['user_id'], item_id=item.id, quantity=1)
-    db.session.add(order)
-    db.session.commit()
-    
-    flash('Item ordered successfully!', 'success')
-    return redirect(url_for('items'))  # Redirect to the items page
 
-from decimal import Decimal
+    user_id = session['user_id']
+    basket_id = get_or_create_basket_id(user_id)
+
+    # Clear the existing basket items for the user
+    Basket.query.filter_by(basket_id=basket_id, user_id=user_id).delete()
+
+    # Add the selected item to the basket with quantity 1
+    try:
+        quantity = Decimal(1)  # Default quantity for "Order" button
+        basket_item = Basket(basket_id=basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
+        db.session.add(basket_item)
+        db.session.commit()
+
+        # Update basket count
+        basket_count = Basket.query.filter_by(basket_id=basket_id).count()
+        session['basket_count'] = basket_count
+
+        flash('Item ordered successfully! Redirecting to checkout...', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred: {e}', 'danger')
+        return redirect(url_for('items'))
+
+    return redirect(url_for('checkout'))
 
 @app.route('/add_to_basket/<int:item_id>', methods=['POST'])
 def add_to_basket(item_id):
