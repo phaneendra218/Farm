@@ -9,7 +9,6 @@ from decimal import Decimal
 from datetime import datetime
 import random
 import string
-import time
 
 def generate_basket_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
@@ -288,7 +287,8 @@ def order_item(item_id):
     user_id = session['user_id']
 
     # Create a temporary basket_id, unique for this order session
-    temp_basket_id = f'temp_{user_id}_{str(int(time.time()))[-6:]}'
+    random_part = ''.join(random.choices(string.ascii_letters + string.digits, k=5))  # Generate 5 random alphanumeric characters
+    temp_basket_id = f't{random_part}'
 
     quantity = Decimal(1)  # Default to 1 item
     basket_item = Basket(basket_id=temp_basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
