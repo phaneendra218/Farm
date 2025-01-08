@@ -309,6 +309,9 @@ def clear_and_add_to_basket():
     # Get the item_id from the form data
     item_id = request.form.get('item_id')
     
+    if not item_id:
+        return jsonify({'success': False, 'message': 'Item ID is missing.'}), 400
+
     # Add the selected item to the basket
     basket_item = Basket(user_id=user_id, item_id=item_id, quantity=1)
     db.session.add(basket_item)

@@ -47,10 +47,10 @@
                         <button type="submit">Add to Basket</button>
                     </form>                    
                     <!-- Order item button -->
-                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" id="order-form-{{ item.id }}" style="margin-top:10px;">
-                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <form method="POST" action="{{ url_for('clear_and_add_to_basket') }}" id="order-form-{{ item.id }}" style="margin-top:10px;">
+                        <input type="hidden" name="item_id" value="{{ item.id }}"> <!-- Pass item_id -->
                         <button type="submit" id="order-button-{{ item.id }}">Order</button>
-                    </form>                    
+                    </form>                                       
                 {% endif %}
 
                 <!-- Admin actions -->
