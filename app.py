@@ -295,6 +295,28 @@ def order_item(item_id):
 
 from decimal import Decimal
 
+@app.route('/clear_and_add_to_basket', methods=['POST'])
+def clear_and_add_to_basket():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    
+    # Clear the current basket for the user
+    Basket.query.filter_by(user_id=user_id).delete()
+    db.session.commit()
+
+    # Get the item_id from the form data
+    item_id = request.form.get('item_id')
+    
+    # Add the selected item to the basket
+    basket_item = Basket(user_id=user_id, item_id=item_id, quantity=1)
+    db.session.add(basket_item)
+    db.session.commit()
+
+    # Redirect to the checkout page
+    return redirect(url_for('checkout'))
+
 @app.route('/add_to_basket/<int:item_id>', methods=['POST'])
 def add_to_basket(item_id):
     if 'user_id' not in session:
@@ -563,17 +585,6 @@ def complete_order():
     db.session.commit()
 
     return jsonify({'success': True, 'message': 'Order placed successfully!', 'total_price': str(total_price)})
-
-@app.route('/refresh_basket_count', methods=['POST'])
-def refresh_basket_count():
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'User not logged in'}), 401
-    
-    user_id = session['user_id']
-    basket_items = Basket.query.filter_by(user_id=user_id).all()
-    item_count = sum(basket_item.quantity for basket_item in basket_items)
-    
-    return jsonify({'success': True, 'item_count': item_count})
 
 @app.route('/orders', methods=['GET'])
 def orders():

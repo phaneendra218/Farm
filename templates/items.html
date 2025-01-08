@@ -47,10 +47,10 @@
                         <button type="submit">Add to Basket</button>
                     </form>                    
                     <!-- Order item button -->
-                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
+                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" id="order-form-{{ item.id }}" style="margin-top:10px;">
                         <input type="hidden" name="item_id" value="{{ item.id }}">
-                        <button type="submit">Order</button>
-                    </form>
+                        <button type="submit" id="order-button-{{ item.id }}">Order</button>
+                    </form>                    
                 {% endif %}
 
                 <!-- Admin actions -->
@@ -90,5 +90,35 @@
             customInput.required = false;
         }
     }
+    
+    document.querySelectorAll('form[id^="order-form-"]').forEach(form => {
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const itemId = form.querySelector('input[name="item_id"]').value;
+
+        // Clear the basket first
+        fetch('/clear_and_add_to_basket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ item_id: itemId })
+        })
+        .then(response => {
+            if (response.ok) {
+                // Redirect to checkout after successful order
+                window.location.href = '/checkout';
+            } else {
+                alert('Error while processing your order.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing your order. Please try again.');
+        });
+    });
+});
+
 </script>
 {% endblock %}
