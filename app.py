@@ -295,42 +295,6 @@ def order_item(item_id):
 
 from decimal import Decimal
 
-@app.route('/clear_and_add_to_basket', methods=['POST'])
-def clear_and_add_to_basket():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    user_id = session['user_id']
-    
-    # Clear the current basket for the user
-    Basket.query.filter_by(user_id=user_id).delete()
-    db.session.commit()
-
-    # Get the item_id and quantity from the form data
-    item_id = request.form.get('item_id')
-    quantity = request.form.get('quantity')
-    
-    if not item_id:
-        return jsonify({'success': False, 'message': 'Item ID is missing.'}), 400
-
-    # Fetch the item to check if it exists in the database
-    item = db.session.get(Item, item_id)
-    if not item:
-        return jsonify({'success': False, 'message': 'Item not found.'}), 404
-
-    # Determine the actual quantity
-    if quantity == 'custom':
-        custom_quantity = int(request.form.get('custom_quantity', 1))
-        quantity = custom_quantity
-    
-    # Add the selected item to the basket
-    basket_item = Basket(user_id=user_id, item_id=item_id, quantity=int(quantity))
-    db.session.add(basket_item)
-    db.session.commit()
-
-    # Redirect to the checkout page
-    return redirect(url_for('checkout'))
-
 @app.route('/add_to_basket/<int:item_id>', methods=['POST'])
 def add_to_basket(item_id):
     if 'user_id' not in session:
