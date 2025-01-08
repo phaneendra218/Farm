@@ -294,7 +294,7 @@ def order_item(item_id):
 
     try:
         # Retrieve the selected quantity from the form
-        quantity = request.form.get('quantity')
+        quantity = request.form.get('quantity', '1')  # Default to 1 if no quantity is selected
 
         if not quantity:
             raise ValueError("No quantity selected.")

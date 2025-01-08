@@ -47,7 +47,7 @@
                         <button type="submit">Add to Basket</button>
                     </form>                    
                     <!-- Order item button -->
-                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
+                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;" onsubmit="passQuantityToOrder('{{ item.id }}')">
                         <button type="submit">Order</button>
                     </form>
                 {% endif %}
@@ -88,6 +88,25 @@
             customInput.style.display = 'none';
             customInput.required = false;
         }
+      }
+
+      function passQuantityToOrder(itemId) {
+    // Find the select element
+    const selectedQuantity = document.querySelector(`#quantity_${itemId}`).value;
+    const customQuantity = document.querySelector(`#custom_quantity_${itemId}`).value;
+    
+    // Create a hidden input field for quantity
+    const orderQuantityField = document.createElement('input');
+    orderQuantityField.type = 'hidden';
+    orderQuantityField.name = 'quantity'; 
+    orderQuantityField.value = (selectedQuantity === 'custom') ? customQuantity : selectedQuantity;
+
+    // Find the form and append the hidden input
+    const orderForm = document.querySelector(`form[action*="order_item/${itemId}"]`);
+    if (orderForm) {
+        orderForm.appendChild(orderQuantityField);
     }
+}
+
 </script>
 {% endblock %}
