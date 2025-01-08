@@ -39,6 +39,9 @@
       <form action="{{ url_for('profile') }}" method="get">
         <button type="submit" class="btn-secondary mt-3">+ Add New Address</button>
     </form>
+    <form action="{{ url_for('cancel_order') }}" method="get">
+      <button type="submit">Cancel Order</button>
+  </form>
   </div>
 </div>
   {% else %}

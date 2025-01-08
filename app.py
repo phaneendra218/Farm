@@ -281,19 +281,24 @@ def add_item():
 @app.route('/order_item/<int:item_id>', methods=['POST'])
 def order_item(item_id):
     if 'user_id' not in session:
-        flash('Please login to order items', 'danger')
+        flash('Please login to place an order', 'danger')
         return redirect(url_for('login'))
-    
-    # Get the item and create an order (assuming quantity is 1 for simplicity)
-    item = Item.query.get_or_404(item_id)
-    order = Order(user_id=session['user_id'], item_id=item.id, quantity=1)
-    db.session.add(order)
-    db.session.commit()
-    
-    flash('Item ordered successfully!', 'success')
-    return redirect(url_for('items'))  # Redirect to the items page
 
-from decimal import Decimal
+    user_id = session['user_id']
+
+    # Create a temporary basket_id, unique for this order session
+    temp_basket_id = f'temp_{user_id}_{int(time())}'
+
+    quantity = Decimal(1)  # Default to 1 item
+    basket_item = Basket(basket_id=temp_basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
+    db.session.add(basket_item)
+    db.session.commit()
+
+    # Store the temporary basket_id in session to maintain this basket across pages
+    session['temp_basket_id'] = temp_basket_id
+
+    # Redirect to checkout page with the temporary basket
+    return redirect(url_for('checkout'))
 
 @app.route('/add_to_basket/<int:item_id>', methods=['POST'])
 def add_to_basket(item_id):
@@ -447,23 +452,54 @@ def checkout():
         flash('You must be logged in to complete the checkout process', 'danger')
         return redirect(url_for('login'))    
     user = User.query.get(session['user_id'])
+
     if request.method == 'POST':
+        # For "Order" button
+        if 'item_id' in request.form:
+            item_id = request.form.get('item_id')
+            quantity = 1  # Default to 1 item
+
+            # Create a temporary basket_id and add this single item into it
+            temp_basket_id = f'temp_{user.id}_{item_id}'
+            existing_basket_item = Basket.query.filter_by(basket_id=temp_basket_id, item_id=item_id).first()
+
+            if existing_basket_item:
+                existing_basket_item.quantity += quantity
+            else:
+                basket_item = Basket(
+                    basket_id=temp_basket_id,
+                    user_id=user.id,
+                    item_id=item_id,
+                    quantity=quantity
+                )
+                db.session.add(basket_item)
+
+            db.session.commit()
+
+            flash('Item added to temporary basket. Proceed to checkout.', 'success')
+            return redirect(url_for('checkout', temp_basket_id=temp_basket_id))
+        
+        # Regular checkout process with selected address and payment method
         address_id = request.form.get('address_id')
-        # payment_option = request.form.get('payment_option')
         payment_method = request.form.get('payment_method')
-        # Check if an address was selected
+
         if not address_id:
             flash('Please select a delivery address', 'danger')
             return redirect(url_for('checkout'))
+
         address = Address.query.get(address_id)
-        # Ensure the address exists and belongs to the current user
+
         if not address or address.user_id != user.id:
             flash('Invalid address selected', 'danger')
             return redirect(url_for('checkout'))
-        # Process the order, create order entries for items in the basket, etc.
-        basket_items = Basket.query.filter_by(user_id=user.id).all()
+
+        # Fetch items from the temporary basket if exists, otherwise use user's basket
+        basket_id = request.args.get('temp_basket_id', None)
+        basket_items = Basket.query.filter_by(basket_id=basket_id).all() if basket_id else Basket.query.filter_by(user_id=user.id).all()
+
         total_price = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
-        # Example of creating an order from the basket
+
+        # Create orders for each item in the basket
         for basket_item in basket_items:
             order = Order(
                 user_id=user.id,
@@ -471,20 +507,32 @@ def checkout():
                 quantity=basket_item.quantity
             )
             db.session.add(order)
-        db.session.query(Basket).filter_by(user_id=user.id).delete()
-        # Commit the transaction
+
+        # Clear the basket once orders are placed
+        db.session.query(Basket).filter_by(basket_id=basket_id).delete() if basket_id else db.session.query(Basket).filter_by(user_id=user.id).delete()
+
+        # Commit transaction
         db.session.commit()
+
         flash('Order placed successfully!', 'success')
         return redirect(url_for('profile'))
+    
     # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
-    # Clear flash messages on GET request
-    if request.method == 'GET':
-        session.pop('_flashes', None)
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
+
+    # Clear flash messages on GET request
+    if request.method == 'GET':
+        session.pop('_flashes', None)
+
     return render_template('checkout.html', addresses=addresses)
+
+@app.route('/cancel_order', methods=['GET'])
+def cancel_order():
+    session.pop('temp_basket_id', None)
+    return redirect(url_for('items'))
 
 @app.route('/get_basket_items')
 def get_basket_items():
