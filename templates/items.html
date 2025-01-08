@@ -91,15 +91,22 @@
       }
 
       function passQuantityToOrder(itemId) {
-    // Find the select element
-    const selectedQuantity = document.querySelector(`#quantity_${itemId}`).value;
-    const customQuantity = document.querySelector(`#custom_quantity_${itemId}`).value;
+    const selectElement = document.querySelector(`#quantity_${itemId}`);
+    const selectedQuantity = selectElement.value;
+    const customQuantityInput = document.querySelector(`#custom_quantity_${itemId}`);
+
+    let quantityValue = selectedQuantity === 'custom' ? customQuantityInput.value : selectedQuantity;
     
-    // Create a hidden input field for quantity
+    if (selectedQuantity === 'custom' && customQuantityInput.value.trim() === '') {
+        alert('Please enter a custom quantity.');
+        return;
+    }
+    
+    // Create a hidden input field for the quantity
     const orderQuantityField = document.createElement('input');
     orderQuantityField.type = 'hidden';
     orderQuantityField.name = 'quantity'; 
-    orderQuantityField.value = (selectedQuantity === 'custom') ? customQuantity : selectedQuantity;
+    orderQuantityField.value = quantityValue;
 
     // Find the form and append the hidden input
     const orderForm = document.querySelector(`form[action*="order_item/${itemId}"]`);
