@@ -292,9 +292,22 @@ def order_item(item_id):
     # Clear the existing basket items for the user
     Basket.query.filter_by(basket_id=basket_id, user_id=user_id).delete()
 
-    # Add the selected item to the basket with quantity 1
-    try:
-        quantity = Decimal(1)  # Default quantity for "Order" button
+    # Add the selected item to the basket
+    quantity = request.form.get('quantity')
+    if quantity == 'custom':
+        try:
+            custom_quantity = request.form.get('custom_quantity', '1')
+            quantity = Decimal(custom_quantity)
+        except Exception:
+            flash('Invalid custom quantity entered.', 'danger')
+            return redirect(url_for('items'))
+    else:
+        try:
+            quantity = Decimal(quantity)
+        except Exception:
+            flash('Invalid quantity entered.', 'danger')
+            return redirect(url_for('items'))
+
         basket_item = Basket(basket_id=basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
         db.session.add(basket_item)
         db.session.commit()
@@ -302,12 +315,6 @@ def order_item(item_id):
         # Update basket count
         basket_count = Basket.query.filter_by(basket_id=basket_id).count()
         session['basket_count'] = basket_count
-
-        flash('Item ordered successfully! Redirecting to checkout...', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'An error occurred: {e}', 'danger')
-        return redirect(url_for('items'))
 
     return redirect(url_for('checkout'))
 
