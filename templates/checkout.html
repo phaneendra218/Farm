@@ -200,7 +200,7 @@
 #change-address-container .btn-secondary {
   background-color: white;
   color: rgb(51, 51, 240);
-  border: 1px solid #5a6268;
+  border: 1px solid #28a745;
   padding: 5px 10px;
   font-size: 0.9em;
   font-weight: bold;
@@ -324,25 +324,50 @@
     };
 
     fetch('/complete_order', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            window.location.href = '/orders';
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while completing your order. Please try again.');
-    });
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(requestData)
+})
+.then(response => response.json())
+.then(data => {
+    if (data.success) {
+        alert(data.message);
+        
+        // Refresh the basket count and clear the basket (if applicable)
+        // This will handle clearing any remaining items from the basket UI after a successful order.
+        fetch('/refresh_basket_count', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user_id: data.user_id }) // Assuming you have user_id from the session or data response
+        })
+        .then(response => response.json())
+        .then(basketData => {
+            // Optionally, update the UI with the new basket count
+            if (basketData.success) {
+                document.getElementById('basket-item-count').textContent = basketData.item_count;
+            } else {
+                alert('Error refreshing basket count.');
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing basket count:', error);
+        });
+
+        // Redirect to the orders page after refreshing the basket count
+        window.location.href = '/orders';
+    } else {
+        alert(data.message);
+    }
+   })
+.catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while completing your order. Please try again.');
+  });
+
 });
 document.querySelectorAll('input[name="payment_method"]').forEach(input => {
     input.addEventListener('change', (event) => {
