@@ -343,7 +343,6 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
   // Replace the container content with the confirmed address details
   addressContainer.innerHTML = `
     <div class="confirmed-address">
-      <h3>Selected Address:</h3>
       <p><strong>${selectedCard.querySelector('.address-type').textContent}</strong></p>
       <p>${selectedCard.querySelector('.address-text').textContent}</p>
     </div>
