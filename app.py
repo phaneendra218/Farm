@@ -331,47 +331,6 @@ def order_item(item_id):
         flash(f'An error occurred: {e}', 'danger')
         return redirect(url_for('items'))
 
-    return redirect(url_for('checkout'))
-
-@app.route('/add_to_basket/<int:item_id>', methods=['POST'])
-def add_to_basket(item_id):
-    if 'user_id' not in session:
-        flash('Please login to add items to your basket', 'danger')
-        return redirect(url_for('login'))
-
-    user_id = session['user_id']
-    basket_id = get_or_create_basket_id(user_id)
-
-    quantity = request.form.get('quantity')
-    if quantity == 'custom':
-        try:
-            custom_quantity = request.form.get('custom_quantity', '1')
-            quantity = Decimal(custom_quantity)
-        except Exception:
-            flash('Invalid custom quantity entered.', 'danger')
-            return redirect(url_for('items'))
-    else:
-        try:
-            quantity = Decimal(quantity)
-        except Exception:
-            flash('Invalid quantity entered.', 'danger')
-            return redirect(url_for('items'))
-
-    # Check if the item already exists in the basket
-    basket_item = Basket.query.filter_by(basket_id=basket_id, item_id=item_id).first()
-    if basket_item:
-        basket_item.quantity += quantity  # Update quantity if item already exists
-    else:
-        basket_item = Basket(basket_id=basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
-        db.session.add(basket_item)
-
-    db.session.commit()
-
-    # Update basket count
-    basket_count = Basket.query.filter_by(basket_id=basket_id).count()
-    session['basket_count'] = basket_count
-
-    flash('Item added to basket successfully!', 'success')
     return redirect(url_for('items'))
 
 @app.route('/update_basket_quantity/<int:item_id>', methods=['POST'])

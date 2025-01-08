@@ -47,20 +47,8 @@
                         <button type="submit">Add to Basket</button>
                     </form>                    
                     <!-- Order item button -->
-                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}">
-                        <label for="quantity">Quantity:</label>
-                        <select id="quantity" name="quantity" onchange="toggleCustomQuantityField()">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="custom">Custom</option>
-                        </select>
-                        <div id="customQuantityField" style="display: none;">
-                            <label for="custom_quantity">Enter Custom Quantity:</label>
-                            <input type="number" id="custom_quantity" name="custom_quantity" min="1" step="1">
-                        </div>
-                        <button type="submit">Order Item</button>
+                    <form method="POST" action="{{ url_for('order_item', item_id=item.id) }}" style="margin-top:10px;">
+                        <button type="submit">Order</button>
                     </form>
                 {% endif %}
 
@@ -101,15 +89,5 @@
             customInput.required = false;
         }
     }
-
-    function toggleCustomQuantityField() {
-    const quantitySelect = document.getElementById('quantity');
-    const customField = document.getElementById('customQuantityField');
-    if (quantitySelect.value === 'custom') {
-        customField.style.display = 'block';
-    } else {
-        customField.style.display = 'none';
-    }
-}
 </script>
 {% endblock %}
