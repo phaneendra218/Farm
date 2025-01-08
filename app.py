@@ -564,6 +564,17 @@ def complete_order():
 
     return jsonify({'success': True, 'message': 'Order placed successfully!', 'total_price': str(total_price)})
 
+@app.route('/refresh_basket_count', methods=['POST'])
+def refresh_basket_count():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'User not logged in'}), 401
+    
+    user_id = session['user_id']
+    basket_items = Basket.query.filter_by(user_id=user_id).all()
+    item_count = sum(basket_item.quantity for basket_item in basket_items)
+    
+    return jsonify({'success': True, 'item_count': item_count})
+
 @app.route('/orders', methods=['GET'])
 def orders():
     if 'user_id' not in session:
