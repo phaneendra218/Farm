@@ -42,6 +42,10 @@
     <p>No addresses found. Please add an address to proceed.</p>
     <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
   {% endif %}
+  <!-- Change Button -->
+  <div id="change-address-container" class="hidden">
+    <button id="change-address-button" class="btn btn-secondary">Change</button>
+  </div>
 </div>
 
 <!-- Order Summary Section -->
@@ -315,7 +319,7 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
 });
 
   // Initialize the page state
-  const initializeCheckoutPage = () => {
+    const initializeCheckoutPage = () => {
     const orderSummarySection = document.getElementById('order-summary-section');
     const paymentSection = document.getElementById('payment-options-section');
 
@@ -351,9 +355,14 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
   // Hide all remaining address cards and buttons
   document.querySelector('.address-cards-container').style.display = 'none';
   document.querySelector('.address-buttons').style.display = 'none';
-
+  // Show the Change button
+  document.getElementById('change-address-container').classList.remove('hidden');
   // Lock the delivery address section visually
   deliveryAddressSection.classList.add('locked');
+  document.getElementById('change-address-button')?.addEventListener('click', () => {
+  // Reload the page to start fresh
+  window.location.reload();
+  });
 
   // Fetch basket items and show Order Summary section (existing logic)
   fetch(`/get_basket_items?address_id=${selectedAddress.value}`)
