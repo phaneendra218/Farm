@@ -299,7 +299,7 @@ def order_item(item_id):
     session['temp_basket_id'] = temp_basket_id
 
     # Redirect to checkout page with the temporary basket
-    return redirect(url_for('checkout'))
+    return redirect(url_for('checkout', temp_basket_id=temp_basket_id))
 
 @app.route('/add_to_basket/<int:item_id>', methods=['POST'])
 def add_to_basket(item_id):
