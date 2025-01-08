@@ -292,22 +292,31 @@ def order_item(item_id):
     # Clear the existing basket items for the user
     Basket.query.filter_by(basket_id=basket_id, user_id=user_id).delete()
 
-    # Add the selected item to the basket
+    # Retrieve quantity from the form
     quantity = request.form.get('quantity')
+
     if quantity == 'custom':
         try:
-            custom_quantity = request.form.get('custom_quantity', '1')
+            # Retrieve and validate custom quantity
+            custom_quantity = request.form.get('custom_quantity', '1').strip()
             quantity = Decimal(custom_quantity)
+            if quantity <= 0:
+                raise ValueError("Quantity must be greater than zero.")
         except Exception:
-            flash('Invalid custom quantity entered.', 'danger')
+            flash('Invalid custom quantity entered. Please enter a positive number.', 'danger')
             return redirect(url_for('items'))
     else:
         try:
+            # Convert predefined quantities to decimal
             quantity = Decimal(quantity)
+            if quantity not in [1, 2, 5, 10]:  # Ensure only valid predefined options
+                raise ValueError("Invalid quantity option selected.")
         except Exception:
-            flash('Invalid quantity entered.', 'danger')
+            flash('Invalid quantity selected.', 'danger')
             return redirect(url_for('items'))
 
+    try:
+        # Add the selected item to the basket with the specified quantity
         basket_item = Basket(basket_id=basket_id, user_id=user_id, item_id=item_id, quantity=quantity)
         db.session.add(basket_item)
         db.session.commit()
@@ -315,6 +324,12 @@ def order_item(item_id):
         # Update basket count
         basket_count = Basket.query.filter_by(basket_id=basket_id).count()
         session['basket_count'] = basket_count
+
+        flash('Item ordered successfully! Redirecting to checkout...', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred: {e}', 'danger')
+        return redirect(url_for('items'))
 
     return redirect(url_for('checkout'))
 
