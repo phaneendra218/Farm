@@ -314,7 +314,8 @@ def order_item(item_id):
         # Update basket count
         basket_count = Basket.query.filter_by(basket_id=basket_id).count()
         session['basket_count'] = basket_count
-        return redirect(url_for('items'))
+
+        return redirect(url_for('checkout'))
 
 @app.route('/add_to_basket/<int:item_id>', methods=['POST'])
 def add_to_basket(item_id):
