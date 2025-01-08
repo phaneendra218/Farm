@@ -183,16 +183,19 @@
   gap: 10px;
 }
 
+
 #change-address-container {
   position: absolute;
   top: 10px;
   right: 10px;
   text-align: right;
+  z-index: 10; /* Ensures the button is above the blackout overlay */
+  pointer-events: auto; /* Enables clicking on the button */
 }
 
 #change-address-container .btn-secondary {
   background-color: white;
-  color: blue;
+  color: rgb(51, 51, 240);
   border: 1px solid #5a6268;
   padding: 5px 10px;
   font-size: 0.9em;
@@ -202,8 +205,12 @@
   background-color: #dbf0fc;
 }
 
-.address-box {
-  position: relative; /* Ensures the button is positioned relative to this container */
+.address-box.locked {
+  pointer-events: none; /* Disables interactions with the entire container */
+}
+
+.address-box.locked #change-address-container {
+  pointer-events: auto; /* Re-enables interactions specifically for the Change button */
 }
 
 </style>
