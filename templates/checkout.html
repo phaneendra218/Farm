@@ -335,8 +335,22 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
       return;
     }
 
-    // Lock the Delivery Address section
-    document.getElementById('delivery-address-section').classList.add('locked');
+    // Lock the Delivery Address section and display only the confirmed address
+    const deliveryAddressSection = document.getElementById('delivery-address-section');
+    const selectedCard = selectedAddress.closest('.address-card');
+    const addressContainer = document.getElementById('address-container');
+
+    // Replace the container content with the confirmed address details
+    addressContainer.innerHTML = `
+      <div class="confirmed-address">
+        <p><strong>Selected Address:</strong></p>
+        <p>${selectedCard.querySelector('.address-type').textContent}</p>
+        <p>${selectedCard.querySelector('.address-text').textContent}</p>
+      </div>
+    `;
+
+    // Lock the delivery address section visually
+    deliveryAddressSection.classList.add('locked');
 
     // Fetch basket items and show Order Summary section (existing logic)
     fetch(`/get_basket_items?address_id=${selectedAddress.value}`)
