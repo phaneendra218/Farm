@@ -9,8 +9,8 @@ from decimal import Decimal
 from datetime import datetime
 import random
 import string
-
-# old
+from sqlalchemy.exc import OperationalError
+# Old
 
 def generate_basket_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
@@ -93,6 +93,14 @@ class Basket(db.Model):
     Order.item = db.relationship('Item', backref='order_items')    
 
 # Routes
+@app.before_request
+def check_database():
+    try:
+        # Example query to test DB connection
+        db.session.execute('SELECT 1')
+    except OperationalError:
+        return render_template('maintenance.html'), 503
+    
 @app.route('/')
 def home():
     items = Item.query.all()  # Fetch all items from the database, including image_path for each item
