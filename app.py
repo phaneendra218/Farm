@@ -30,7 +30,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 # Database Configuration (External Database URL)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://farmpsql_user:ilFpRrHEzsedKGwtrOtweM0ToOV6YmIW@dpg-ctc8ap5ds78s73flqmpg-a.oregon-postgres.render.com/farmpsql'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://farmpsql_user:1lzuTjaCQsUNSxAoUMk3tB2ftOMzeNTr@dpg-cu021mjv2p9s739bk33g-a.oregon-postgres.render.com/farmpsql_x178'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Set the upload folder and allowed file extensions
