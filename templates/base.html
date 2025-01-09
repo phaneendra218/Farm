@@ -58,6 +58,23 @@
         {% endwith %}
     </div>
 
+    <div class="maintenance-message">
+        {% if session.get('maintenance_message') %}
+            <div class="alert alert-warning">
+                {{ session['maintenance_message'] }}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if session.get('is_admin') %}
+    <form method="POST" action="{{ url_for('set_maintenance') }}" style="display:inline;">
+        <button type="submit" class="admin-button">Set Maintenance</button>
+    </form>
+    <form method="POST" action="{{ url_for('clear_maintenance') }}" style="display:inline;">
+        <button type="submit" class="admin-button">Clear Maintenance</button>
+    </form>
+    {% endif %}
+
     <main>
         {% block content %}
         {% endblock %}
