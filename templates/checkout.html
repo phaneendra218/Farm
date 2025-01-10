@@ -65,7 +65,7 @@
             <p><strong>{{ item.name }}</strong></p>
             <p>Price: ₹{{ item.price }}</p>
             <p>Quantity: {{ basket_item.quantity }}</p>
-            <p>Total: ₹{{ (float(item.price) * basket_item.quantity) | float }}</p>
+            <p>Total: ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p>
           </div>
         </div>
       {% endfor %}
