@@ -379,8 +379,8 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
           totalPrice += itemTotal;
           itemsSummaryDiv.innerHTML += `
           <div class="item-row">
-            <img src="${item.image_url}" alt="${item.name}" width="100" height="100">
-            <p>${item.name} : ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>
+            <img src="${item.image_url}" alt="${item.name}" width="100" height="150px">
+            <p><strong>${item.name} : </strong>Quantity: ${item.quantity} Price: ₹${itemTotal.toFixed(2)}/-</p>
           </div>
         `;
       });
