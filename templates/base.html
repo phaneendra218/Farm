@@ -53,6 +53,17 @@
     </div>
     {% endif %}
 
+    {% if session.get('is_admin') %}
+<form method="POST" action="{{ url_for('toggle_maintenance') }}" style="display:inline;">
+    {% if maintenance_mode %}
+        <button type="submit" style="background-color: red; color: white;">Disable Maintenance Mode</button>
+    {% else %}
+        <button type="submit" style="background-color: green; color: white;">Enable Maintenance Mode</button>
+    {% endif %}
+</form>
+{% endif %}
+
+
     <div class="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}

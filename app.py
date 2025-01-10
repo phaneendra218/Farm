@@ -105,12 +105,17 @@ def inject_maintenance_mode():
 
 @app.route('/admin/toggle_maintenance', methods=['POST'])
 def toggle_maintenance():
+    # Check if the user is an admin
     if 'user_id' in session and session.get('is_admin'):
+        # Toggle the maintenance mode
         app.config['MAINTENANCE_MODE'] = not app.config['MAINTENANCE_MODE']
-        mode = 'ON' if app.config['MAINTENANCE_MODE'] else 'OFF'
-        flash(f'Maintenance mode is now {mode}.', 'info')
-        return redirect(url_for('admin_dashboard'))
-    return "Unauthorized", 403
+        mode = "ON" if app.config['MAINTENANCE_MODE'] else "OFF"
+        flash(f"Maintenance mode is now {mode}.", "info")
+        return redirect(url_for('home'))
+    else:
+        # Unauthorized access
+        flash("You are not authorized to perform this action.", "error")
+        return redirect(url_for('home'))
 
 @app.route('/')
 def home():
