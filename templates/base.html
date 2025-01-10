@@ -45,7 +45,6 @@
             <span id="basket-count">{{ session.get('basket_count', 0) }}</span>
         </a>
     </header>
-
     <!-- Maintenance mode banner -->
     {% if maintenance_mode %}
     <div class="maintenance-banner" style="background-color: #f8d7da; color: #721c24; padding: 10px; text-align: center;">
@@ -62,7 +61,6 @@
     {% endif %}
 </form>
 {% endif %}
-
 
     <div class="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}

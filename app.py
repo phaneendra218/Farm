@@ -94,22 +94,17 @@ class Basket(db.Model):
     Order.item = db.relationship('Item', backref='order_items')    
 
 # Routes
-from flask import request, jsonify, url_for
-
 @app.before_request
 def check_maintenance_mode():
     # List of routes to exclude from maintenance check
-    exempt_routes = [url_for('login'), url_for('toggle_maintenance')]
-    
+    exempt_routes = [url_for('login'), url_for('toggle_maintenance')]    
     if app.config.get('MAINTENANCE_MODE'):
         # Allow GET requests (read-only mode)
         if request.method == 'GET':
-            return None
-        
+            return None        
         # Allow exempt routes to proceed
         if request.path in exempt_routes:
-            return None
-        
+            return None        
         # Block other POST requests
         return render_template('maintenance.html'), 503
 

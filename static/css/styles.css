@@ -56,10 +56,10 @@ main {
     padding: 0;
 }
 .flash-messages li {
-    padding: 10px;
+    padding: 5px;
     background-color: #f8d7da;
     color: #721c24;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 .flash-messages li.success {
     background-color: #d4edda;
