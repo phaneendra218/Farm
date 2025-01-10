@@ -408,7 +408,7 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
         data.items.forEach(item => {
           const itemTotal = item.price * item.quantity;
           totalPrice += itemTotal;
-          itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>`;
+          itemsSummaryDiv.innerHTML += `<p>${item.name} : ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>`;
         });
 
         totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
