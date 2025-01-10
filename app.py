@@ -111,7 +111,7 @@ def check_maintenance_mode():
             return None
         
         # Block other POST requests
-        return jsonify({'error': 'The site is under maintenance. Please try again later.'}), 503
+        return render_template('maintenance.html'), 503
 
 @app.context_processor
 def inject_maintenance_mode():
