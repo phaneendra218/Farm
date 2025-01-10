@@ -559,12 +559,14 @@ def get_basket_items():
     for basket_item in basket_items:
         # Convert both price and quantity to float before calculating total
         item_price = float(basket_item.item.price)  # Convert price to float
-        item_quantity = float(basket_item.quantity)  # Convert quantity to float        
+        item_quantity = float(basket_item.quantity)  # Convert quantity to float
+        image_url = basket_item.item.image_url
         item_data = {
             'name': basket_item.item.name,
             'price': item_price,
             'quantity': item_quantity,
-            'unit': basket_item.item.unit
+            'unit': basket_item.item.unit,
+            'image_url': image_url
         }
         items.append(item_data)
         total_price = Decimal(total_price)
