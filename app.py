@@ -560,7 +560,7 @@ def get_basket_items():
         # Convert both price and quantity to float before calculating total
         item_price = float(basket_item.item.price)  # Convert price to float
         item_quantity = float(basket_item.quantity)  # Convert quantity to float
-        image_url = basket_item.item.image_url
+        image_url = basket_item.item.image_path
         item_data = {
             'name': basket_item.item.name,
             'price': item_price,
