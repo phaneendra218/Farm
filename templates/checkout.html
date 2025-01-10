@@ -38,8 +38,9 @@
       <button id="confirm-address-button" class="btn btn-primary">Confirm Address</button>
       <form action="{{ url_for('profile') }}" method="get">
         <button type="submit" class="btn-secondary mt-3">+ Add New Address</button>
-      </form>
-    </div>
+    </form>
+  </div>
+</div>
   {% else %}
     <p>No addresses found. Please add an address to proceed.</p>
     <a href="{{ url_for('profile') }}" class="btn btn-success">+ Add New Address</a>
@@ -87,14 +88,7 @@
     opacity: 0.5;
   }
   .blackout h2 {
-    pointer-events: auto;
-  }
-  .address-box, .summary-box {
-    border: 1px solid #ccc;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    pointer-events: auto; /* Allow clicking on the container name */
   }
   .address-box.locked {
     pointer-events: none;
@@ -104,15 +98,29 @@
     background-color: #e6b514;
     color: white;
     border: none;
-  }
+    }
   .address-box .btn-secondary:hover {
     background-color: #c5840b; 
+   }
+   
+  .address-box, .summary-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
+  
+  .address-box h2, .summary-box h2 {
+    margin-bottom: 20px;
+  }
+
   .address-cards-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
+
   .address-card {
     display: flex;
     align-items: center;
@@ -123,15 +131,17 @@
     transition: 0.3s;
     background-color: white;
   }
+
   .address-card:hover {
     background-color: #f9f9f9;
   }
   .address-card.selected {
-    background-color: #d4edda;
-    border-color: #28a745;
+    background-color: #d4edda; /* Light green background for selected address */
+    border-color: #28a745; /* Green border */
   }
+
   .address-radio:checked + .address-label .address-card {
-    border-color: #007bff;
+    border-color: #007bff; /* Ensure blue border for checked radio button */
   }
   .address-radio {
     margin-right: 15px;
@@ -142,16 +152,20 @@
     width: 100%;
     align-items: center;
   }
+
   .address-info {
     flex: 1;
   }
+
   .address-type {
     font-weight: bold;
   }
+
   .address-text {
     color: #555;
     font-size: 0.9em;
   }
+
   .default-address {
     background-color: #28a745;
     color: white;
@@ -159,52 +173,247 @@
     border-radius: 5px;
     font-size: 0.8em;
   }
+
   .hidden {
     display: none;
   }
-  .address-buttons {
-    margin-top: 10px;
-    display: flex;
-    gap: 10px;
-  }
+.address-buttons {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+
+.address-box {
+  position: relative; /* Ensures the button is positioned relative to this container */
+}
+
+#change-address-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  text-align: right;
+  z-index: 10; /* Ensures the button is above the blackout overlay */
+  pointer-events: auto; /* Enables clicking on the button */
+}
+
+#change-address-container .btn-secondary {
+  background-color: white;
+  color: rgb(51, 51, 240);
+  border: 1px solid #28a745;
+  padding: 5px 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+#change-address-container .btn-secondary:hover {
+  background-color: #dbf0fc;
+}
+
+.address-box.locked {
+  pointer-events: none; /* Disables interactions with the entire container */
+}
+
+.address-box.locked #change-address-container {
+  pointer-events: auto; /* Re-enables interactions specifically for the Change button */
+}
+
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const updateSelectedAddress = () => {
-      document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
-      const selectedRadio = document.querySelector('input[name="address_id"]:checked');
-      if (selectedRadio) {
-        selectedRadio.closest('.address-card').classList.add('selected');
-      }
-    };
-
-    const lockSection = (sectionId, hideDetails = false) => {
-      const section = document.getElementById(sectionId);
-      section.classList.add('blackout');
-      if (hideDetails) {
-        section.querySelector('.hidden')?.classList.remove('hidden');
-      }
-    };
-
-    document.getElementById('confirm-address-button')?.addEventListener('click', () => {
-      const selectedAddress = document.querySelector('input[name="address_id"]:checked');
-      if (!selectedAddress) {
-        alert('Please select a delivery address.');
-        return;
-      }
-      document.getElementById('delivery-address-section').classList.add('locked');
-      lockSection('order-summary-section');
-    });
-
-    document.getElementById('place-order-button')?.addEventListener('click', () => {
-      lockSection('order-summary-section', true);
-      document.getElementById('payment-options-section').classList.remove('blackout');
-    });
-
-    updateSelectedAddress();
-    document.querySelectorAll('.address-radio').forEach(radio => radio.addEventListener('change', updateSelectedAddress));
+  // Manage address selection, order summary, and payment options
+  document.getElementById('confirm-address-button')?.addEventListener('click', () => {
+    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+    if (!selectedAddress) {
+      alert('Please select a delivery address.');
+      return;
+    }
+    
+    const addressId = selectedAddress.value;   
   });
+
+  document.getElementById('place-order-button')?.addEventListener('click', () => {
+    // Reveal the Payment Options section
+    document.getElementById('payment-options-section').classList.remove('hidden');
+    window.scrollTo(0, document.getElementById('payment-options-section').offsetTop);
+  });
+
+  document.querySelectorAll('.address-radio').forEach(radio => {
+    radio.addEventListener('change', () => {
+      // Remove 'selected' class from all address cards
+      document.querySelectorAll('.address-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      // Add 'selected' class to the currently checked radio button's parent
+      const selectedCard = radio.closest('.address-card');
+      selectedCard.classList.add('selected');
+    });
+  });
+  // Function to update selected class for the currently checked address
+  const updateSelectedAddress = () => {
+    document.querySelectorAll('.address-card').forEach(card => {
+      card.classList.remove('selected'); // Remove the 'selected' class from all cards
+    });
+
+    const selectedRadio = document.querySelector('input[name="address_id"]:checked'); // Find the checked radio
+    if (selectedRadio) {
+      const selectedCard = selectedRadio.closest('.address-card'); // Find the corresponding card
+      selectedCard.classList.add('selected'); // Add the 'selected' class
+    }
+  };
+
+  // Add event listeners to handle address selection changes
+  document.querySelectorAll('.address-radio').forEach(radio => {
+    radio.addEventListener('change', updateSelectedAddress);
+  });
+
+  // Run the logic once on page load for the default selection
+  document.addEventListener('DOMContentLoaded', () => {
+    updateSelectedAddress();
+  });
+
+  document.getElementById('confirm-payment-button')?.addEventListener('click', () => {
+    const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+    // const selectedPaymentOption = document.querySelector('input[name="payment_option"]:checked');
+    const selectedPaymentOption = document.querySelector('input[name="payment_method"]:checked');
+    
+    if (!selectedAddress || !selectedPaymentOption) {
+        alert('Please select both a delivery address and payment option.');
+        return;
+    }
+
+    const requestData = {
+        address_id: selectedAddress.value,
+        // payment_option: selectedPaymentOption.value
+        payment_method: selectedPaymentOption.value
+    };
+
+    fetch('/complete_order', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.href = '/orders';
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while completing your order. Please try again.');
+    });
+});
+document.querySelectorAll('input[name="payment_method"]').forEach(input => {
+    input.addEventListener('change', (event) => {
+        if (event.target.value === 'UPI') {
+            alert('UPI payment is coming soon!');
+        }
+    });
+});
+
+  // Initialize the page state
+    const initializeCheckoutPage = () => {
+    const orderSummarySection = document.getElementById('order-summary-section');
+    const paymentSection = document.getElementById('payment-options-section');
+
+    // Lock Order Summary and Payment sections initially
+    orderSummarySection.classList.add('blackout');
+    paymentSection.classList.add('blackout');
+
+    // Update the selected address on page load
+    updateSelectedAddress();
+  };
+
+  // Handle confirm address button click
+  document.getElementById('confirm-address-button')?.addEventListener('click', () => {
+  const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+  if (!selectedAddress) {
+    alert('Please select a delivery address.');
+    return;
+  }
+
+  // Lock the Delivery Address section and display only the confirmed address
+  const deliveryAddressSection = document.getElementById('delivery-address-section');
+  const selectedCard = selectedAddress.closest('.address-card');
+  const addressContainer = document.getElementById('address-container');
+
+  // Replace the container content with the confirmed address details
+  addressContainer.innerHTML = `
+    <div class="confirmed-address">
+      <p><strong>${selectedCard.querySelector('.address-type').textContent}</strong></p>
+      <p>${selectedCard.querySelector('.address-text').textContent}</p>
+    </div>
+  `;
+
+  // Hide all remaining address cards and buttons
+  document.querySelector('.address-cards-container').style.display = 'none';
+  document.querySelector('.address-buttons').style.display = 'none';
+  // Show the Change button
+  document.getElementById('change-address-container').classList.remove('hidden');
+  // Lock the delivery address section visually
+  deliveryAddressSection.classList.add('locked');
+  document.getElementById('change-address-button')?.addEventListener('click', () => {
+  // Reload the page to start fresh
+  window.location.reload();
+  });
+
+  // Fetch basket items and show Order Summary section (existing logic)
+  fetch(`/get_basket_items?address_id=${selectedAddress.value}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const itemsSummaryDiv = document.getElementById('items-summary');
+        const totalPriceDiv = document.getElementById('total-price');
+        let totalPrice = 0;
+
+        itemsSummaryDiv.innerHTML = '';
+        data.items.forEach(item => {
+          const itemTotal = item.price * item.quantity;
+          totalPrice += itemTotal;
+          itemsSummaryDiv.innerHTML += `<p>${item.name} x ${item.quantity} - ₹${itemTotal.toFixed(2)}</p>`;
+        });
+
+        totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
+        document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
+
+        // Unlock and expand Order Summary section
+        document.getElementById('order-summary-section').classList.remove('blackout');
+        document.getElementById('order-summary-details').classList.remove('hidden');
+      } else {
+        alert('Error fetching order summary.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Something went wrong. Please try again.');
+    });
+});
+
+  // Handle place order button click
+  document.getElementById('place-order-button')?.addEventListener('click', () => {
+    // Lock Order Summary section
+    document.getElementById('order-summary-section').classList.add('blackout');
+
+    // Unlock and expand Payment section
+    document.getElementById('payment-options-section').classList.remove('blackout');
+    document.getElementById('payment-details').classList.remove('hidden');
+  });
+
+  // Add event listeners to handle address selection changes
+  document.querySelectorAll('.address-radio').forEach(radio => {
+    radio.addEventListener('change', updateSelectedAddress);
+  });
+
+  // Initialize the page on load
+  document.addEventListener('DOMContentLoaded', initializeCheckoutPage);
+
 </script>
 
 {% endblock %}
