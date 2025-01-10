@@ -52,8 +52,22 @@
   <h2>Order Summary</h2>
   <div id="order-summary-details" class="hidden">
     <div id="items-summary">
-      {% for basket_item in basket_items %}
-        <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p>
+      {% for basket_item, item in basket_items %}
+        <div class="item-summary-card">
+          <div class="item-image">
+            {% if item.image_path %}
+              <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}">
+            {% else %}
+              <p class="no-image">No image available</p>
+            {% endif %}
+          </div>
+          <div class="item-details">
+            <p><strong>{{ item.name }}</strong></p>
+            <p>Price: ₹{{ item.price }}</p>
+            <p>Quantity: {{ basket_item.quantity }}</p>
+            <p>Total: ₹{{ (item.price * basket_item.quantity) | float }}</p>
+          </div>
+        </div>
       {% endfor %}
     </div>
     <div id="total-price">
@@ -217,7 +231,24 @@
 .address-box.locked #change-address-container {
   pointer-events: auto; /* Re-enables interactions specifically for the Change button */
 }
-
+.item-summary-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  .item-image img {
+    max-width: 80px;
+    max-height: 80px;
+    margin-right: 15px;
+  }
+  .item-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
 </style>
 
 <script>
