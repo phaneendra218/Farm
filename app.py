@@ -94,9 +94,23 @@ class Basket(db.Model):
     Order.item = db.relationship('Item', backref='order_items')    
 
 # Routes
+from flask import request, jsonify, url_for
+
 @app.before_request
 def check_maintenance_mode():
-    if app.config.get('MAINTENANCE_MODE') and request.method == 'POST':
+    # List of routes to exclude from maintenance check
+    exempt_routes = [url_for('login'), url_for('toggle_maintenance')]
+    
+    if app.config.get('MAINTENANCE_MODE'):
+        # Allow GET requests (read-only mode)
+        if request.method == 'GET':
+            return None
+        
+        # Allow exempt routes to proceed
+        if request.path in exempt_routes:
+            return None
+        
+        # Block other POST requests
         return jsonify({'error': 'The site is under maintenance. Please try again later.'}), 503
 
 @app.context_processor
