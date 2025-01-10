@@ -533,20 +533,13 @@ def checkout():
         return redirect(url_for('profile'))
     # Handle GET request to display checkout form
     addresses = Address.query.filter_by(user_id=user.id).all()
-    basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.user_id == user.id).all()
-    total_price = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
     # Clear flash messages on GET request
     if request.method == 'GET':
         session.pop('_flashes', None)
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
-    return render_template(
-        'checkout.html',
-        addresses=addresses,
-        basket_items=basket_items,
-        total_price=total_price
-    )
+    return render_template('checkout.html', addresses=addresses)
 
 @app.route('/get_basket_items')
 def get_basket_items():
