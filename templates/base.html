@@ -38,13 +38,20 @@
             <a href="/logout"><button>Logout</button></a>            
         </div>
         {% endif %}
-
+        
         <!-- Basket icon with count -->
         <a href="/basket" id="basket-icon">
             <img src="{{ url_for('static', filename='basket.png') }}" alt="Basket" style="width:36px; height:36px;">
             <span id="basket-count">{{ session.get('basket_count', 0) }}</span>
         </a>
     </header>
+
+    <!-- Maintenance mode banner -->
+    {% if maintenance_mode %}
+    <div class="maintenance-banner" style="background-color: #f8d7da; color: #721c24; padding: 10px; text-align: center;">
+        <p>The site is under maintenance. You can browse items, but no actions are allowed at this time.</p>
+    </div>
+    {% endif %}
 
     <div class="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -57,23 +64,6 @@
             {% endif %}
         {% endwith %}
     </div>
-
-    <div class="maintenance-message">
-        {% if session.get('maintenance_message') %}
-            <div class="alert alert-warning">
-                {{ session['maintenance_message'] }}
-            </div>
-        {% endif %}
-    </div>
-
-    {% if session.get('is_admin') %}
-    <form method="POST" action="{{ url_for('set_maintenance') }}" style="display:inline;">
-        <button type="submit" class="admin-button">Set Maintenance</button>
-    </form>
-    <form method="POST" action="{{ url_for('clear_maintenance') }}" style="display:inline;">
-        <button type="submit" class="admin-button">Clear Maintenance</button>
-    </form>
-    {% endif %}
 
     <main>
         {% block content %}

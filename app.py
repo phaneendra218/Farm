@@ -29,6 +29,7 @@ def get_or_create_basket_id(user_id):
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
+app.config['MAINTENANCE_MODE'] = False
 # Database Configuration (Replace with External Database URL)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://farmpsql_user:1lzuTjaCQsUNSxAoUMk3tB2ftOMzeNTr@dpg-cu021mjv2p9s739bk33g-a.oregon-postgres.render.com/farmpsql_x178'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -93,6 +94,24 @@ class Basket(db.Model):
     Order.item = db.relationship('Item', backref='order_items')    
 
 # Routes
+@app.before_request
+def check_maintenance_mode():
+    if app.config.get('MAINTENANCE_MODE') and request.method == 'POST':
+        return jsonify({'error': 'The site is under maintenance. Please try again later.'}), 503
+
+@app.context_processor
+def inject_maintenance_mode():
+    return {'maintenance_mode': app.config.get('MAINTENANCE_MODE')}
+
+@app.route('/admin/toggle_maintenance', methods=['POST'])
+def toggle_maintenance():
+    if 'user_id' in session and session.get('is_admin'):
+        app.config['MAINTENANCE_MODE'] = not app.config['MAINTENANCE_MODE']
+        mode = 'ON' if app.config['MAINTENANCE_MODE'] else 'OFF'
+        flash(f'Maintenance mode is now {mode}.', 'info')
+        return redirect(url_for('admin_dashboard'))
+    return "Unauthorized", 403
+
 @app.route('/')
 def home():
     items = Item.query.all()  # Fetch all items from the database, including image_path for each item
@@ -873,24 +892,6 @@ def delete_address_by_id():
         return jsonify({'message': 'Address deleted successfully!'}), 200
 
     return jsonify({'message': 'Address not found or unauthorized'}), 404
-
-@app.route('/set_maintenance', methods=['POST'])
-def set_maintenance():
-    if 'is_admin' in session and session['is_admin']:
-        session['maintenance_message'] = "The application is under maintenance. Please check back later."
-        flash("Maintenance message set successfully.", "success")
-    else:
-        flash("Unauthorized action.", "danger")
-    return redirect(url_for('home'))
-
-@app.route('/clear_maintenance', methods=['POST'])
-def clear_maintenance():
-    if 'is_admin' in session and session['is_admin']:
-        session.pop('maintenance_message', None)
-        flash("Maintenance message cleared successfully.", "success")
-    else:
-        flash("Unauthorized action.", "danger")
-    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     with app.app_context():
