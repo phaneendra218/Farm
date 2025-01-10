@@ -31,7 +31,7 @@ app.secret_key = os.urandom(24)
 
 app.config['MAINTENANCE_MODE'] = False
 # Database Configuration (Replace with External Database URL)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://farmpsql_user:1lzuTjaCQsUNSxAoUMk3tB2ftOMzeNTr@dpg-cu021mjv2p9s739bk33g-a.oregon-postgres.render.com/farmpsql_x178'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Set the upload folder and allowed file extensions
