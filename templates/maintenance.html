@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Under Maintenance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            margin-top: 100px;
+        }
+        .message {
+            font-size: 1.5em;
+            margin: 20px;
+        }
+        img {
+            max-width: 300px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='maintenance.png') }}" alt="Maintenance">
+        <h1>We'll Be Back Soon!</h1>
+        <p class="message">Our site is currently undergoing maintenance. Please check back later.</p>
+    </div>
+</body>
+</html>
