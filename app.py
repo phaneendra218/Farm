@@ -500,25 +500,28 @@ def clear_basket():
 def checkout():
     if 'user_id' not in session:
         flash('You must be logged in to complete the checkout process', 'danger')
-        return redirect(url_for('login'))    
+        return redirect(url_for('login'))
+    
     user = User.query.get(session['user_id'])
+    
     if request.method == 'POST':
         address_id = request.form.get('address_id')
-        # payment_option = request.form.get('payment_option')
         payment_method = request.form.get('payment_method')
+        
         # Check if an address was selected
         if not address_id:
             flash('Please select a delivery address', 'danger')
             return redirect(url_for('checkout'))
+        
         address = Address.query.get(address_id)
+        
         # Ensure the address exists and belongs to the current user
         if not address or address.user_id != user.id:
             flash('Invalid address selected', 'danger')
             return redirect(url_for('checkout'))
+        
         # Process the order, create order entries for items in the basket, etc.
         basket_items = Basket.query.filter_by(user_id=user.id).all()
-        total_price = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
-        # Example of creating an order from the basket
         for basket_item in basket_items:
             order = Order(
                 user_id=user.id,
@@ -526,20 +529,38 @@ def checkout():
                 quantity=basket_item.quantity
             )
             db.session.add(order)
+        
         db.session.query(Basket).filter_by(user_id=user.id).delete()
-        # Commit the transaction
         db.session.commit()
+        
         flash('Order placed successfully!', 'success')
         return redirect(url_for('profile'))
+
     # Handle GET request to display checkout form
+    basket_items = db.session.query(Basket, Item).join(Item).filter(Basket.user_id == user.id).all()
+    total_price = sum(float(item.price) * float(basket_item.quantity) for basket_item, item in basket_items)
+    
+    # Pass basket items with image paths to the template
+    basket_data = [
+        {
+            "name": item.name,
+            "quantity": basket_item.quantity,
+            "price": item.price,
+            "image_path": item.image_path  # Ensure the `Item` model has this field
+        }
+        for basket_item, item in basket_items
+    ]
+    
     addresses = Address.query.filter_by(user_id=user.id).all()
-    # Clear flash messages on GET request
+    
     if request.method == 'GET':
         session.pop('_flashes', None)
+    
     if not addresses:
         flash('Please add a delivery address before proceeding.', 'warning')
         return redirect(url_for('profile'))
-    return render_template('checkout.html', addresses=addresses)
+    
+    return render_template('checkout.html', addresses=addresses, basket_items=basket_data, total_price=total_price)
 
 @app.route('/get_basket_items')
 def get_basket_items():

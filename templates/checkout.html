@@ -53,7 +53,13 @@
   <div id="order-summary-details" class="hidden">
     <div id="items-summary">
       {% for basket_item in basket_items %}
-        <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p>
+        <div class="order-item">
+          <img src="{{ basket_item.item.image_url }}" alt="{{ basket_item.item.name }}" class="item-image">
+          <p>
+            {{ basket_item.item.name }} x {{ basket_item.quantity }} 
+            - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}
+          </p>
+        </div>
       {% endfor %}
     </div>
     <div id="total-price">
@@ -216,6 +222,19 @@
 
 .address-box.locked #change-address-container {
   pointer-events: auto; /* Re-enables interactions specifically for the Change button */
+}
+.order-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.item-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 10px;
+  border-radius: 5px;
 }
 
 </style>
