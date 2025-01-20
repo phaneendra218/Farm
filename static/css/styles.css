@@ -142,7 +142,7 @@ main {
     border-radius: 50%;
 }
 /* Item and Basket Container Styles */
-.item-container, .basket-container {
+.item-container {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
