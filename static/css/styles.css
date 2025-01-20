@@ -359,22 +359,27 @@ button:hover {
     display: inline-block; 
     margin-right: 10px; 
 }
-.basket-actions .btn {
+.basket-actions .btn-backtoitems {
     padding: 10px 20px; 
+    background-color: #e6b940;
+    color: white;
+    border: none;
 }
 .empty-basket-message {
     color: #777;
     margin-top: 20px;
 }
+
 .empty-basket-message a {
     color: #008fee;
 }
-.basket-item-card .basket-actions .btn-update {
+.basket-item-card .btn-update {
     background-color: #e6b940;
     color: white;
     border: none;
 }
-.basket-item-card .basket-actions .btn-update:hover {
+
+.basket-item-card .btn-update:hover {
     background-color: #c28f04; 
 }
 .basket-item-card .btn-danger {
