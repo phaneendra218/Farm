@@ -42,10 +42,10 @@
             <button type="submit" class="btn btn-success">Proceed to Checkout</button>
         </form>
         <form method="POST" action="{{ url_for('clear_basket') }}">
-            <button type="submit" class="btn btn-warning mt-3">Clear Basket</button>
+            <button type="submit" class="btn-danger btn-sm">Clear Basket</button>
         </form>
         <form action="{{ url_for('items') }}" method="get">
-            <button type="submit" class="btn btn-secondary mt-3">Back to Items</button>
+            <button type="submit" class="btn-update btn-sm">Back to Items</button>
         </form>
     </div>
 {% else %}
