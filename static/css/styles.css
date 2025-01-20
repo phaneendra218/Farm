@@ -331,7 +331,7 @@ button:hover {
 
 .basket-item-card img {
     width: 150px;
-    height: 120px;
+    height: 110px;
     object-fit: cover;
     border-radius: 5px;
     margin-right: 15px;           /* Space between image and details */
@@ -439,43 +439,77 @@ button:hover {
 }
 
 /* Media Queries */
+/* For tablets and smaller screens */
 @media (max-width: 768px) {
     .basket-container {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 8px; 
+        display: flex;             /* Maintain flex layout */
+        flex-direction: column;    /* Stack basket items vertically */
+        gap: 10px;                 /* Add spacing between items */
+        padding: 0 15px;           /* Add some padding to container */
     }
 
-    .basket-item-card img {
-        width: 120px;
-        height: 80px;
-    }
-}
-
-@media (max-width: 480px) {
-    .basket-container {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 6px; 
-    }
-
-    .basket-item-card {
-        padding: 8px; 
-    }
-
-    .basket-item-card img {
-        width: 100px;
-        height: 70px;
-    }
-}
-@media (max-width: 768px) {
     .basket-item-card {
         flex-direction: column;    /* Stack image and details vertically */
-        align-items: flex-start;   /* Align content to the start */
+        align-items: center;       /* Center-align content */
+        padding: 15px;
     }
 
     .basket-item-card img {
-        margin-bottom: 10px;      /* Add space between image and details */
+        width: 120px;              /* Adjust image size */
+        height: 100px;
+        margin-bottom: 10px;       /* Add space below the image */
+    }
+
+    .basket-item-content {
+        text-align: center;        /* Center-align text on smaller screens */
+    }
+
+    .basket-item-actions {
+        flex-direction: column;    /* Stack buttons vertically */
+        gap: 8px;                  /* Add spacing between buttons */
+        width: 100%;               /* Make buttons span full width */
+    }
+
+    .basket-item-actions form {
+        width: 100%;               /* Ensure forms/buttons take full width */
+    }
+
+    .basket-item-actions .btn-update, 
+    .basket-item-actions .btn-danger {
+        width: 100%;               /* Full-width buttons */
+        padding: 10px;             /* Adjust button padding for touch-friendliness */
     }
 }
+
+/* For mobile phones */
+@media (max-width: 480px) {
+    .basket-container {
+        padding: 0 10px;           /* Reduce side padding for small screens */
+    }
+
+    .basket-item-card {
+        padding: 10px;             /* Reduce padding inside the card */
+    }
+
+    .basket-item-card img {
+        width: 100px;              /* Reduce image size for small screens */
+        height: 80px;
+    }
+
+    .basket-item-content h4 {
+        font-size: 1em;            /* Adjust font size for headings */
+    }
+
+    .basket-item-content p {
+        font-size: 0.85em;         /* Adjust font size for text */
+    }
+
+    .basket-item-actions .btn-update, 
+    .basket-item-actions .btn-danger {
+        padding: 8px;              /* Adjust padding for smaller buttons */
+    }
+}
+
 /* Order Card Styles */
 .card {
     border: 1px solid #ddd; /* Light border around each order card */
