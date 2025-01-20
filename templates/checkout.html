@@ -69,8 +69,8 @@
   <div id="payment-details" class="hidden">
     <div id="payment-methods">
       <label>
-        <img src="{{ url_for('static', filename='cod.png') }}" alt="COD" class="payment-icon">
-        <span class="payment-text">Cash on Delivery (Cash/UPI)</span>
+        <img src="{{ url_for('static', filename='cod.png') }}" alt="cod" style="width: 30px; height: 20px; margin-right: 5px; margin-bottom: 15px;">
+        <input type="radio" name="payment_method" value="cash_on_delivery"> Cash on Delivery (Cash/UPI)
       </label><br>
       <label>
         <img src="{{ url_for('static', filename='upi.png') }}" alt="cod" style="width: 30px; height: 20px; margin-right: 5px;">
@@ -218,23 +218,6 @@
 
 .address-box.locked #change-address-container {
   pointer-events: auto; /* Re-enables interactions specifically for the Change button */
-}
-.payment-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
-.payment-icon {
-  width: 30px;
-  height: 20px;
-  margin-right: 10px; /* Adjust space between the icon and text */
-}
-
-.payment-text {
-  font-size: 16px; /* Adjust text size if necessary */
-  color: #555;
 }
 
 </style>
