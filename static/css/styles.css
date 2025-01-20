@@ -417,7 +417,7 @@ button:hover {
 @media (max-width: 768px) {
     .basket-container {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 5px; 
+        gap: 8px; 
     }
 
     .basket-item-card img {
@@ -429,7 +429,7 @@ button:hover {
 @media (max-width: 480px) {
     .basket-container {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 5px; 
+        gap: 6px; 
     }
 
     .basket-item-card {
