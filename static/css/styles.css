@@ -365,6 +365,18 @@ button:hover {
     color: white;
     border: none;
 }
+.basket-actions .btn-backtoitems:hover {
+    background-color: #c28f04;
+}
+.basket-actions .btn-clearbasket {
+    padding: 10px 20px; 
+    background-color: #c5998e;
+    color: white;
+    border: none;
+}
+.basket-actions .btn-clearbasket:hover {
+    background-color: #c26c3b;
+}
 .empty-basket-message {
     color: #777;
     margin-top: 20px;
