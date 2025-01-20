@@ -51,7 +51,7 @@
 <div id="order-summary-section" class="summary-box blackout">
   <h2>Order Summary</h2>
   <div id="order-summary-details" class="hidden">
-    <div id="items-summary">
+    <div id="basket-item-card">
       {% for basket_item in basket_items %}
         <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p>
       {% endfor %}
