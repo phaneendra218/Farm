@@ -90,6 +90,20 @@ main {
 .user-info {
     text-align: right;
 }
+/* Basket Icon Style */
+#basket-icon {
+    position: relative;
+}
+#basket-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
 .user-info p {
     display: inline-block;
     margin-right: 15px;
@@ -118,20 +132,7 @@ main {
 .user-info button:hover {
     background-color: #c28c0d;
 }
-/* Basket Icon Style */
-#basket-icon {
-    position: relative;
-}
-#basket-count {
-    position: absolute;
-    top: -5px;
-    right: -10px;
-    background-color: red;
-    color: white;
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 50%;
-}
+
 /* Item and Basket Container Styles */
 .item-container, .basket-container {
     display: flex;
