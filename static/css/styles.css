@@ -92,6 +92,8 @@ main {
 }
 /* Basket Icon Style */
 #basket-icon {
+    display: flex;
+    align-items: center;
     position: relative;
 }
 #basket-count {
