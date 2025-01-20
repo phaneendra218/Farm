@@ -7,7 +7,11 @@
     <div class="basket-container">
         {% for basket_item, item in basket_items %}
         <div class="basket-item-card">
+            {% if item.image_path %}
             <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}">
+            {% else %}
+                <p class="no-image">No image available</p>
+            {% endif %}
             <div class="basket-item-content">
                 <h4>{{ item.name }}</h4>
                 <p><strong>Price:</strong> ₹{{ item.price }} /{{ item.unit }}</p>
