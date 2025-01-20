@@ -330,7 +330,7 @@ button:hover {
 }
 
 .basket-item-card img {
-    width: 120px;
+    width: 150px;
     height: 120px;
     object-fit: cover;
     border-radius: 5px;
