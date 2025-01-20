@@ -489,7 +489,8 @@ button:hover {
 
     .basket-item-card {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap; /* Prevent content wrapping initially */
+        align-items: flex-start; /* Align items to the top */
         padding: 10px; /* Reduce padding inside the card */
         border: 1px solid #ddd; /* Optional: Add a border for better visibility */
         border-radius: 5px; /* Optional: Add rounded corners */
@@ -504,21 +505,24 @@ button:hover {
 
     .basket-item-content {
         flex: 1; /* Allow content to take remaining space */
+        display: flex;
+        flex-direction: column; /* Stack Name, Price, and Quantity vertically */
+        justify-content: flex-start;
     }
 
     .basket-item-content h4 {
         font-size: 1em; /* Adjust font size for headings */
-        margin: 0;
+        margin: 0 0 5px 0; /* Add spacing below the name */
     }
 
     .basket-item-content p {
         font-size: 0.85em; /* Adjust font size for text */
-        margin: 5px 0;
+        margin: 0 0 5px 0; /* Space below each detail */
     }
 
     .basket-item-actions {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap; /* Prevent buttons from wrapping unnecessarily */
         margin-top: 10px;
     }
 
@@ -526,7 +530,7 @@ button:hover {
         flex: 1;
         display: flex;
         align-items: center;
-        margin-bottom: 5px; /* Space between buttons and update box */
+        margin: 0 5px 0 0; /* Add spacing between forms */
     }
 
     .basket-item-actions .btn-update, 
@@ -539,8 +543,8 @@ button:hover {
     .basket-item-actions input[type="number"] {
         flex: 2;
         padding: 5px;
-        margin-right: 5px; /* Add space between input and buttons */
         font-size: 0.85em;
+        margin-right: 5px; /* Add space between input and buttons */
     }
 }
 
