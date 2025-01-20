@@ -484,29 +484,63 @@ button:hover {
 /* For mobile phones */
 @media (max-width: 480px) {
     .basket-container {
-        padding: 0 10px;           /* Reduce side padding for small screens */
+        padding: 0 10px; /* Reduce side padding for small screens */
     }
 
     .basket-item-card {
-        padding: 10px;             /* Reduce padding inside the card */
+        display: flex;
+        flex-wrap: wrap;
+        padding: 10px; /* Reduce padding inside the card */
+        border: 1px solid #ddd; /* Optional: Add a border for better visibility */
+        border-radius: 5px; /* Optional: Add rounded corners */
+        margin-bottom: 10px; /* Space between items */
     }
 
     .basket-item-card img {
-        width: 100px;              /* Reduce image size for small screens */
-        height: 80px;
+        width: 100px; /* Set fixed size for image */
+        height: auto;
+        margin-right: 10px; /* Add spacing between image and content */
+    }
+
+    .basket-item-content {
+        flex: 1; /* Allow content to take remaining space */
     }
 
     .basket-item-content h4 {
-        font-size: 1em;            /* Adjust font size for headings */
+        font-size: 1em; /* Adjust font size for headings */
+        margin: 0;
     }
 
     .basket-item-content p {
-        font-size: 0.85em;         /* Adjust font size for text */
+        font-size: 0.85em; /* Adjust font size for text */
+        margin: 5px 0;
+    }
+
+    .basket-item-actions {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    .basket-item-actions form {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px; /* Space between buttons and update box */
     }
 
     .basket-item-actions .btn-update, 
     .basket-item-actions .btn-danger {
-        padding: 8px;              /* Adjust padding for smaller buttons */
+        flex: 1;
+        padding: 8px; /* Adjust padding for smaller buttons */
+        margin: 0 5px; /* Add spacing between buttons */
+    }
+
+    .basket-item-actions input[type="number"] {
+        flex: 2;
+        padding: 5px;
+        margin-right: 5px; /* Add space between input and buttons */
+        font-size: 0.85em;
     }
 }
 
