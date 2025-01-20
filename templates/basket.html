@@ -1,33 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="text-center" style="margin-top: 20px;">My Basket</h2>
+<!-- <h2 class="text-center" style="margin-top: 20px;">My Basket</h2> -->
 
 {% if basket_items %}
     <div class="basket-container">
         {% for basket_item, item in basket_items %}
-            <div class="basket-item-card">
+        <div class="basket-item-card">
+            {% if item.image_path %}
+            <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}">
+            {% else %}
+                <p class="no-image">No image available</p>
+            {% endif %}
+            <div class="basket-item-content">
                 <h4>{{ item.name }}</h4>
                 <p><strong>Price:</strong> ₹{{ item.price }} /{{ item.unit }}</p>
                 <p><strong>Quantity:</strong> {{ basket_item.quantity | int }}</p>
-
-                {% if item.image_path %}
-                    <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}">
-                {% else %}
-                    <p class="no-image">No image available</p>
-                {% endif %}
-
-                <!-- Update Quantity Form -->
-                <form method="POST" action="{{ url_for('update_basket_quantity', item_id=item.id) }}">
-                    <input type="number" name="quantity" value="{{ basket_item.quantity | int }}" min="1" max="50" step="1">
-                    <button type="submit" class="btn-update btn-sm">Update</button>
-                </form>
-
-                <!-- Remove Item Button -->
-                <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}">
-                    <button type="submit" class="btn-danger btn-sm">Remove</button>
-                </form>
+        
+                <div class="basket-item-actions">
+                    <!-- Update Quantity Form -->
+                    <form method="POST" action="{{ url_for('update_basket_quantity', item_id=item.id) }}">
+                        <input type="number" name="quantity" value="{{ basket_item.quantity | int }}" min="1" max="50" step="1">
+                        <button type="submit" class="btn-update">Update</button>
+                    </form>
+        
+                    <!-- Remove Item Button -->
+                    <form method="POST" action="{{ url_for('remove_from_basket', item_id=item.id) }}">
+                        <button type="submit" class="btn-danger">Remove</button>
+                    </form>
+                </div>
             </div>
+        </div>        
         {% endfor %}
     </div>
 
