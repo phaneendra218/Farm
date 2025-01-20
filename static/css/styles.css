@@ -398,23 +398,44 @@ button:hover {
 .empty-basket-message a {
     color: #008fee;
 }
-.basket-item-card .btn-update {
+/* Quantity input and buttons */
+.basket-item-actions {
+    display: flex;
+    flex-direction: row;          /* Arrange buttons horizontally */
+    gap: 10px;                    /* Space between buttons */
+    margin-top: 10px;
+}
+
+.basket-item-content input[type="number"] {
+    width: 70px;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.basket-item-actions .btn-update {
     background-color: #e6b940;
     color: white;
     border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
-.basket-item-card .btn-update:hover {
-    background-color: #c28f04; 
+.basket-item-actions .btn-update:hover {
+    background-color: #c28f04;
 }
-.basket-item-card .btn-danger {
+
+.basket-item-actions .btn-danger {
     background-color: #c5998e;
     color: white;
     border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
-.basket-item-card .btn-danger:hover {
-    background-color: #c26c3b; 
+.basket-item-actions .btn-danger:hover {
+    background-color: #c26c3b;
 }
 
 /* Media Queries */
@@ -445,7 +466,16 @@ button:hover {
         height: 70px;
     }
 }
+@media (max-width: 768px) {
+    .basket-item-card {
+        flex-direction: column;    /* Stack image and details vertically */
+        align-items: flex-start;   /* Align content to the start */
+    }
 
+    .basket-item-card img {
+        margin-bottom: 10px;      /* Add space between image and details */
+    }
+}
 /* Order Card Styles */
 .card {
     border: 1px solid #ddd; /* Light border around each order card */
