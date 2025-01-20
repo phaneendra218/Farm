@@ -445,7 +445,6 @@ button:hover {
         flex-direction: row;            /* Align image and details horizontally */
         align-items: flex-start;        /* Align content at the top */
         padding: 10px;                  /* Compact padding for smaller screens */
-        position: relative;             /* Enable absolute positioning for buttons */
     }
 
     .basket-item-card img {
@@ -458,17 +457,13 @@ button:hover {
         display: flex;
         flex-direction: column;         /* Stack name, price, and quantity vertically */
         flex-grow: 1;                   /* Allow content to grow and fill space */
-        margin-bottom: 10px;            /* Add space above buttons */
+        margin-bottom: 10px;            /* Space above buttons */
     }
 
-    .basket-item-content h4 {
-        font-size: 1em;                 /* Adjust heading size */
-        margin: 0 0 5px;                /* Space below heading */
-    }
-
+    .basket-item-content h4,
     .basket-item-content p {
-        font-size: 0.85em;              /* Adjust font size for details */
-        margin: 0 0 5px;                /* Add space below details */
+        font-size: 0.9em;               /* Adjust font size for details */
+        margin: 5px 0;                  /* Space between content lines */
     }
 
     .basket-item-actions {
@@ -477,9 +472,7 @@ button:hover {
         gap: 5px;                       /* Reduce spacing between buttons */
         align-items: center;            /* Vertically align items */
         justify-content: flex-start;    /* Align items to the left */
-        position: absolute;             /* Position buttons */
-        bottom: 10px;                   /* Move to the bottom of the card */
-        left: 115px;                    /* Align to the bottom-left corner of the image */
+        margin-top: 10px;               /* Ensure space below content */
     }
 
     .basket-item-actions input[type="number"] {
@@ -523,27 +516,42 @@ button:hover {
 /* For mobile phones */
 @media (max-width: 480px) {
     .basket-item-card {
+        flex-direction: column;         /* Stack image and content vertically */
+        align-items: flex-start;        /* Align items to the start */
         padding: 8px;                   /* Compact padding for narrow screens */
     }
 
     .basket-item-card img {
-        width: 80px;                    /* Smaller image size */
-        height: 60px;
+        width: 100%;                    /* Adjust image size */
+        height: auto;
+        margin-bottom: 10px;            /* Space below the image */
+    }
+
+    .basket-item-content {
+        margin-bottom: 10px;            /* Add space above actions */
     }
 
     .basket-item-actions {
-        bottom: 8px;                    /* Adjust bottom spacing for buttons */
-        left: 100px;                    /* Adjust left alignment for smaller images */
+        display: flex;
+        flex-direction: row;            /* Arrange items horizontally */
+        gap: 5px;                       /* Small gap between elements */
+        align-items: center;            /* Align elements vertically */
+        justify-content: flex-start;    /* Align elements to the left */
+        margin-top: 5px;                /* Add space above actions */
     }
 
     .basket-item-actions input[type="number"] {
-        width: 50px;                    /* Compact width for quantity input */
+        width: 50px;                    /* Compact width for input */
     }
 
     .basket-item-actions .btn-update,
     .basket-item-actions .btn-danger {
-        padding: 4px 6px;               /* Compact button padding */
+        padding: 4px 6px;               /* Compact padding for buttons */
         font-size: 0.75em;              /* Smaller font size for buttons */
+    }
+
+    .basket-item-content p:last-child {
+        margin-bottom: 0;               /* Remove extra margin below Quantity text */
     }
 }
 
