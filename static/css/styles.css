@@ -112,7 +112,10 @@ main {
 }
 /* Basket Icon Style */
 #basket-icon {
-    position: relative;
+    position: fixed; /* Changed to fixed to make it always visible */
+    top: 15px; /* Adjust position to align with the header */
+    right: 15px; /* Move it away from the edge */
+    z-index: 1001; /* Ensure it is above other elements */
 }
 #basket-count {
     position: absolute;
@@ -197,6 +200,8 @@ button:hover {
 @media (max-width: 768px) {
     header {
         padding: 12px 20px;
+        flex-direction: column;
+        align-items: flex-start; /* Align items vertically */
     }
     .logo {
         height: 60px;
@@ -210,6 +215,10 @@ button:hover {
     }
     .delete-button, .user-info button {
         padding: 8px 12px;
+    }
+    #basket-icon {
+        top: 60px; /* Adjust position for smaller screens */
+        right: 10px; /* Adjust alignment */
     }
 }
 
@@ -237,6 +246,10 @@ button:hover {
     .delete-button, .user-info button {
         padding: 8px 12px;
     }
+    #basket-icon {
+        top: 70px; /* Adjust position to avoid overlap with the header */
+        right: 10px;
+    }
     #basket-count {
         font-size: 10px;
         padding: 2px 5px;
@@ -261,6 +274,10 @@ button:hover {
         font-size: 10px;
         padding: 10px 10px;
     }
+    #basket-icon {
+        top: 65px; /* Adjust position */
+        right: 8px;
+    }
 }
 
 /* For 375x667 screens */
@@ -277,6 +294,10 @@ button:hover {
     footer {
         font-size: 12px;
         padding: 10px 20px;
+    }
+    #basket-icon {
+        top: 70px; /* Adjust position */
+        right: 10px;
     }
 }
 /* Media Queries for Basket items*/
