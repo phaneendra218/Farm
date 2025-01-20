@@ -53,7 +53,7 @@
   <div id="order-summary-details" class="hidden">
     <div id="items-summary">
       {% for basket_item in basket_items %}
-        <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p>
+        <!-- <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p> -->
       {% endfor %}
     </div>
     <div id="total-price">
@@ -379,9 +379,9 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
           totalPrice += itemTotal;
           itemsSummaryDiv.innerHTML += `
             <div class="basket-item-card">
-              <h4>${item.name}</h4>
+              <img src="{{ url_for('static', filename='uploads/' + item.image_path.split('/')[-1]) }}" alt="{{ item.name }}">
               <div class="basket-item-content">
-                <img src="${item.image_url}" alt="${item.name}" width="100%" height="150px" border-radius="5px" margin-top="10px">
+              <h4>${item.name}</h4>              
               </div>
               <p><strong>Price:</strong> ₹${item.price} /${item.unit}</p>
               <p><strong>Quantity:</strong> ${item.quantity}</p>
