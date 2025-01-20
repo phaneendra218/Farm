@@ -35,14 +35,15 @@
             <!-- <p>Welcome, {{ session['username'] }}</p> -->
             <a href="{{ url_for('profile') }}"><button>My Profile</button></a>
             <a href="/orders"><button>My Orders</button></a>
-            <a href="/logout"><button>Logout</button></a>
-            <!-- Basket icon with count -->
-            <a href="/basket" id="basket-icon">
-               <img src="{{ url_for('static', filename='basket.png') }}" alt="Basket" style="width:36px; height:36px;">
-               <span id="basket-count">{{ session.get('basket_count', 0) }}</span>
-            </a>                     
+            <a href="/logout"><button>Logout</button></a>         
         </div>
         {% endif %}
+        
+        <!-- Basket icon with count -->
+        <a href="/basket" id="basket-icon">
+            <img src="{{ url_for('static', filename='basket.png') }}" alt="Basket" style="width:36px; height:36px;">
+            <span id="basket-count">{{ session.get('basket_count', 0) }}</span>
+        </a>
     </header>
     <!-- Maintenance mode banner -->
     {% if maintenance_mode %}
