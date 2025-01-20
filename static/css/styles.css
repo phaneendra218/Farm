@@ -441,117 +441,72 @@ button:hover {
 /* Media Queries */
 /* For tablets and smaller screens */
 @media (max-width: 768px) {
+    .basket-container {
+        display: flex;             /* Maintain flex layout */
+        flex-direction: column;    /* Stack basket items vertically */
+        gap: 10px;                 /* Add spacing between items */
+        padding: 0 15px;           /* Add some padding to container */
+    }
+
     .basket-item-card {
-        flex-direction: row;            /* Align image and details horizontally */
-        align-items: flex-start;        /* Align content at the top */
-        padding: 10px;                  /* Compact padding for smaller screens */
+        flex-direction: column;    /* Stack image and details vertically */
+        align-items: center;       /* Center-align content */
+        padding: 15px;
     }
 
     .basket-item-card img {
-        width: 100px;                   /* Smaller image for mobile */
-        height: 80px;
-        margin-right: 15px;             /* Space between image and details */
+        width: 120px;              /* Adjust image size */
+        height: 100px;
+        margin-bottom: 10px;       /* Add space below the image */
     }
 
     .basket-item-content {
-        display: flex;
-        flex-direction: column;         /* Stack name, price, and quantity vertically */
-        flex-grow: 1;                   /* Allow content to grow and fill space */
-        margin-bottom: 10px;            /* Space above buttons */
-    }
-
-    .basket-item-content h4,
-    .basket-item-content p {
-        font-size: 0.9em;               /* Adjust font size for details */
-        margin: 5px 0;                  /* Space between content lines */
+        text-align: center;        /* Center-align text on smaller screens */
     }
 
     .basket-item-actions {
-        display: flex;
-        flex-direction: row;            /* Align quantity and buttons in a row */
-        gap: 5px;                       /* Reduce spacing between buttons */
-        align-items: center;            /* Vertically align items */
-        justify-content: flex-start;    /* Align items to the left */
-        margin-top: 10px;               /* Ensure space below content */
+        flex-direction: column;    /* Stack buttons vertically */
+        gap: 8px;                  /* Add spacing between buttons */
+        width: 100%;               /* Make buttons span full width */
     }
 
-    .basket-item-actions input[type="number"] {
-        width: 60px;                    /* Adjust quantity input width */
-        padding: 5px;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+    .basket-item-actions form {
+        width: 100%;               /* Ensure forms/buttons take full width */
     }
 
-    .basket-item-actions .btn-update,
+    .basket-item-actions .btn-update, 
     .basket-item-actions .btn-danger {
-        flex: none;                     /* Prevent buttons from stretching */
-        padding: 5px 8px;               /* Compact padding for buttons */
-        font-size: 0.85em;              /* Smaller text size for buttons */
-    }
-
-    .basket-item-actions .btn-update {
-        background-color: #e6b940;      /* Update button color */
-        color: white;
-        border: none;
-        border-radius: 5px;
-    }
-
-    .basket-item-actions .btn-update:hover {
-        background-color: #c28f04;      /* Hover color for Update button */
-    }
-
-    .basket-item-actions .btn-danger {
-        background-color: #c5998e;      /* Remove button color */
-        color: white;
-        border: none;
-        border-radius: 5px;
-    }
-
-    .basket-item-actions .btn-danger:hover {
-        background-color: #c26c3b;      /* Hover color for Remove button */
+        width: 100%;               /* Full-width buttons */
+        padding: 10px;             /* Adjust button padding for touch-friendliness */
     }
 }
 
 /* For mobile phones */
 @media (max-width: 480px) {
+    .basket-container {
+        padding: 0 10px;           /* Reduce side padding for small screens */
+    }
+
     .basket-item-card {
-        flex-direction: column;         /* Stack image and content vertically */
-        align-items: flex-start;        /* Align items to the start */
-        padding: 8px;                   /* Compact padding for narrow screens */
+        padding: 10px;             /* Reduce padding inside the card */
     }
 
     .basket-item-card img {
-        width: 100%;                    /* Adjust image size */
-        height: auto;
-        margin-bottom: 10px;            /* Space below the image */
+        width: 100px;              /* Reduce image size for small screens */
+        height: 80px;
     }
 
-    .basket-item-content {
-        margin-bottom: 10px;            /* Add space above actions */
+    .basket-item-content h4 {
+        font-size: 1em;            /* Adjust font size for headings */
     }
 
-    .basket-item-actions {
-        display: flex;
-        flex-direction: row;            /* Arrange items horizontally */
-        gap: 5px;                       /* Small gap between elements */
-        align-items: center;            /* Align elements vertically */
-        justify-content: flex-start;    /* Align elements to the left */
-        margin-top: 5px;                /* Add space above actions */
+    .basket-item-content p {
+        font-size: 0.85em;         /* Adjust font size for text */
     }
 
-    .basket-item-actions input[type="number"] {
-        width: 50px;                    /* Compact width for input */
-    }
-
-    .basket-item-actions .btn-update,
+    .basket-item-actions .btn-update, 
     .basket-item-actions .btn-danger {
-        padding: 4px 6px;               /* Compact padding for buttons */
-        font-size: 0.75em;              /* Smaller font size for buttons */
-    }
-
-    .basket-item-content p:last-child {
-        margin-bottom: 0;               /* Remove extra margin below Quantity text */
+        padding: 8px;              /* Adjust padding for smaller buttons */
     }
 }
 
