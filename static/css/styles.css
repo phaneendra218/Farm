@@ -424,9 +424,6 @@ button:hover {
         width: 120px;
         height: 80px;
     }
-    .basket-item-card {
-        min-width: 200px;
-    }
 }
 
 @media (max-width: 480px) {
