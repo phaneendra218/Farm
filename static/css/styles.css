@@ -17,10 +17,14 @@ header {
     padding: 8px 30px;
     color: white;
     text-align: center;
-    position: relative;
+    position: fixed; /* Changed from relative to fixed */
+    top: 0; /* Ensures the header stays at the top of the page */
+    width: 100%; /* Ensures the header spans the full width of the page */
+    z-index: 1000; /* Keeps the header above other elements */
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Optional: adds a shadow for separation */
 }
 footer {
     background-color: #4CAF50;
@@ -46,6 +50,7 @@ nav a:hover {
 main {
     padding: 20px;
     flex-grow: 1;
+    margin-top: 56px; /* Adjust this value to match the header's height */
 }
 /* Flash Messages */
 .flash-messages {

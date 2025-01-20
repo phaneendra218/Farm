@@ -392,7 +392,6 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
         
         totalPriceDiv.innerHTML = `<p><strong>Total: ₹${totalPrice.toFixed(2)}</strong></p>`;
         document.getElementById('payable-amount-value').textContent = totalPrice.toFixed(2);
-
         // Unlock and expand Order Summary section
         document.getElementById('order-summary-section').classList.remove('blackout');
         document.getElementById('order-summary-details').classList.remove('hidden');
