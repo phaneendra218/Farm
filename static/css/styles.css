@@ -441,83 +441,109 @@ button:hover {
 /* Media Queries */
 /* For tablets and smaller screens */
 @media (max-width: 768px) {
-    .basket-container {
-        flex-direction: column;       /* Stack basket items vertically */
-        gap: 10px;                    /* Add spacing between items */
-        padding: 0 15px;              /* Add padding for smaller screens */
-    }
-
     .basket-item-card {
-        flex-direction: row;          /* Align image and details horizontally */
-        align-items: flex-start;      /* Align items to the top */
-        padding: 10px;                /* Adjust padding for compact view */
+        flex-direction: row;            /* Align image and details horizontally */
+        align-items: flex-start;        /* Align content at the top */
+        padding: 10px;                  /* Compact padding for smaller screens */
+        position: relative;             /* Enable absolute positioning for buttons */
     }
 
     .basket-item-card img {
-        width: 100px;                 /* Smaller image for mobile */
+        width: 100px;                   /* Smaller image for mobile */
         height: 80px;
-        margin-right: 15px;           /* Space between image and details */
+        margin-right: 15px;             /* Space between image and details */
     }
 
     .basket-item-content {
         display: flex;
-        flex-direction: column;       /* Stack name, price, and quantity vertically */
-        flex-grow: 1;                 /* Allow content to grow and fill space */
+        flex-direction: column;         /* Stack name, price, and quantity vertically */
+        flex-grow: 1;                   /* Allow content to grow and fill space */
+        margin-bottom: 10px;            /* Add space above buttons */
     }
 
     .basket-item-content h4 {
-        font-size: 1em;               /* Adjust heading size */
-        margin: 0 0 5px;              /* Add spacing below heading */
+        font-size: 1em;                 /* Adjust heading size */
+        margin: 0 0 5px;                /* Space below heading */
     }
 
     .basket-item-content p {
-        font-size: 0.85em;            /* Smaller font size for details */
-        margin: 0 0 5px;              /* Add spacing below each detail */
+        font-size: 0.85em;              /* Adjust font size for details */
+        margin: 0 0 5px;                /* Add space below details */
     }
 
     .basket-item-actions {
         display: flex;
-        flex-direction: row;          /* Align buttons horizontally */
-        justify-content: space-between; /* Space buttons evenly */
-        gap: 10px;                    /* Add spacing between buttons */
-        margin-top: 10px;             /* Space between details and buttons */
+        flex-direction: row;            /* Align quantity and buttons in a row */
+        gap: 5px;                       /* Reduce spacing between buttons */
+        align-items: center;            /* Vertically align items */
+        justify-content: flex-start;    /* Align items to the left */
+        position: absolute;             /* Position buttons */
+        bottom: 10px;                   /* Move to the bottom of the card */
+        left: 115px;                    /* Align to the bottom-left corner of the image */
+    }
+
+    .basket-item-actions input[type="number"] {
+        width: 60px;                    /* Adjust quantity input width */
+        padding: 5px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
     }
 
     .basket-item-actions .btn-update,
     .basket-item-actions .btn-danger {
-        flex: 1;                      /* Buttons take equal space */
-        padding: 8px;                 /* Adjust padding for touch devices */
-        text-align: center;           /* Center-align button text */
+        flex: none;                     /* Prevent buttons from stretching */
+        padding: 5px 8px;               /* Compact padding for buttons */
+        font-size: 0.85em;              /* Smaller text size for buttons */
+    }
+
+    .basket-item-actions .btn-update {
+        background-color: #e6b940;      /* Update button color */
+        color: white;
+        border: none;
+        border-radius: 5px;
+    }
+
+    .basket-item-actions .btn-update:hover {
+        background-color: #c28f04;      /* Hover color for Update button */
+    }
+
+    .basket-item-actions .btn-danger {
+        background-color: #c5998e;      /* Remove button color */
+        color: white;
+        border: none;
+        border-radius: 5px;
+    }
+
+    .basket-item-actions .btn-danger:hover {
+        background-color: #c26c3b;      /* Hover color for Remove button */
     }
 }
 
 /* For mobile phones */
 @media (max-width: 480px) {
-    .basket-container {
-        padding: 0 10px;              /* Reduce side padding for smaller screens */
-    }
-
     .basket-item-card {
-        padding: 8px;                 /* Compact padding inside the card */
+        padding: 8px;                   /* Compact padding for narrow screens */
     }
 
     .basket-item-card img {
-        width: 80px;                  /* Smaller image size for narrow screens */
+        width: 80px;                    /* Smaller image size */
         height: 60px;
     }
 
-    .basket-item-content h4 {
-        font-size: 0.9em;             /* Slightly smaller heading */
+    .basket-item-actions {
+        bottom: 8px;                    /* Adjust bottom spacing for buttons */
+        left: 100px;                    /* Adjust left alignment for smaller images */
     }
 
-    .basket-item-content p {
-        font-size: 0.8em;             /* Smaller text size */
+    .basket-item-actions input[type="number"] {
+        width: 50px;                    /* Compact width for quantity input */
     }
 
     .basket-item-actions .btn-update,
     .basket-item-actions .btn-danger {
-        padding: 6px;                 /* Smaller padding for buttons */
-        font-size: 0.8em;             /* Smaller text size for buttons */
+        padding: 4px 6px;               /* Compact button padding */
+        font-size: 0.75em;              /* Smaller font size for buttons */
     }
 }
 
