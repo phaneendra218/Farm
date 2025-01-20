@@ -298,13 +298,12 @@ button:hover {
 }
 /* Media Queries for Basket items*/
 .basket-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-    gap: 10px; 
-    justify-content: center;
+    display: flex;                /* Change from grid to flex */
+    flex-wrap: wrap;               /* Allows wrapping */
+    justify-content: space-between; /* Space items evenly */
+    gap: 15px;                      /* Gap between items */
     margin: 20px auto;
     max-width: 1200px;
-    grid-auto-rows: minmax(100px, auto); 
 }
 
 .basket-item-card {
@@ -313,7 +312,8 @@ button:hover {
     padding: 12px;
     text-align: center;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-    min-height: 250px; 
+    min-width: 250px; 
+    flex: 1 1 auto;                /* Allows item to expand and shrink */
 }
 
 .basket-item-card h4 {
@@ -423,6 +423,9 @@ button:hover {
     .basket-item-card img {
         width: 120px;
         height: 80px;
+    }
+    .basket-item-card {
+        min-width: 200px;
     }
 }
 
