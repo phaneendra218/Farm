@@ -125,6 +125,7 @@ main {
     position: relative;
     display: flex;
     align-items: center;
+    margin-left: 10px;
 }
 .basket-img {
     width: 36px;
