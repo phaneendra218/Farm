@@ -38,7 +38,7 @@
             <a href="/logout"><button>Logout</button></a>
             <!-- Basket icon with count -->
             <a href="/basket" id="basket-icon">
-               <img src="{{ url_for('static', filename='basket.png') }}" alt="Basket" style="width:36px; height:36px;">
+               <img src="{{ url_for('static', filename='basket.png') }}" alt="Basket" >
                <span id="basket-count">{{ session.get('basket_count', 0) }}</span>
             </a>                     
         </div>
