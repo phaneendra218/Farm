@@ -88,7 +88,9 @@ main {
 }
 /* User Info */
 .user-info {
-    text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adds space between buttons and basket icon */
 }
 .user-info p {
     display: inline-block;
@@ -121,6 +123,12 @@ main {
 /* Basket Icon Style */
 #basket-icon {
     position: relative;
+    display: flex;
+    align-items: center;
+}
+.basket-img {
+    width: 36px;
+    height: 36px;
 }
 #basket-count {
     position: absolute;
