@@ -395,13 +395,13 @@ button:hover {
     background-color: #c28f04; 
 }
 .basket-item-card .btn-danger {
-    background-color: #cc2d22;
+    background-color: #c5998e;
     color: white;
     border: none;
 }
 
 .basket-item-card .btn-danger:hover {
-    background-color: #920905; 
+    background-color: #c26c3b; 
 }
 
 /* Media Queries */
