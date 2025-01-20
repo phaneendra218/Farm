@@ -53,17 +53,7 @@
   <div id="order-summary-details" class="hidden">
     <div id="items-summary">
       {% for basket_item in basket_items %}
-        <div class="basket-item-card">
-          <div class="item-image">
-            <img src="{{ basket_item.item.image_url }}" alt="{{ basket_item.item.name }}" width="150" height="150" style="border-radius: 5px;">
-          </div>
-          <div class="item-details">
-            <h4>{{ basket_item.item.name }}</h4>
-            <p><strong>Price:</strong> ₹{{ basket_item.item.price|float }}</p>
-            <p><strong>Quantity:</strong> {{ basket_item.quantity }}</p>
-            <p><strong>Total:</strong> ₹{{ (basket_item.item.price|float * basket_item.quantity)|float }}</p>
-          </div>
-        </div>
+        <p>{{ basket_item.item.name }} x {{ basket_item.quantity }} - ₹{{ basket_item.item.price|float * basket_item.quantity|float }}</p>
       {% endfor %}
     </div>
     <div id="total-price">
@@ -226,42 +216,6 @@
 
 .address-box.locked #change-address-container {
   pointer-events: auto; /* Re-enables interactions specifically for the Change button */
-}
-.basket-item-card {
-  display: flex;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  align-items: center;
-  background-color: white;
-  margin-bottom: 15px;
-}
-
-.item-image img {
-  margin-right: 15px;
-  border-radius: 5px;
-  max-width: 150px;
-  max-height: 150px;
-}
-
-.item-details {
-  flex: 1;
-}
-
-.item-details h4 {
-  margin: 0 0 10px 0;
-}
-
-.item-details p {
-  margin: 5px 0;
-}
-
-#total-price {
-  margin-top: 20px;
-  font-size: 1.2em;
-  color: #333;
-  border-top: 1px solid #ccc;
-  padding-top: 10px;
 }
 
 </style>
