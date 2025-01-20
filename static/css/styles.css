@@ -17,14 +17,10 @@ header {
     padding: 8px 30px;
     color: white;
     text-align: center;
-    position: fixed; /* Changed from relative to fixed */
-    top: 0; /* Keeps the header at the top of the page */
-    width: 100%; /* Ensures the header spans the full width of the page */
-    z-index: 1000; /* Keeps the header above other elements */
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Optional: adds a shadow for better visibility */
 }
 footer {
     background-color: #4CAF50;
@@ -50,7 +46,6 @@ nav a:hover {
 main {
     padding: 20px;
     flex-grow: 1;
-    margin-top: 96px; /* Adjust this value to match the height of the header (80px logo height + padding) */
 }
 /* Flash Messages */
 .flash-messages {
@@ -112,10 +107,7 @@ main {
 }
 /* Basket Icon Style */
 #basket-icon {
-    position: fixed; /* Changed to fixed to make it always visible */
-    top: 15px; /* Adjust position to align with the header */
-    right: 15px; /* Move it away from the edge */
-    z-index: 1001; /* Ensure it is above other elements */
+    position: relative;
 }
 #basket-count {
     position: absolute;
@@ -200,8 +192,6 @@ button:hover {
 @media (max-width: 768px) {
     header {
         padding: 12px 20px;
-        flex-direction: column;
-        align-items: flex-start; /* Align items vertically */
     }
     .logo {
         height: 60px;
@@ -215,10 +205,6 @@ button:hover {
     }
     .delete-button, .user-info button {
         padding: 8px 12px;
-    }
-    #basket-icon {
-        top: 60px; /* Adjust position for smaller screens */
-        right: 10px; /* Adjust alignment */
     }
 }
 
@@ -246,10 +232,6 @@ button:hover {
     .delete-button, .user-info button {
         padding: 8px 12px;
     }
-    #basket-icon {
-        top: 70px; /* Adjust position to avoid overlap with the header */
-        right: 10px;
-    }
     #basket-count {
         font-size: 10px;
         padding: 2px 5px;
@@ -274,10 +256,6 @@ button:hover {
         font-size: 10px;
         padding: 10px 10px;
     }
-    #basket-icon {
-        top: 65px; /* Adjust position */
-        right: 8px;
-    }
 }
 
 /* For 375x667 screens */
@@ -294,10 +272,6 @@ button:hover {
     footer {
         font-size: 12px;
         padding: 10px 20px;
-    }
-    #basket-icon {
-        top: 70px; /* Adjust position */
-        right: 10px;
     }
 }
 /* Media Queries for Basket items*/
