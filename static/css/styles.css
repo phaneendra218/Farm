@@ -14,16 +14,14 @@ h2, h3 {
 }
 header {
     background-color: #4CAF50;
-    padding: 8px 30px;
-    color: white;
-    text-align: center;
     position: fixed;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    top: 0;
+    left: 0;
     width: 100%;
-    z-index: 1000;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Ensures the header is above other elements */
+    /* background-color: #fff; Match the header's background color */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Optional: adds a slight shadow for separation */
+    padding: 10px 0; /* Adjust padding as needed */
 }
 footer {
     background-color: #4CAF50;
