@@ -366,17 +366,15 @@ button:hover {
     color: #777;
     margin-top: 20px;
 }
-
 .empty-basket-message a {
     color: #008fee;
 }
-.basket-item-card .btn-update {
+.basket-item-card .basket-actions .btn-update {
     background-color: #e6b940;
     color: white;
     border: none;
 }
-
-.basket-item-card .btn-update:hover {
+.basket-item-card .basket-actions .btn-update:hover {
     background-color: #c28f04; 
 }
 .basket-item-card .btn-danger {
