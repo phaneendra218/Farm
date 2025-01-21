@@ -91,10 +91,16 @@
     .social-icon:hover {
         color: #2e7d32;
     }
+    /* Lottie animation container */
+    .lottie-facebook {
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+    }
 </style>
 
 <div class="contact-container">
-    <!-- <h2 class="contact-header">Contact Us</h2> -->
+    <!-- Existing content -->
     <img src="{{ url_for('static', filename='Contactus.png') }}" alt="Contact Us Image" class="contact-image">
     <div class="contact-info">
         <div class="contact-item">
@@ -112,8 +118,8 @@
     <div class="keep-in-touch">
         <p><strong>KEEP IN TOUCH</strong></p>
         <div class="social-icons">
-            <a href="https://facebook.com" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>
-            <a href="https://instagram.com/lifetimeclicks/" target="https://www.instagram.com/lifetimeclicks/" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <div class="lottie-facebook" id="facebook-lottie"></div>
+            <a href="https://instagram.com/lifetimeclicks/" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
             <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
         </div>
     </div>
@@ -121,4 +127,24 @@
 
 <!-- Include Font Awesome for Icons -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- Include Lottie JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.10.2/lottie.min.js"></script>
+
+<script>
+    // Load the Facebook Lottie animation
+    const facebookLottie = document.getElementById('facebook-lottie');
+    lottie.loadAnimation({
+        container: facebookLottie, // Specify the container
+        renderer: 'svg', // Use SVG rendering for scalability
+        loop: true, // Enable looping
+        autoplay: true, // Start automatically
+        path: '{{ url_for("static", filename="Facebook.json") }}' // Path to your Lottie JSON file
+    });
+
+    // Optional: Add a click event to redirect when the animation is clicked
+    facebookLottie.addEventListener('click', () => {
+        window.open('https://facebook.com', '_blank');
+    });
+</script>
 {% endblock %}
