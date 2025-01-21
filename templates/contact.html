@@ -136,38 +136,41 @@
 
 <script>
     // Load Facebook Lottie animation
+    const facebookLottie = document.getElementById('facebook-lottie');
     lottie.loadAnimation({
-        container: document.getElementById('facebook-lottie'),
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: '{{ url_for("static", filename="Facebook.json") }}'
+        container: facebookLottie, // Specify the container
+        renderer: 'svg', // Use SVG rendering for scalability
+        loop: true, // Enable looping
+        autoplay: true, // Start automatically
+        path: '{{ url_for("static", filename="Facebook.json") }}' // Path to your Lottie JSON file
     });
     facebookLottie.addEventListener('click', () => {
         window.open('https://facebook.com', '_blank');
     });
 
     // Load Instagram Lottie animation
+    const instagramLottie = document.getElementById('instagram-lottie');
     lottie.loadAnimation({
-        container: document.getElementById('instagram-lottie'),
+        container: instagramLottie,
         renderer: 'svg',
         loop: true,
         autoplay: true,
         path: '{{ url_for("static", filename="Insta.json") }}'
     });
-    facebookLottie.addEventListener('click', () => {
+    instagramLottie.addEventListener('click', () => {
         window.open('https://instagram.com/lifetimeclicks/', '_blank');
     });
 
     // Load Twitter Lottie animation
+    const twitterLottie = document.getElementById('twitter-lottie');
     lottie.loadAnimation({
-        container: document.getElementById('twitter-lottie'),
+        container: twitterLottie,
         renderer: 'svg',
         loop: true,
         autoplay: true,
         path: '{{ url_for("static", filename="Twitter.json") }}'
     });
-    facebookLottie.addEventListener('click', () => {
+    twitterLottie.addEventListener('click', () => {
         window.open('https://twitter.com', '_blank');
     });
 
