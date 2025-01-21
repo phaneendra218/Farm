@@ -142,7 +142,8 @@
         loop: true,
         autoplay: true,
         path: '{{ url_for("static", filename="Facebook.json") }}'
-    }).addEventListener('click', () => {
+    });
+    facebookLottie.addEventListener('click', () => {
         window.open('https://facebook.com', '_blank');
     });
 
@@ -153,7 +154,8 @@
         loop: true,
         autoplay: true,
         path: '{{ url_for("static", filename="Insta.json") }}'
-    }).addEventListener('click', () => {
+    });
+    facebookLottie.addEventListener('click', () => {
         window.open('https://instagram.com/lifetimeclicks/', '_blank');
     });
 
@@ -164,8 +166,10 @@
         loop: true,
         autoplay: true,
         path: '{{ url_for("static", filename="Twitter.json") }}'
-    }).addEventListener('click', () => {
+    });
+    facebookLottie.addEventListener('click', () => {
         window.open('https://twitter.com', '_blank');
     });
+
 </script>
 {% endblock %}
