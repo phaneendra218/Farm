@@ -69,7 +69,7 @@
 
     /* Keep in Touch */
     .keep-in-touch {
-        margin-top: 30px;
+        margin-top: 8px;
         font-size: 18px;
         color: #555;
     }
@@ -140,9 +140,13 @@
     lottie.loadAnimation({
         container: facebookLottie, // Specify the container
         renderer: 'svg', // Use SVG rendering for scalability
-        loop: true, // Enable looping
+        loop: false, //no looping true for loop
         autoplay: true, // Start automatically
         path: '{{ url_for("static", filename="Facebook.json") }}' // Path to your Lottie JSON file
+    });
+    // Add hover event to play animation once
+    facebookLottie.addEventListener('mouseenter', () => {
+        facebookAnimation.goToAndPlay(0, true); // Restart animation on hover
     });
     facebookLottie.addEventListener('click', () => {
         window.open('https://facebook.com', '_blank');
@@ -153,9 +157,13 @@
     lottie.loadAnimation({
         container: instagramLottie,
         renderer: 'svg',
-        loop: true,
+        loop: false,
         autoplay: true,
         path: '{{ url_for("static", filename="Insta.json") }}'
+    });
+    // Add hover event to play animation once
+    instagramLottie.addEventListener('mouseenter', () => {
+        instagramAnimation.goToAndPlay(0, true); // Restart animation on hover
     });
     instagramLottie.addEventListener('click', () => {
         window.open('https://instagram.com/lifetimeclicks/', '_blank');
@@ -166,9 +174,12 @@
     lottie.loadAnimation({
         container: twitterLottie,
         renderer: 'svg',
-        loop: true,
+        loop: false,
         autoplay: true,
         path: '{{ url_for("static", filename="Twitter.json") }}'
+    });
+    twitterLottie.addEventListener('mouseenter', () => {
+        twitterAnimation.goToAndPlay(0, true); // Restart animation on hover
     });
     twitterLottie.addEventListener('click', () => {
         window.open('https://twitter.com', '_blank');
