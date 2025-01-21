@@ -60,10 +60,17 @@
     .contact-footer a:hover {
         text-decoration: underline;
     }
+
+    /* Image styling */
+    .contact-image {
+        max-width: 100%; /* Ensures the image doesn't exceed its container */
+        margin-bottom: 20px; /* Adds some space below the image */
+    }
 </style>
 
 <div class="contact-container">
     <h2 class="contact-header">Contact Us</h2>
+    <img src="{{ url_for('static', filename='Contactus.png') }}" alt="Contact Us Image" class="contact-image">
     <div class="contact-info">
         <div class="contact-item">
             <i class="fas fa-envelope contact-icon"></i>
@@ -71,7 +78,7 @@
         </div>
         <div class="contact-item">
             <i class="fas fa-phone-alt contact-icon"></i>
-            <span>Phone: <a href="tel:+918142515278">+91 81425 15278</a></span>
+            <span>Phone: <a href="tel:+918142515278">+91-8142515278</a></span>
         </div>
     </div>
     <div class="contact-footer">
