@@ -118,9 +118,12 @@
     <div class="keep-in-touch">
         <p><strong>KEEP IN TOUCH</strong></p>
         <div class="social-icons">
-            <div class="lottie-facebook" id="facebook-lottie"></div>
-            <a href="https://instagram.com/lifetimeclicks/" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
-            <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <!-- Facebook Lottie -->
+            <div class="lottie-icon" id="facebook-lottie"></div>
+            <!-- Instagram Lottie -->
+            <div class="lottie-icon" id="instagram-lottie"></div>
+            <!-- Twitter Lottie -->
+            <div class="lottie-icon" id="twitter-lottie"></div>
         </div>
     </div>
 </div>
@@ -132,19 +135,37 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.10.2/lottie.min.js"></script>
 
 <script>
-    // Load the Facebook Lottie animation
-    const facebookLottie = document.getElementById('facebook-lottie');
+    // Load Facebook Lottie animation
     lottie.loadAnimation({
-        container: facebookLottie, // Specify the container
-        renderer: 'svg', // Use SVG rendering for scalability
-        loop: true, // Enable looping
-        autoplay: true, // Start automatically
-        path: '{{ url_for("static", filename="Facebook.json") }}' // Path to your Lottie JSON file
+        container: document.getElementById('facebook-lottie'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: '{{ url_for("static", filename="Facebook.json") }}'
+    }).addEventListener('click', () => {
+        window.open('https://facebook.com', '_blank');
     });
 
-    // Optional: Add a click event to redirect when the animation is clicked
-    facebookLottie.addEventListener('click', () => {
-        window.open('https://facebook.com', '_blank');
+    // Load Instagram Lottie animation
+    lottie.loadAnimation({
+        container: document.getElementById('instagram-lottie'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: '{{ url_for("static", filename="Insta.json") }}'
+    }).addEventListener('click', () => {
+        window.open('https://instagram.com/lifetimeclicks/', '_blank');
+    });
+
+    // Load Twitter Lottie animation
+    lottie.loadAnimation({
+        container: document.getElementById('twitter-lottie'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: '{{ url_for("static", filename="Twitter.json") }}'
+    }).addEventListener('click', () => {
+        window.open('https://twitter.com', '_blank');
     });
 </script>
 {% endblock %}
