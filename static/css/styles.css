@@ -527,12 +527,12 @@ button:hover {
 /* Responsive Design */
 @media (max-width: 768px) {
     .card-body {
-        padding: 15px;
+        padding: 8px;
     }
 }
 
 @media (max-width: 480px) {
     .card-body {
-        padding: 12px;
+        padding: 8px;
     }
 }
