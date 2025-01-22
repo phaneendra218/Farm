@@ -69,22 +69,22 @@
   <div id="payment-details" class="hidden">
     <div id="payment-methods">
       <div class="payment-method-card">
-        <label>
+        <label class="payment-label">
+          <input type="radio" name="payment_method" value="cash_on_delivery" class="payment-radio">
           <div class="payment-content">
             <img src="{{ url_for('static', filename='cod.png') }}" alt="cod" class="payment-icon">
             <span>Cash on Delivery (Cash/UPI)</span>
           </div>
-          <input type="radio" name="payment_method" value="cash_on_delivery">
         </label>
       </div>
     
       <div class="payment-method-card">
-        <label>
+        <label class="payment-label">
+          <input type="radio" name="payment_method" value="upi" class="payment-radio" disabled>
           <div class="payment-content">
             <img src="{{ url_for('static', filename='upi.png') }}" alt="upi" class="payment-icon">
             <span>UPI (Coming Soon)</span>
           </div>
-          <input type="radio" name="payment_method" value="upi" disabled>
         </label>
       </div>
     </div>
@@ -237,13 +237,21 @@
     border-radius: 8px;
     display: flex;
     align-items: center;
-    transition: 0.3s;
     cursor: pointer;
     background-color: white;
+    transition: background-color 0.3s;
   }
 
   .payment-method-card:hover {
     background-color: #f9f9f9;
+  }
+
+  .payment-label {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between elements */
+    width: 100%;
+    cursor: pointer;
   }
 
   .payment-content {
@@ -257,13 +265,17 @@
     height: 20px;
   }
 
-  .payment-method-card input[type="radio"] {
-    margin-left: auto; /* Aligns the radio button to the right */
+  .payment-radio {
+    margin-right: 10px;
+    cursor: pointer;
   }
 
-  .payment-method-card:disabled {
+  .payment-method-card input[type="radio"]:disabled + .payment-content {
     opacity: 0.6;
-    pointer-events: none; /* Prevent interaction with disabled options */
+  }
+
+  .payment-method-card.disabled {
+    pointer-events: none;
   }
 </style>
 
@@ -469,7 +481,35 @@ document.querySelectorAll('input[name="payment_method"]').forEach(input => {
 
   // Initialize the page on load
   document.addEventListener('DOMContentLoaded', initializeCheckoutPage);
+// Highlight the selected payment method card
+const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
 
+paymentRadios.forEach(radio => {
+  radio.addEventListener('change', (event) => {
+    // Remove the selected class from all cards
+    document.querySelectorAll('.payment-method-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+
+    // Add the selected class to the parent card of the selected radio
+    const selectedCard = event.target.closest('.payment-method-card');
+    selectedCard.classList.add('selected');
+
+    // Show a message for UPI (disabled)
+    if (event.target.value === 'upi') {
+      alert('UPI payment is coming soon!');
+    }
+  });
+});
+
+// Initialize the selected card on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const checkedRadio = document.querySelector('input[name="payment_method"]:checked');
+  if (checkedRadio) {
+    const selectedCard = checkedRadio.closest('.payment-method-card');
+    selectedCard.classList.add('selected');
+  }
+});
 </script>
 
 {% endblock %}
