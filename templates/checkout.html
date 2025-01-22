@@ -68,14 +68,25 @@
   <h2>Payment</h2>
   <div id="payment-details" class="hidden">
     <div id="payment-methods">
-      <label>
-        <img src="{{ url_for('static', filename='cod.png') }}" alt="cod" style="width: 30px; height: 20px; margin-right: 5px;">
-        <input type="radio" name="payment_method" value="cash_on_delivery"> Cash on Delivery (Cash/UPI)
-      </label><br>
-      <label>
-        <img src="{{ url_for('static', filename='upi.png') }}" alt="cod" style="width: 30px; height: 20px; margin-right: 5px;">
-        <input type="radio" name="payment_method" value="upi" disabled> UPI (Coming Soon)
-      </label>
+      <div class="payment-method-card">
+        <label>
+          <div class="payment-content">
+            <img src="{{ url_for('static', filename='cod.png') }}" alt="cod" class="payment-icon">
+            <span>Cash on Delivery (Cash/UPI)</span>
+          </div>
+          <input type="radio" name="payment_method" value="cash_on_delivery">
+        </label>
+      </div>
+    
+      <div class="payment-method-card">
+        <label>
+          <div class="payment-content">
+            <img src="{{ url_for('static', filename='upi.png') }}" alt="upi" class="payment-icon">
+            <span>UPI (Coming Soon)</span>
+          </div>
+          <input type="radio" name="payment_method" value="upi" disabled>
+        </label>
+      </div>
     </div>
     <div id="payable-amount">
       <p><strong>Payable Amount: ₹<span id="payable-amount-value"></span></strong></p>
@@ -219,7 +230,41 @@
 .address-box.locked #change-address-container {
   pointer-events: auto; /* Re-enables interactions specifically for the Change button */
 }
+.payment-method-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    transition: 0.3s;
+    cursor: pointer;
+    background-color: white;
+  }
 
+  .payment-method-card:hover {
+    background-color: #f9f9f9;
+  }
+
+  .payment-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .payment-icon {
+    width: 30px;
+    height: 20px;
+  }
+
+  .payment-method-card input[type="radio"] {
+    margin-left: auto; /* Aligns the radio button to the right */
+  }
+
+  .payment-method-card:disabled {
+    opacity: 0.6;
+    pointer-events: none; /* Prevent interaction with disabled options */
+  }
 </style>
 
 <script>
