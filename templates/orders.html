@@ -27,7 +27,7 @@
                                     <p><strong>Quantity:</strong> {{ order.quantity | int }}</p>
                                     <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
                                     <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
-                                    <p><strong>Payment Method:</strong> {{ order.payment_method | capitalize }}</p>
+                                    <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
                                 </div>
                             </div>
                         </div>
