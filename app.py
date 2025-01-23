@@ -6,11 +6,11 @@ from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import sessionmaker, Session, joinedload
 from sqlalchemy.types import Numeric
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 import string
 
-# old
+#old
 
 def generate_basket_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
@@ -25,6 +25,11 @@ def get_or_create_basket_id(user_id):
     # Generate a new basket_id if none exists
     new_basket_id = generate_basket_id()
     return new_basket_id
+
+def utc_to_ist(utc_dt):
+    # IST is UTC + 5:30
+    ist_offset = timedelta(hours=5, minutes=30)
+    return utc_dt + ist_offset
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -77,7 +82,7 @@ class Order(db.Model):
     quantity = db.Column(Numeric(10, 2), nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=True)
     total_price = db.Column(db.Numeric(10, 2), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: utc_to_ist(datetime.utcnow()))
     delivery_address = db.Column(db.String(255), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
     
