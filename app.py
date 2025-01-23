@@ -657,7 +657,7 @@ def orders():
     # Group orders by order_id
     grouped_orders = {}
     for order in user_orders:
-        if order.order_id not in grouped_orders:
+        if order.b_order_id not in grouped_orders:
             grouped_orders[order.b_order_id] = {
                 "order_id": order.b_order_id,
                 "created_at": order.created_at,
@@ -665,7 +665,7 @@ def orders():
                 "payment_method": order.payment_method,
                 "items": []
             }
-        grouped_orders[order.order_id]["items"].append({
+        grouped_orders[order.b_order_id]["items"].append({
             "item_name": order.item.name,
             "image_url": order.item.image_path,
             "quantity": order.quantity,
