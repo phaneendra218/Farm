@@ -17,7 +17,7 @@
                             <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
                             <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
                             <div class="order-items">
-                                {% for item in order.items %}
+                                {% for item in order["items"] %}
                                     <div class="order-item mb-3">
                                         <h5 class="text-dark mb-2">{{ item.item_name }}</h5>
                                         <p class="text-muted"><strong>Price:</strong> ₹{{ item.item_price | round(2) }}</p>
