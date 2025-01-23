@@ -654,23 +654,26 @@ def orders():
             .filter_by(user_id=user.id)\
             .order_by(Order.created_at.desc())  # Orders by newest first
     
-    # Process orders for the response
-    orders_list = [
-        {
-            "order_id": order.b_order_id,
-            "item_name": order.item.name,  # Access item relationship
+    # Group orders by order_id
+    grouped_orders = {}
+    for order in user_orders:
+        if order.order_id not in grouped_orders:
+            grouped_orders[order.order_id] = {
+                "order_id": order.order_id,
+                "created_at": order.created_at,
+                "delivery_address": order.delivery_address,
+                "payment_method": order.payment_method,
+                "items": []
+            }
+        grouped_orders[order.order_id]["items"].append({
+            "item_name": order.item.name,
             "image_url": order.item.image_path,
             "quantity": order.quantity,
             "item_price": float(order.item_price),
-            "total_price": round(float(order.item_price) * float(order.quantity), 2),
-            "delivery_address": order.delivery_address,
-            "payment_method": order.payment_method,
-            "created_at": order.created_at
-        }
-        for order in user_orders
-    ]
+            "total_price": round(float(order.item_price) * float(order.quantity), 2)
+        })
 
-    return render_template('orders.html', orders=orders_list)
+    return render_template('orders.html', orders=grouped_orders.values())
 
 @app.route('/hide_item/<int:item_id>', methods=['POST'])
 def hide_item(item_id):
