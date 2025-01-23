@@ -77,6 +77,7 @@ class Item(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    b_order_id = db.Column(db.String(12), nullable=False, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
@@ -607,8 +608,12 @@ def complete_order():
         item_total = Decimal(item.price) * Decimal(basket_item.quantity)
         total_price += item_total
 
+        # Generate order_id
+        # order_id = f"{basket_item.basket_id}-{basket_item.id}"
+
         # Create and add an Order
         order = Order(
+            b_order_id=basket_item.basket_id,
             user_id=user.id,
             item_id=basket_item.item_id,
             quantity=basket_item.quantity,
