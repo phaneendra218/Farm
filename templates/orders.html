@@ -1,6 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .order-item {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
+    }
+
+    .order-item img {
+        display: block;
+        margin: 0 auto 10px;
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .order-item h5 {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .order-item p {
+        margin: 5px 0;
+    }
+
+    .card-header {
+        background: linear-gradient(45deg, #007bff, #00c6ff);
+        color: white;
+    }
+
+    .card-body {
+        background-color: #ffffff;
+    }
+
+    .container {
+        max-width: 1200px;
+    }
+</style>
+
 <div class="container my-5">
     <h1 class="mb-4 text-center text-primary font-weight-bold">My Orders</h1>
 
@@ -13,14 +53,14 @@
                             <strong>Order ID: {{ order.order_id }}</strong>
                         </div>
                         <div class="card-body">
-                            <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</p>
+                            <p><strong>Order Date:</strong> {{ order.created_at.strftime('%d-%m-%Y %H:%M') }}</p>
                             <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
                             <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
                             <div class="order-items">
                                 {% for item in order["items"] %}
                                     <div class="order-item mb-3 p-3 border rounded">
                                         <h5 class="text-dark mb-2">{{ item.item_name }}</h5>
-                                        <img src="{{ item.image_url }}" alt="{{ item.item_name }}" class="img-fluid mb-2" style="width:150px; height:100px;">
+                                        <img src="{{ item.image_url }}" alt="{{ item.item_name }}" style="width:150px; height:100px;">
                                         <p class="text-muted"><strong>Price:</strong> ₹{{ item.item_price | round(2) }}</p>
                                         <p class="text-muted"><strong>Quantity:</strong> {{ item.quantity | int }}</p>
                                         <p class="text-muted"><strong>Total Price:</strong> ₹{{ item.total_price | round(2) }}</p>
