@@ -13,10 +13,16 @@
     }
 
     .order-item img {
+        flex-shrink: 0;
+        width: 150px; /* Set a fixed width */
+        height: 120px; /* Set a fixed height */
+        object-fit: cover; /* Ensures the image doesn't stretch */
         margin-right: 15px;
-        width: 150px;
-        height: 100px;
         border-radius: 8px;
+    }
+
+    .order-item div {
+        flex: 1;
     }
 
     .order-item h5 {
