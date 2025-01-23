@@ -77,7 +77,7 @@ class Item(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    b_order_id = db.Column(db.String(12), nullable=False, unique=True)
+    b_order_id = db.Column(db.String(12), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(Numeric(10, 2), nullable=False)
@@ -609,7 +609,7 @@ def complete_order():
         total_price += item_total
 
         # Generate order_id
-        # order_id = f"{basket_item.basket_id}-{basket_item.id}"
+        # b_order_id = f"{basket_item.basket_id}-{basket_item.id}"
 
         # Create and add an Order
         order = Order(
@@ -657,7 +657,7 @@ def orders():
     # Process orders for the response
     orders_list = [
         {
-            "order_id": order.id,
+            "order_id": order.b_order_id,
             "item_name": order.item.name,  # Access item relationship
             "quantity": order.quantity,
             "item_price": float(order.item_price),
