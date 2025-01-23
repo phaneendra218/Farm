@@ -20,7 +20,7 @@
                                 {% for item in order["items"] %}
                                     <div class="order-item mb-3 p-3 border rounded">
                                         <h5 class="text-dark mb-2">{{ item.item_name }}</h5>
-                                        <img src="{{ item.image_url }}" alt="{{ item.item_name }}" class="img-fluid mb-2">
+                                        <img src="{{ item.image_url }}" alt="{{ item.item_name }}" class="img-fluid mb-2" style="width:150px; height:100px;">
                                         <p class="text-muted"><strong>Price:</strong> ₹{{ item.item_price | round(2) }}</p>
                                         <p class="text-muted"><strong>Quantity:</strong> {{ item.quantity | int }}</p>
                                         <p class="text-muted"><strong>Total Price:</strong> ₹{{ item.total_price | round(2) }}</p>
