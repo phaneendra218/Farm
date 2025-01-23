@@ -82,6 +82,7 @@ class Order(db.Model):
     quantity = db.Column(Numeric(10, 2), nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=True)
     total_price = db.Column(db.Numeric(10, 2), nullable=False)
+    item_price = db.Column(db.Numeric(10, 2), nullable=False) 
     created_at = db.Column(db.DateTime, default=lambda: utc_to_ist(datetime.utcnow()))
     delivery_address = db.Column(db.String(255), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
@@ -614,6 +615,7 @@ def complete_order():
             address_id=address.id,
             delivery_address=delivery_address.address,
             total_price=item_total,
+            item_price=Decimal(item.price),
             payment_method=payment_method
         )
         db.session.add(order)
