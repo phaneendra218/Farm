@@ -655,8 +655,8 @@ def orders():
             "order_id": order.id,
             "item_name": order.item.name,  # Access item relationship
             "quantity": order.quantity,
-            "item_price": float(order.item.price),
-            "total_price": round(float(order.item.price) * float(order.quantity), 2),
+            "item_price": float(order.item_price),
+            "total_price": round(float(order.item_price) * float(order.quantity), 2),
             "delivery_address": order.delivery_address,
             "payment_method": order.payment_method,
             "created_at": order.created_at
