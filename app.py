@@ -658,8 +658,8 @@ def orders():
     grouped_orders = {}
     for order in user_orders:
         if order.order_id not in grouped_orders:
-            grouped_orders[order.order_id] = {
-                "order_id": order.order_id,
+            grouped_orders[order.b_order_id] = {
+                "order_id": order.b_order_id,
                 "created_at": order.created_at,
                 "delivery_address": order.delivery_address,
                 "payment_method": order.payment_method,
