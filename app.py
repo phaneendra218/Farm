@@ -659,6 +659,7 @@ def orders():
         {
             "order_id": order.b_order_id,
             "item_name": order.item.name,  # Access item relationship
+            "image_url": order.item.image_path,
             "quantity": order.quantity,
             "item_price": float(order.item_price),
             "total_price": round(float(order.item_price) * float(order.quantity), 2),
